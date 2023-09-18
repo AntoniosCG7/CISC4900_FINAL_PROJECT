@@ -1,0 +1,227 @@
+<mxfile host="Electron" modified="2023-09-10T01:30:33.912Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="LF_IK0EFyu2luw-Zf_Ha" version="21.6.8" type="device">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="2440" dy="1416" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-0" target="cYiu2tUt7WA_hPtLnq-O-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-0" value="&lt;b&gt;User clicks &quot;view map&quot; from the nav bar&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="190" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-87" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-1" target="cYiu2tUt7WA_hPtLnq-O-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="696" y="370" />
+              <mxPoint x="305" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-88" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-1" target="cYiu2tUt7WA_hPtLnq-O-43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-114" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-1" target="cYiu2tUt7WA_hPtLnq-O-50">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="696" y="370" />
+              <mxPoint x="1075" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-115" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-1" target="cYiu2tUt7WA_hPtLnq-O-42">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="696" y="370" />
+              <mxPoint x="1258" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-116" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-1" target="cYiu2tUt7WA_hPtLnq-O-89">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="696" y="370" />
+              <mxPoint x="1445" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-1" value="&lt;b&gt;Display interactive map on the right and &quot;My events&quot; list on the left&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-3" target="cYiu2tUt7WA_hPtLnq-O-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-3" value="&lt;b&gt;The user clicks on a marker (representing another user)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="245" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-5" value="&lt;h1&gt;MAP INTERACTION&lt;/h1&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=4;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1051" y="20" width="236" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-7" target="cYiu2tUt7WA_hPtLnq-O-0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-7" value="&lt;b&gt;START&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="90" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-21" value="&lt;b&gt;Display popup with the options: visit profile, initiate chat, close&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="245" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-40" value="&lt;b&gt;User returns to the map interaction&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="792" y="740" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-83" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-42" target="cYiu2tUt7WA_hPtLnq-O-82">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-42" value="&lt;b&gt;The user clicks on an event from the &quot;My Events&quot; list&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1198" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-49" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-43" target="cYiu2tUt7WA_hPtLnq-O-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-43" value="&lt;b&gt;The user clicks on a marker (representing an event)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-54" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-48" target="cYiu2tUt7WA_hPtLnq-O-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-57" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-48" target="cYiu2tUt7WA_hPtLnq-O-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-48" target="cYiu2tUt7WA_hPtLnq-O-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-48" value="&lt;b&gt;Display popup with event details and options: Going, Interested, close&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-65" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-50" target="cYiu2tUt7WA_hPtLnq-O-64">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-50" value="&lt;b&gt;The user clicks on the map&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1015" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-53" value="&lt;b&gt;Add event to &quot;My Events&quot; list. Display in the &quot;going&quot; category&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="636" y="630" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-55" value="&lt;b&gt;Going&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="696" y="590" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-56" value="&lt;b&gt;Add event to &quot;My Events&quot; list. Display in the &quot;interested&quot; category&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="792" y="630" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-58" value="&lt;b&gt;Interested&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="786" y="590" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-63" value="&lt;b&gt;Close&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="866" y="520" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-67" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-64" target="cYiu2tUt7WA_hPtLnq-O-66">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-64" value="&lt;b&gt;Render event form on the &quot;My events&quot; list&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1015" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-85" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-66" target="cYiu2tUt7WA_hPtLnq-O-84">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-66" value="&lt;b&gt;User submits new event&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1015" y="630" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-70" value="&lt;b&gt;Users exchange real-time chat messages&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="245" y="740" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-71" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;fillColor=#008a00;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" target="cYiu2tUt7WA_hPtLnq-O-75">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="305" y="580.0000000000002" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-72" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;fillColor=#008a00;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="425" y="550" as="targetPoint" />
+            <mxPoint x="365" y="549.9565217391305" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-74" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;fillColor=#008a00;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-75" target="cYiu2tUt7WA_hPtLnq-O-81">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-75" value="&lt;b&gt;User is redirected to the other user&#39;s profile&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="245" y="620" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-76" value="&lt;b&gt;Visit Profile&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="305" y="590" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-77" value="&lt;b&gt;Initiate Chat&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="365" y="520" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=default;fillColor=#008a00;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-79" target="cYiu2tUt7WA_hPtLnq-O-70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-79" value="&lt;b&gt;The chat with the selected user is initiated&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="425" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-80" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;fillColor=#008a00;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-81" target="cYiu2tUt7WA_hPtLnq-O-79">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-81" value="&lt;b&gt;User Clicks on the Initiate Chat Icon&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=default;fillColor=#008a00;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="425" y="620" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-82" value="&lt;b&gt;Move map to the event location&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1198" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-84" value="&lt;b&gt;Add event to the &quot;My Events&quot; list under the &quot;created by me&quot; category&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1015" y="740" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-96" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-89" target="cYiu2tUt7WA_hPtLnq-O-95">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-89" value="&lt;b&gt;The user clicks on the three dot symbol next to an event on the &quot;My Events&quot; list&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1385" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-98" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-95" target="cYiu2tUt7WA_hPtLnq-O-97">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-109" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-95" target="cYiu2tUt7WA_hPtLnq-O-108">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-95" value="&lt;b&gt;Is &quot;created by&quot; the user?&lt;/b&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1375" y="510" width="140" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-103" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-97" target="cYiu2tUt7WA_hPtLnq-O-102">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-97" value="&lt;b&gt;Display option: Delete Event&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1575" y="522.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-101" value="&lt;b&gt;YES&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1505" y="522.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-105" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-102" target="cYiu2tUt7WA_hPtLnq-O-104">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-102" value="&lt;b&gt;User clicks on &quot;Delete Event&quot;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1775" y="522.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-104" value="&lt;b&gt;Event is removed from the list as well as the event marker on the map&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1975" y="522.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-107" value="&lt;b&gt;NO&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1435" y="590" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-111" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-108" target="cYiu2tUt7WA_hPtLnq-O-110">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-108" value="&lt;b&gt;Display option: &quot;Remove from my list&quot;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1385" y="630" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-118" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="cYiu2tUt7WA_hPtLnq-O-110" target="cYiu2tUt7WA_hPtLnq-O-117">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-110" value="&lt;b&gt;Display option: &quot;Remove from my list&quot;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1385" y="740" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cYiu2tUt7WA_hPtLnq-O-117" value="&lt;b&gt;Event is removed from the &quot;My Events&quot; list&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;strokeColor=#FFFFFF;fontColor=#ffffff;strokeWidth=2;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1585" y="740" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
