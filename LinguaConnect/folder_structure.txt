@@ -1,0 +1,54 @@
+FOLDER STRUCTURE
+
+Structuring my MERN (MongoDB, Express.js, React, Node.js) project folders is essential for maintaining a clean and organized codebase.
+
+Folder structure for my MERN app:
+
+LinguaConnect/
+  ├── client/              # React Frontend
+  │   ├── src/             # React App Source Code
+  │   │   ├── components/  # Reusable React components
+  │   │   ├── pages/       # Top-level route components
+  │   │   |  ├── About
+  |   |   |  |  ├── About.jsx, About.css                    
+  │   │   |  ├── Chat
+  |   |   |  |  ├── Chat.jsx, Chat.css
+  │   │   |  ├── Contact 
+  |   |   |  |  ├── Contact.jsx, Contact.css
+  │   │   |  ├── Discover 
+  |   |   |  |  ├── Discover.jsx, Discover.css
+  │   │   |  ├── Home
+  |   |   |  |  ├── Home.jsx, Home.css
+  │   │   |  ├── Login
+  |   |   |  |  ├── Login.jsx, Login.css
+  │   │   |  ├── Map
+  |   |   |  |  ├── Map.jsx, Map.css
+  │   │   |  ├── Profile
+  |   |   |  |  ├── Profile.jsx, Profile.css
+  │   │   |  ├── Register
+  |   |   |  |  ├── Register.jsx, Register.css
+  │   │   |  ├── User
+  |   |   |  |  ├── User.jsx, User.css
+  |   |   ├── styles/       # Application-wide styles (generally settings)
+  │   │   |  ├── index.js   # exports all pages for easy importing
+  │   │   ├── App.jsx       # Main React application component
+  │   │   ├── main.jsx      # React app entry point
+  │   │   ├── ...
+  │   ├── public/         # Public assets (HTML, images, etc.)
+  │   ├── package.json    # Frontend dependencies and scripts
+  │   ├── ...
+  ├── server/             # Express.js Backend
+  |   ├── node_modules/   # Node.js modules (generated)
+  │   ├── package.json    # Backend dependencies and scripts 
+  │   ├── api/            # API routes and controllers
+  │   ├── config/         # Configuration files (database, .env file, etc)
+  │   ├── models/         # Mongoose models
+  │   ├── routes/         # Express route handlers
+  │   ├── app.js          # Express application setup
+  │   ├── server.js       # Backend entry point
+  │   ├── ...
+  ├── node_modules/       # Node.js modules (generated)
+  ├── package.json        # Backend + Frontend dependencies and scripts
+  ├── package-lock.json   # Lock file for package versions
+  ├── .gitignore          # List of files and folders to ignore in version control
+  ├── README.md           # Project documentation

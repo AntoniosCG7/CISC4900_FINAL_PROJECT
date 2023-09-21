@@ -1,0 +1,117 @@
+.body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.register-form {
+  width: 800px;
+  height: 600px;
+  background: var(--primary-color);
+}
+
+.register-form-container {
+  width: 100%;
+  height: 85%;
+  padding: 0 40px;
+}
+
+.register-form-title {
+  text-align: center;
+}
+
+.register-form-group {
+  position: relative;
+  width: 100%;
+  height: 25%;
+  margin: 40px 0;
+}
+
+.register-form-group input {
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid var(--secondary-color);
+  padding-right: 30px;
+}
+
+.register-form-group input:focus,
+.register-form-group input:valid {
+  border-bottom-color: var(--tertiary-color);
+}
+
+.register-form-group label {
+  font-size: 24px;
+  color: var(--secondary-color);
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  transition: 0.5s;
+}
+
+.register-form-group input:focus ~ label,
+.register-form-group input:valid ~ label {
+  top: -15px;
+  color: var(--tertiary-color);
+}
+
+.register-form-group i {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  color: var(--secondary-color);
+  transition: 0.5s;
+}
+
+.register-form-group input:focus ~ i,
+.register-form-group input:valid ~ i {
+  color: var(--tertiary-color);
+}
+
+.register-form-group input[type="text"],
+.register-form-group input[type="email"],
+.register-form-group input[type="password"] {
+  font-family: "Times New Roman", Times, serif;
+  font-weight: 600;
+}
+
+.register-btn {
+  font-weight: 600;
+  width: 100%;
+  height: 50px;
+  font-family: var(--font-family);
+  color: var(--secondary-color);
+  border: 2px solid var(--secondary-color);
+  border-radius: 5px;
+  font-size: 24px;
+  background: transparent;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.register-btn:hover {
+  background: var(--secondary-color);
+  color: var(--tertiary-color);
+}
+
+.login {
+  margin: 25px 0 -10px 0;
+}
+
+.login p,
+.login-link {
+  font-size: 20px;
+  text-align: center;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}

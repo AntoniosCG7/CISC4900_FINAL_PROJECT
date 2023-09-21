@@ -1,0 +1,19 @@
+{
+  "name": "linguaconnect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd client && npm run dev",
+    "server": "cd server && nodemon src/server.js",
+    "dev": "concurrently \"npm run client\" \"npm run server\""
+  },
+  "author": "Antonios Chatzinikolas Georgas",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.1"
+  }
+}

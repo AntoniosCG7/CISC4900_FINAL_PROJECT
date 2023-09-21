@@ -1,0 +1,101 @@
+#welcome-message {
+  margin-top: 2rem;
+  text-align: center;
+  text-shadow: #000000 1px 1px 0;
+}
+
+#page-title {
+  font-size: large;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.profile-creation-container {
+  max-width: 1000px;
+  max-height: 2000px;
+  margin: 0 auto;
+  margin-bottom: 4rem;
+  padding: 40px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.profile-creation-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-creation-form legend {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 20px;
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  padding: 10px 18px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.profile-creation-form .name-section input,
+.profile-creation-form .about-section input,
+.profile-creation-form .profile-picture-section input,
+.profile-creation-form .photos-section input,
+.profile-creation-form textarea,
+.profile-creation-form select {
+  font-family: "Times New Roman", Times, serif;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 3px solid var(--primary-color);
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  transition: all 0.3s ease-in-out;
+}
+
+.profile-creation-form .name-section input:focus,
+.profile-creation-form .about-section input:focus,
+.profile-creation-form .profile-picture-section input:focus,
+.profile-creation-form .photos-section input:focus,
+.profile-creation-form textarea:focus,
+.profile-creation-form select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.about-section {
+  margin-top: 40px;
+}
+
+.profile-creation-form textarea {
+  min-height: 100px;
+}
+
+.profile-creation-button {
+  font-family: var(--font-family);
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--tertiary-color);
+  background-color: var(--secondary-color);
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.profile-creation-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  box-shadow: 0 0 30px var(--primary-color);
+}
