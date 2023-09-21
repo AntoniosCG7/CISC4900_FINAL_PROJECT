@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Navbar.css";
-import logo from "/../public/assets/logo-white.png";
+import logo from "/assets/images/logo-white.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,29 +11,29 @@ const Navbar = () => {
   return (
     <>
       <header className="header">
-        <a href="Home" className="logo">
+        <a href="home" className="logo">
           <img src={logo} alt="logo" className="rotate-vert-center" />
         </a>
 
         <ul className={`navbar ${isMenuOpen ? "open" : ""}`}>
           <li>
-            <a href="Home" className="active">
+            <a href="home" className="active">
               Home
             </a>
           </li>
           <li>
-            <a href="About">About Us</a>
+            <a href="about">About Us</a>
           </li>
           <li>
-            <a href="Contact">Contact</a>
+            <a href="contact">Contact</a>
           </li>
         </ul>
 
         <div className="navbar_buttons">
-          <a href="Login">
+          <a href="login">
             <button id="login-btn">LOG IN</button>
           </a>
-          <a href="Register">
+          <a href="register">
             <button id="register-btn">SIGN UP</button>
           </a>
           <div

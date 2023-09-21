@@ -43,7 +43,7 @@ const RegistrationForm = () => {
               </div>
               <div className="register-form-group">
                 <input type="password" required />
-                <label for="confirmPassword">Confirm Password</label>
+                <label htmlFor="confirmPassword">Confirm Password</label>
                 <i className="bx bxs-lock-alt"></i>
               </div>
               <button type="submit" className="register-btn">
@@ -52,7 +52,7 @@ const RegistrationForm = () => {
               <div className="login">
                 <p>
                   Already have an account?{" "}
-                  <a href="Login" className="login-link">
+                  <a href="login" className="login-link">
                     Log In
                   </a>
                 </p>

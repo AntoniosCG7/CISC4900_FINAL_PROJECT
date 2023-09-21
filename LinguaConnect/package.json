@@ -6,6 +6,7 @@
   "scripts": {
     "client": "cd client && npm run dev",
     "server": "cd server && nodemon src/server.js",
+    "debug": "cd server && ndb server.js",
     "dev": "concurrently \"npm run client\" \"npm run server\""
   },
   "author": "Antonios Chatzinikolas Georgas",
