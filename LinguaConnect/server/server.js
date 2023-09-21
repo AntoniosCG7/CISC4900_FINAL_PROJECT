@@ -4,6 +4,16 @@ const mongoose = require("mongoose");
 // Import the dotenv library for loading environment variables
 const dotenv = require("dotenv");
 
+// Listen for uncaught exception events
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+
+  server.close(() => {
+    process.exit(1); // exit with a non-zero status code to indicate an error
+  });
+});
+
 // Load environment variables from the .env file
 dotenv.config({ path: "./config/.env" });
 
@@ -24,6 +34,10 @@ const connectDB = async () => {
     console.log("DB connection successful!");
   } catch (error) {
     console.error("DB connection failed:", error);
+    // Close the server and exit the process if the database connection fails
+    server.close(() => {
+      process.exit(1);
+    });
   }
 };
 
@@ -37,8 +51,16 @@ const port = process.env.PORT || 3000;
 const app = require("./app");
 
 // Start the server and listen for incoming requests
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
+});
+
+// Listen for unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  server.close(() => {
+    process.exit(1); // exit with a non-zero status code to indicate an error
+  });
 });
 
 // Handle the SIGINT signal (Ctrl+C) by closing the MongoDB connection and exiting the process
