@@ -100,15 +100,44 @@ const userSchema = new mongoose.Schema(
     // Additional Photos
     photos: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Photo",
+        type: String,
+        validate: [arrayLimit, "You can only upload up to 10 photos"],
       },
     ],
 
     // User's Location
     location: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Location",
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        index: "2dsphere", // to support geospatial queries
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
+    },
+
+    events: [
+      {
+        event: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Event",
+        },
+        relationship: {
+          type: String,
+          enum: ["created", "attending", "interested"],
+        },
+      },
+    ],
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
 
     // Password management fields
@@ -125,6 +154,11 @@ const userSchema = new mongoose.Schema(
     timestamps: true, // This will add createdAt and updatedAt fields
   }
 );
+
+// Function to limit the number of photos uploaded
+function arrayLimit(val) {
+  return val.length <= 10;
+}
 
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
