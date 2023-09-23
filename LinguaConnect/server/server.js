@@ -4,6 +4,20 @@ const mongoose = require("mongoose");
 // Import the dotenv library for loading environment variables
 const dotenv = require("dotenv");
 
+// Load environment variables from the .env file
+dotenv.config({ path: "./config/.env" });
+
+// Set the port number to listen on
+const port = process.env.PORT || 3000;
+
+// Import the Express application from the app.js file
+const app = require("./app");
+
+// Start the server and listen for incoming requests
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}`);
+});
+
 // Listen for uncaught exception events
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
@@ -13,9 +27,6 @@ process.on("uncaughtException", (err) => {
     process.exit(1); // exit with a non-zero status code to indicate an error
   });
 });
-
-// Load environment variables from the .env file
-dotenv.config({ path: "./config/.env" });
 
 // Construct the MongoDB connection string using environment variables
 const DB = process.env.DATABASE.replace(
@@ -43,17 +54,6 @@ const connectDB = async () => {
 
 // Call the connectDB function to connect to the database
 connectDB();
-
-// Set the port number to listen on
-const port = process.env.PORT || 3000;
-
-// Import the Express application from the app.js file
-const app = require("./app");
-
-// Start the server and listen for incoming requests
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}`);
-});
 
 // Listen for unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {

@@ -3,144 +3,196 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    unique: true,
-    required: [true, "Please provide a username"],
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [true, "Please provide your email address"],
-    lowercase: true,
-    validate: [validator.isEmail, "Please provide a valid email"],
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8,
-    select: false, // Exclude the password field by default
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, "Please confirm your password"],
-    validate: {
-      // This only works on CREATE and SAVE
-      validator: function (el) {
-        return el === this.password;
+const userSchema = new mongoose.Schema(
+  {
+    // Basic User Details
+    username: {
+      type: String,
+      unique: true,
+      required: [true, "Please provide a username"],
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: [true, "Please provide your email address"],
+      lowercase: true,
+      validate: [validator.isEmail, "Please provide a valid email"],
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+      select: false, // Exclude the password field by default
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, "Please confirm your password"],
+      validate: {
+        // This only works on CREATE and SAVE
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords are not the same",
       },
-      message: "Passwords are not the same",
     },
-  },
-  profilePicture: {
-    type: String,
-    default: "default.jpg",
-  },
-  // Languages Section
-  languages: {
-    native: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Language",
-        },
-      ],
-      validate: [
-        (arr) => arr.length > 0,
-        "Specify at least one native language",
-      ],
-      required: [true, "Native language field is required"],
-    },
-    fluent: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Language",
-        },
-      ],
-      validate: [
-        (arr) => arr.length > 0,
-        "Specify at least one fluent language",
-      ],
-      required: [true, "Fluent language field is required"],
-    },
-    learning: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Language",
-        },
-      ],
-      validate: [
-        (arr) => arr.length > 0,
-        "Specify at least one learning language",
-      ],
-      required: [true, "Learning language field is required"],
-    },
-  },
-  // About Section
-  about: {
-    talkAbout: {
-      type: String,
-      required: [true, "Please specify what you like to talk about"],
-      maxlength: [250, "Your answer must be less or equal to 250 characters"],
-    },
-    perfectPartner: {
-      type: String,
-      required: [true, "Please specify your ideal LinguaConnect partner"],
-      maxlength: [250, "Your answer must be less or equal to 250 characters"],
-    },
-    learningGoals: {
-      type: String,
-      required: [true, "Please specify your language learning goals"],
-      maxlength: [250, "Your answer must be less or equal to 250 characters"],
-    },
-  },
 
-  // Photos Section
-  photos: [
-    {
+    // Personal Information
+    firstName: {
+      type: String,
+      maxlength: [30, "Your first name must be less or equal to 30 characters"],
+    },
+    lastName: {
+      type: String,
+      maxlength: [50, "Your last name must be less or equal to 50 characters"],
+    },
+    dateOfBirth: {
+      type: Date,
+    },
+    profilePicture: {
+      type: String,
+      default: "default.jpg",
+    },
+
+    // Language Proficiency
+    languages: {
+      native: {
+        type: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Language",
+          },
+        ],
+      },
+      fluent: {
+        type: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Language",
+          },
+        ],
+      },
+      learning: {
+        type: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Language",
+          },
+        ],
+      },
+    },
+
+    // About User
+    about: {
+      talkAbout: {
+        type: String,
+        maxlength: [250, "Your answer must be less or equal to 250 characters"],
+      },
+      perfectPartner: {
+        type: String,
+        maxlength: [250, "Your answer must be less or equal to 250 characters"],
+      },
+      learningGoals: {
+        type: String,
+        maxlength: [250, "Your answer must be less or equal to 250 characters"],
+      },
+    },
+
+    // Additional Photos
+    photos: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Photo",
+      },
+    ],
+
+    // User's Location
+    location: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Photo",
+      ref: "Location",
     },
-  ],
-  location: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Location",
-  },
-});
 
-// Hash the password before saving the user to the database
+    // Password management fields
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: false, // User must verify email address before account is active
+      select: false, // Exclude the active field by default
+    },
+  },
+  {
+    timestamps: true, // This will add createdAt and updatedAt fields
+  }
+);
+
+// Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
   // Only hash the password if it has been modified or is new
   if (!this.isModified("password")) return next();
 
-  try {
-    // Generate a salt for the password hash
-    const salt = await bcrypt.genSalt(10);
+  // Generate a salt for the password hash
+  this.password = await bcrypt.hash(this.password, 10);
 
-    // Hash the password using the salt
-    this.password = await bcrypt.hash(this.password, salt);
+  // Delete passwordConfirm field
+  this.passwordConfirm = undefined;
 
-    // Delete passwordConfirm field
-    this.passwordConfirm = undefined;
-
-    next();
-  } catch (error) {
-    next(error);
-  }
+  next();
 });
 
-// Compare hashed passwords for login
+// Method to compare passwords for login
 userSchema.methods.comparePassword = async function (
   candidatePassword,
   userPassword
 ) {
+  // Use bcrypt to compare the candidate password to the hashed user password
   return userPassword
     ? await bcrypt.compare(candidatePassword, userPassword)
     : false;
 };
+
+// Method to check if password was changed after a token was issued
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  // If the passwordChangedAt property exists, compare it to the JWT issue time
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means NOT changed
+  return false;
+};
+
+// Method to create a hashed password reset token
+userSchema.methods.createPasswordResetToken = function () {
+  // Generate a random token using crypto
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Hash the token using sha256 and save it to the user document
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set the password reset token expiration time to 10 minutes from now
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  // Return the unhashed token to send in the password reset email
+  return resetToken;
+};
+
+// Middleware to update `passwordChangedAt` timestamp when password changes
+userSchema.pre("save", function (next) {
+  // Only update the timestamp if the password has been modified and the document is not new
+  if (!this.isModified("password") || this.isNew) return next();
+
+  // Subtract 1 second from the current time to ensure the timestamp is earlier than the JWT issue time
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 
