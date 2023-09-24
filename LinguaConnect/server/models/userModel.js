@@ -111,16 +111,11 @@ const userSchema = new mongoose.Schema(
         type: [Number], // [longitude, latitude]
         index: "2dsphere", // to support geospatial queries
       },
-      city: {
-        type: String,
-        required: true,
-      },
-      country: {
-        type: String,
-        required: true,
-      },
+      city: String,
+      country: String,
     },
 
+    // User's Events
     events: [
       {
         event: {
@@ -134,6 +129,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+    // Roles and Permissions
     role: {
       type: String,
       enum: ["user", "admin"],
