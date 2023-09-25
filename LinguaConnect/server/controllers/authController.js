@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const sendEmail = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 
@@ -106,16 +107,52 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1. Get user based on the provided email
   const user = await User.findOne({ email: req.body.email });
 
-  // 2. Check if the user exists
+  // 2. If the user doesn't exist in the database, send a 404 error response.
   if (!user) {
     return next(new AppError("There is no user with that email address.", 404));
   }
 
-  // 3. Generate a password reset token
+  // 3. Utilize user model's method to generate a unique password reset token. This method also hashes the token and sets the expiration date.
   const resetToken = user.createPasswordResetToken();
 
-  // 4. Save the user's updated data
+  // 4. Update user's document with the password reset token.
+  // Disable validators to prevent validation errors during the save operation.
   await user.save({ validateBeforeSave: false });
+
+  // 5. Construct the full URL for the password reset endpoint that includes the generated token as a parameter.
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `You recently requested a password reset. Please submit a PATCH request with your new password to: ${resetURL}.\nIf you didn't request a password reset, please ignore this email.`;
+
+  // 6. Attempt to send the password reset email to the user.
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset token (valid for 10 minutes)",
+      message,
+    });
+
+    // 7. If email is successfully sent, respond to client indicating success.
+    res.status(200).json({
+      status: "success",
+      message: "Password reset token sent to email.",
+    });
+  } catch (err) {
+    // Nullify the reset token and expiration in the user's document to ensure security.
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // 8. Respond to the client with a 500 error indicating a problem in sending the password reset email.
+    return next(
+      new AppError(
+        "There was an error sending the password reset email. Please try again later.",
+        500
+      )
+    );
+  }
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
