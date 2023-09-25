@@ -11,7 +11,7 @@ router.post("/register", authController.register);
 router.post("/login", authController.login);
 // router.get("/logout", authController.logout);
 router.post("/forgotPassword", authController.forgotPassword);
-// router.patch("/resetPassword/:token", authController.resetPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
 
 // From here on, all routes require authentication
 router.use(authController.protect);
@@ -19,7 +19,7 @@ router.use(authController.protect);
 // PROTECTED ROUTES (Only logged-in users can access these routes)
 // router.get("/profile", userController.getProfile); // Get current user profile
 // router.patch("/updateProfile", userController.updateProfile); // Update user profile details
-// router.patch("/updatePassword", authController.updatePassword); // Update user password
+router.patch("/updatePassword", authController.updatePassword); // Update user password
 // router.delete("/deleteAccount", userController.deleteAccount); // Delete own user account
 // router.get("/myEvents", userController.myEvents); // Get events user has joined or created
 

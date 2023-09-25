@@ -4,12 +4,14 @@ const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const crypto = require("crypto");
+const exp = require("constants");
 
 // Function to sign a JWT token
 const signToken = (id) => {
   // Sign a new JWT token with the user's ID and the JWT_SECRET
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_COOKIE_EXPIRES_IN,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
@@ -45,6 +47,7 @@ const createSendToken = (user, statusCode, req, res) => {
   });
 };
 
+// Function to register a new user
 exports.register = catchAsync(async (req, res, next) => {
   // Check if the provided password and password confirmation match
   if (req.body.password !== req.body.passwordConfirm) {
@@ -59,6 +62,9 @@ exports.register = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
+  // Log the user in by sending them a JWT token
+  createSendToken(newUser, 201, req, res);
+
   res.status(201).json({
     status: "success",
     message: "User created successfully.",
@@ -66,11 +72,9 @@ exports.register = catchAsync(async (req, res, next) => {
       user: newUser,
     },
   });
-
-  // Log the user in by sending them a JWT token
-  createSendToken(newUser, 201, req, res);
 });
 
+// Function to log in a user
 exports.login = catchAsync(async (req, res, next) => {
   // Check if the email and password were provided
   if (!req.body.email || !req.body.password) {
@@ -103,6 +107,7 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+// Function to send a password reset email to the user
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1. Get user based on the provided email
   const user = await User.findOne({ email: req.body.email });
@@ -155,6 +160,76 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+// Function to reset a user's password
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1. Hash the reset token from the request URL for a secure comparison with the hashed token in the database.
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  // 2. Retrieve the user whose hashed reset token matches the provided one and ensure the token hasn't expired.
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }, // Ensure the reset token's expiration time is still in the future.
+  });
+
+  // 3. Update the user's password with the new password from the request body, and clear out the reset token and its expiration.
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  // 4. Record the time of the password change.
+  user.passwordChangedAt = Date.now();
+
+  // 5. Persist the user's updated data to the database. This will include the new password and removal of the reset token.
+  await user.save();
+
+  // 6. Directly authenticate the user after a successful password reset, sending back a JWT token as a response.
+  createSendToken(user, 200, req, res);
+});
+
+// Function to update a user's password
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1. Get the user from the collection.
+  const user = await User.findById(req.user.id).select("+password");
+
+  // 2. Check if the current password is correct.
+  if (!(await user.comparePassword(req.body.currentPassword, user.password))) {
+    return next(new AppError("Incorrect password.", 401));
+  }
+
+  // 3. Validate that new password and confirmation are provided and that they match.
+  if (!req.body.password || !req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        "Please provide both new password and password confirmation.",
+        400
+      )
+    );
+  }
+  if (req.body.password !== req.body.passwordConfirm) {
+    return next(
+      new AppError("Password and password confirmation do not match.", 400)
+    );
+  }
+
+  // 4. If the password is correct, update the password.
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+
+  // 5. Record the time of the password change.
+  user.passwordChangedAt = Date.now();
+
+  // 6. Persist the user's updated data to the database.
+  await user.save();
+
+  // 7. Directly authenticate the user after a successful password update, sending back a JWT token as a response.
+  createSendToken(user, 200, req, res);
+});
+
+// Middleware to protect routes from unauthorized access
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
@@ -9,6 +10,7 @@ const languageRouter = require("./routes/languageRoutes");
 // Create a new Express application
 const app = express();
 
+// MIDDLEWARES
 // Enable CORS for requests from http://localhost:5173
 app.use(
   cors({
@@ -19,7 +21,8 @@ app.use(
 // Parse incoming JSON data
 app.use(express.json());
 
-// MIDDLEWARES
+// Parse cookies
+app.use(cookieParser());
 
 // Middleware function to add a request timestamp to the request object. It is for middleware testing purposes only.
 app.use((req, res, next) => {
