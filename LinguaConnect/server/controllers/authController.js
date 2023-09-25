@@ -102,6 +102,22 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1. Get user based on the provided email
+  const user = await User.findOne({ email: req.body.email });
+
+  // 2. Check if the user exists
+  if (!user) {
+    return next(new AppError("There is no user with that email address.", 404));
+  }
+
+  // 3. Generate a password reset token
+  const resetToken = user.createPasswordResetToken();
+
+  // 4. Save the user's updated data
+  await user.save({ validateBeforeSave: false });
+});
+
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
@@ -165,4 +181,3 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
-
