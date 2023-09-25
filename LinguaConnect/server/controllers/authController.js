@@ -150,3 +150,19 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser; // Saving user data to the request object to use later.
   next();
 });
+
+// Middleware to restrict access to certain routes based on user role
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // Check if the user's role is included in the provided roles.
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action.", 403)
+      );
+    }
+
+    // If the user's role is included, grant access to the protected route.
+    next();
+  };
+};
+

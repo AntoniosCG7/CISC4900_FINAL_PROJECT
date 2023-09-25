@@ -6,18 +6,33 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const userController = require("./../controllers/userController");
 
-// Define routes for handling user authentication
+// PUBLIC ROUTES
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-// router.get("/logout", authController.logout);
-// Define routes for handling password reset
-// router.post("/forgotPassword", authController.forgotPassword);
-// router.patch("/resetPassword/:token", authController.resetPassword);
+router.get("/logout", authController.logout);
+router.post("/forgotPassword", authController.forgotPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
 
 // From here on, all routes require authentication
 router.use(authController.protect);
 
-// Define routes for handling user resources
-router.route("/").get(userController.getAllUsers);
+// PROTECTED ROUTES (Only logged-in users can access these routes)
+router.get("/profile", userController.getProfile); // Get current user profile
+router.patch("/updateProfile", userController.updateProfile); // Update user profile details
+router.patch("/updatePassword", authController.updatePassword); // Update user password
+router.delete("/deleteAccount", userController.deleteAccount); // Delete own user account
+router.get("/myEvents", userController.myEvents); // Get events user has joined or created
+
+// From here on, all routes require admin authorization
+router.use(authController.restrictTo("admin"));
+
+// ADMIN ROUTES (Only admins can access these routes)
+router.route("/").get(userController.getAllUsers); // Get all users
+
+router
+  .route("/:id")
+  .get(userController.getSingleUser) // Get a single user by ID
+  .patch(userController.updateUser) // Update a user by ID
+  .delete(userController.deleteUser); // Delete a user by ID
 
 module.exports = router;
