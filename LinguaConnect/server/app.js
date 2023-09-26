@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
@@ -12,6 +13,9 @@ const languageRouter = require("./routes/languageRoutes");
 const app = express();
 
 // MIDDLEWARES
+
+// Set security HTTP headers with helmet
+app.use(helmet());
 
 // Limit the number of requests from an IP address to 1000 per hour
 const limiter = rateLimit({
@@ -30,8 +34,8 @@ app.use(
   })
 );
 
-// Parse incoming JSON data
-app.use(express.json());
+// Parse request body data from JSON into a JavaScript object (req.body) and limit the size of the request body to 10kb
+app.use(express.json({ limit: "10kb" }));
 
 // Parse cookies
 app.use(cookieParser());
