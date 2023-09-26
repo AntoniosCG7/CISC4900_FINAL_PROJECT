@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const rateLimit = require("express-rate-limit");
 
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
@@ -11,6 +12,17 @@ const languageRouter = require("./routes/languageRoutes");
 const app = express();
 
 // MIDDLEWARES
+
+// Limit the number of requests from an IP address to 1000 per hour
+const limiter = rateLimit({
+  max: 1000,
+  windowMs: 60 * 60 * 1000, // 1 hour
+  message: "Too many requests from this IP. Please try again in an hour.",
+});
+
+// Apply the rate limiter to all requests to the /api endpoint
+app.use("/api", limiter);
+
 // Enable CORS for requests from http://localhost:5173
 app.use(
   cors({
