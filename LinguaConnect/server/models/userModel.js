@@ -142,7 +142,7 @@ const userSchema = new mongoose.Schema(
     passwordResetExpires: Date,
     active: {
       type: Boolean,
-      default: false, // User must verify email address before account is active
+      default: true, // User must verify email address before account is active
       select: false, // Exclude the active field by default
     },
   },
@@ -167,6 +167,13 @@ userSchema.pre("save", async function (next) {
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
 
+  next();
+});
+
+// Middleware to exclude inactive users from query results
+userSchema.pre(/^find/, function (next) {
+  // "this" points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 

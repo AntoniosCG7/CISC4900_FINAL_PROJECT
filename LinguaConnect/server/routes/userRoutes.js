@@ -17,11 +17,11 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 router.use(authController.protect);
 
 // PROTECTED ROUTES (Only logged-in users can access these routes)
-// router.get("/profile", userController.getProfile); // Get current user profile
-// router.patch("/updateProfile", userController.updateProfile); // Update user profile details
+router.get("/me", userController.getMe); // Get current user
+router.patch("/updateMe", userController.updateMe); // Update current user
 router.patch("/updatePassword", authController.updatePassword); // Update user password
-// router.delete("/deleteAccount", userController.deleteAccount); // Delete own user account
-// router.get("/myEvents", userController.myEvents); // Get events user has joined or created
+router.delete("/deleteMe", userController.deleteMe); // Delete current user
+// router.get("/me/events", userController.myEvents); // Get events user has joined or created
 
 // From here on, all routes require admin authorization
 router.use(authController.restrictTo("admin"));
