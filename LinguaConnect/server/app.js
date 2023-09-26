@@ -3,6 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
@@ -36,6 +38,12 @@ app.use(
 
 // Parse request body data from JSON into a JavaScript object (req.body) and limit the size of the request body to 10kb
 app.use(express.json({ limit: "10kb" }));
+
+// Data sanitization against NoSQL query injection (e.g. { $gt: "" })
+app.use(mongoSanitize());
+
+// Data sanitization against XSS (e.g. <script>alert("XSS")</script>)
+app.use(xss());
 
 // Parse cookies
 app.use(cookieParser());
