@@ -3,13 +3,13 @@ const express = require("express");
 const router = express.Router();
 
 // Import the authentication and user controllers
-const authController = require("../controllers/authController");
+const authController = require("./../controllers/authController");
 const userController = require("./../controllers/userController");
 
 // PUBLIC ROUTES
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-// router.get("/logout", authController.logout);
+router.get("/logout", authController.logout);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 

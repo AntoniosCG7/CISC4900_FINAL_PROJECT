@@ -61,13 +61,6 @@ const handleProdError = (err, res) => {
 const handleAPINotFoundError = () =>
   new AppError("This route is not found on the server", 404);
 
-// Handle general validation errors (may overlap with handleValidationErrorDB)
-const handleValidationError = (err) => {
-  const errors = Object.values(err.errors).map((el) => el.message);
-  const message = `Invalid input data: ${errors.join(". ")}`;
-  return new AppError(message, 400);
-};
-
 // Handle errors related to unauthorized access
 const handleAuthorizationError = () =>
   new AppError("You are not authorized to perform this action", 403);
@@ -91,7 +84,6 @@ module.exports = (err, req, res, next) => {
     if (error.name === "JsonWebTokenError") error = handleJWTError();
     if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
     if (error.name === "APINotFoundError") error = handleAPINotFoundError();
-    if (error.name === "ValidationError") error = handleValidationError(error);
     if (error.name === "AuthorizationError") error = handleAuthorizationError();
 
     handleProdError(error, res);

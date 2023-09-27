@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const morgan = require("morgan");
 
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
@@ -18,6 +19,11 @@ const app = express();
 
 // Set security HTTP headers with helmet
 app.use(helmet());
+
+// Development logging middleware (only used in development mode) to log requests to the console
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 // Limit the number of requests from an IP address to 1000 per hour
 const limiter = rateLimit({
@@ -33,20 +39,22 @@ app.use("/api", limiter);
 app.use(
   cors({
     origin: "http://localhost:5173",
+    credentials: true, // this allows the server to accept cookies from the client
   })
 );
 
 // Parse request body data from JSON into a JavaScript object (req.body) and limit the size of the request body to 10kb
 app.use(express.json({ limit: "10kb" }));
+// Parse request body data from URL-encoded form into a JavaScript object (req.body) and limit the size of the request body to 10kb
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// Parse cookies
+app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection (e.g. { $gt: "" })
 app.use(mongoSanitize());
 
 // Data sanitization against XSS (e.g. <script>alert("XSS")</script>)
 app.use(xss());
-
-// Parse cookies
-app.use(cookieParser());
 
 // Middleware function to add a request timestamp to the request object. It is for middleware testing purposes only.
 app.use((req, res, next) => {

@@ -5,7 +5,6 @@ const sendEmail = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const crypto = require("crypto");
-const exp = require("constants");
 
 // Function to sign a JWT token
 const signToken = (id) => {
@@ -64,14 +63,6 @@ exports.register = catchAsync(async (req, res, next) => {
 
   // Log the user in by sending them a JWT token
   createSendToken(newUser, 201, req, res);
-
-  res.status(201).json({
-    status: "success",
-    message: "User created successfully.",
-    data: {
-      user: newUser,
-    },
-  });
 });
 
 // Function to log in a user
@@ -106,6 +97,21 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+// Function to log out a user
+exports.logout = (req, res) => {
+  // Set the JWT cookie to an empty string with an expiration date in the past
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000), // 10 seconds
+    httpOnly: true,
+  });
+
+  // Send a success response
+  res.status(200).json({
+    status: "success",
+    message: "User logged out successfully.",
+  });
+};
 
 // Function to send a password reset email to the user
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -145,6 +151,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message: "Password reset token sent to email.",
     });
   } catch (err) {
+    console.error("Error sending password reset email:", err);
     // Nullify the reset token and expiration in the user's document to ensure security.
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
@@ -261,6 +268,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 4. Check if the user for which the token was issued still exists.
   const currentUser = await User.findById(decodedPayload.id);
+
   if (!currentUser) {
     return next(
       new AppError("The user associated with this token no longer exists.", 401)
@@ -276,6 +284,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 6. If all checks pass, grant access to the protected route.
   req.user = currentUser; // Saving user data to the request object to use later.
+
+  console.log("User authenticated:", req.user.id);
   next();
 });
 
