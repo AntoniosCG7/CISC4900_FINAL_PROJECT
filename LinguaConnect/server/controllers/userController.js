@@ -216,3 +216,46 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Create a user profile
+exports.createProfile = catchAsync(async (req, res, next) => {
+  // Extract profile data from req.body
+  const {
+    firstName,
+    lastName,
+    dateOfBirth,
+    profilePicture,
+    languages,
+    about,
+    location,
+    photos,
+  } = req.body;
+
+  // Update the user document
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      firstName,
+      lastName,
+      dateOfBirth,
+      profilePicture,
+      languages,
+      about,
+      location,
+      photos,
+      profileCompleted: true,
+    },
+    {
+      new: true, // This returns the modified document
+      runValidators: true, // Validates the updated document before saving
+    }
+  );
+
+  // Send a response
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
+  });
+});

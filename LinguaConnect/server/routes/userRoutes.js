@@ -17,6 +17,7 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 router.use(authController.protect);
 
 // PROTECTED ROUTES (Only logged-in users can access these routes)
+router.post("/createProfile", userController.createProfile); // Create a user profile
 router.get("/me", userController.getMe); // Get current user
 router.patch("/updateMe", userController.updateMe); // Update current user
 router.patch("/updatePassword", authController.updatePassword); // Update user password

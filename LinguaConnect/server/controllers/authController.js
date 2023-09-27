@@ -151,7 +151,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message: "Password reset token sent to email.",
     });
   } catch (err) {
-    console.error("Error sending password reset email:", err);
     // Nullify the reset token and expiration in the user's document to ensure security.
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
@@ -282,10 +281,23 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Check if user has completed the profile
+  if (
+    !currentUser.profileCompleted &&
+    req.originalUrl !== "/api/v1/users/createProfile"
+  ) {
+    // error response if user has not completed profile and is not trying to access the create-profile route.
+    return next(
+      new AppError(
+        "Please complete your profile before accessing this resource.",
+        403
+      )
+    );
+  }
+
   // 6. If all checks pass, grant access to the protected route.
   req.user = currentUser; // Saving user data to the request object to use later.
 
-  console.log("User authenticated:", req.user.id);
   next();
 });
 

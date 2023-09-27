@@ -136,6 +136,9 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
+    // Profile Completion Status
+    profileCompleted: { type: Boolean, default: false }, // Set to true when user completes profile
+
     // Password management fields
     passwordChangedAt: Date,
     passwordResetToken: String,
