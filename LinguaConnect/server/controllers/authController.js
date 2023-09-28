@@ -14,24 +14,25 @@ const signToken = (id) => {
   });
 };
 
+// Function to set cookie options
+const getCookieOptions = (req) => ({
+  expires: new Date(
+    Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+  ),
+  httpOnly: true, // Ensures the cookie is sent only over HTTP(S), not client JavaScript
+  secure:
+    process.env.NODE_ENV === "production" &&
+    (req.secure || req.headers["x-forwarded-proto"] === "https"), // Use secure cookies in production
+  sameSite: "strict", // Prevents the cookie from being sent in cross-site requests
+});
+
 // Function to create and send a token to the client
 const createSendToken = (user, statusCode, req, res) => {
   // Sign a JWT token for the user
   const token = signToken(user._id);
 
-  // Calculate cookie expiration date
-  const cookieExpiration =
-    process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000;
-
-  // Set JWT as a cookie on the client side
-  res.cookie("jwt", token, {
-    expires: new Date(Date.now() + cookieExpiration),
-    httpOnly: true, // Ensures the cookie is sent only over HTTP(S), not client JavaScript
-    secure:
-      process.env.NODE_ENV === "production" &&
-      (req.secure || req.headers["x-forwarded-proto"] === "https"), // Use secure cookies in production
-    sameSite: "strict", // Prevents the cookie from being sent in cross-site requests
-  });
+  // Set the JWT as a cookie
+  res.cookie("jwt", token, getCookieOptions(req));
 
   // Remove the password from the output for security
   user.password = undefined;
@@ -39,7 +40,6 @@ const createSendToken = (user, statusCode, req, res) => {
   // Send the token and user data as a response
   res.status(statusCode).json({
     status: "success",
-    token,
     data: {
       user,
     },
@@ -89,6 +89,12 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // Generate a JWT token for the user
   const token = signToken(user._id);
+
+  // Send the JWT token to the client
+  createSendToken(user, 200, req, res);
+
+  // Remove the password from the user object
+  user.password = undefined;
 
   // Send a success response with the JWT token
   res.status(200).json({

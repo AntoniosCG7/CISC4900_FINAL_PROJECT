@@ -1,7 +1,6 @@
 import React from "react";
 import { Navbar } from "../../components";
 import "./Home.css";
-// import heroImage from "../../assets/5.jpg";
 
 const Home = () => {
   return (

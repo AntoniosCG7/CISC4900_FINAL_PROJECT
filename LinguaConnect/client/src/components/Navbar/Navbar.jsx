@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 import logo from "/assets/images/logo-white.png";
 
@@ -11,31 +12,31 @@ const Navbar = () => {
   return (
     <>
       <header className="header">
-        <a href="home" className="logo">
+        <Link to="/home" className="logo">
           <img src={logo} alt="logo" className="rotate-vert-center" />
-        </a>
+        </Link>
 
         <ul className={`navbar ${isMenuOpen ? "open" : ""}`}>
           <li>
-            <a href="home" className="active">
+            <Link to="/home" className="active">
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="about">About Us</a>
+            <Link to="/about">About Us</Link>
           </li>
           <li>
-            <a href="contact">Contact</a>
+            <Link to="/contact">Contact</Link>
           </li>
         </ul>
 
         <div className="navbar_buttons">
-          <a href="login">
+          <Link to="/login">
             <button id="login-btn">LOG IN</button>
-          </a>
-          <a href="register">
+          </Link>
+          <Link to="/register">
             <button id="register-btn">SIGN UP</button>
-          </a>
+          </Link>
           <div
             className={`bx bx-menu ${isMenuOpen ? "bx-x" : ""}`}
             id="menu-icon"

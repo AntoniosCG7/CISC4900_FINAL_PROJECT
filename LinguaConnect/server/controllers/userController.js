@@ -147,6 +147,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 // Get current user's data
 exports.getMe = catchAsync(async (req, res, next) => {
   // Since the user is authenticated (protected route), req.user should contain the user's data.
+  console.log(req.user);
   const user = await User.findById(req.user.id);
 
   // Respond with the user's data

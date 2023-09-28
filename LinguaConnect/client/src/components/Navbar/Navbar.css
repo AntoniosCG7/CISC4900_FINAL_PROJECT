@@ -71,7 +71,6 @@ a.logo:hover {
   border-radius: 0.4rem;
   width: 5.5rem;
   height: 2rem;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
   transition: 0.5s ease all;
 }
 
@@ -79,7 +78,6 @@ a.logo:hover {
 #register-btn:hover {
   color: #000000;
   background-color: var(--primary-color);
-  box-shadow: 0 0 15px #ffb50fcc;
   transform: scale(1.1);
 }
 
@@ -159,7 +157,7 @@ a.logo:hover {
 @media (max-width: 700px) {
   #login-btn,
   #register-btn {
-    width: 4rem;
+    width: 3.5rem;
     height: 2rem;
   }
 }
