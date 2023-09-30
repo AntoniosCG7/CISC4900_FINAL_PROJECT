@@ -1,10 +1,9 @@
 import React from "react";
-import { LoginForm, Navbar } from "../../components";
+import { LoginForm } from "../../components";
 
 const Login = () => {
   return (
     <>
-      <Navbar />
       <LoginForm />
     </>
   );

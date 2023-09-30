@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { addAlert } from "../../slices/alertSlice";
-import { authenticationSuccess, authError } from "../../slices/authSlice";
+import { addAlert } from "../../../slices/alertSlice";
+import { authenticationSuccess, authError } from "../../../slices/authSlice";
 import "./LoginForm.css";
 
 const LoginForm = () => {

@@ -111,8 +111,10 @@ const userSchema = new mongoose.Schema(
         type: [Number], // [longitude, latitude]
         index: "2dsphere", // to support geospatial queries
       },
-      city: String,
-      country: String,
+      locationString: {
+        type: String,
+        required: [true, "Please provide a location"],
+      },
     },
 
     // User's Events

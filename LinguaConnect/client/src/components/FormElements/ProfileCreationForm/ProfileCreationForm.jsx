@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./ProfileCreationForm.css";
-
+import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
 import Select from "react-select";
+import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
 
 function ProfileCreationForm() {
+  const dateInputRef = React.useRef(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -13,7 +15,6 @@ function ProfileCreationForm() {
   const [talkAbout, setTalkAbout] = useState("");
   const [perfectPartner, setPerfectPartner] = useState("");
   const [learningGoals, setLearningGoals] = useState("");
-  const [photos, setPhotos] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
   const languageOptions = availableLanguages.map((lang) => ({
     value: lang,
@@ -32,6 +33,15 @@ function ProfileCreationForm() {
         console.error("Error fetching languages:", error);
       });
   }, []); // The empty dependency array ensures this useEffect runs once when the component mounts
+
+  const handleDateInputChange = () => {
+    const input = dateInputRef.current;
+    if (input && input.value) {
+      input.classList.add("has-content");
+    } else {
+      input.classList.remove("has-content");
+    }
+  };
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -81,6 +91,10 @@ function ProfileCreationForm() {
       ...base,
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
+      backgroundColor: "#e0e0e0",
+      fontSize: "20px",
+      fontWeight: "bold",
+      padding: "5px",
       "&:hover": {
         borderColor: "var(--primary-color)",
       },
@@ -100,6 +114,7 @@ function ProfileCreationForm() {
     }),
     multiValueLabel: (base) => ({
       ...base,
+      fontSize: "20px",
     }),
     multiValueRemove: (base) => ({
       ...base,
@@ -142,6 +157,7 @@ function ProfileCreationForm() {
             <input
               type="text"
               id="firstName"
+              placeholder="Enter your first name..."
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
@@ -150,10 +166,30 @@ function ProfileCreationForm() {
             <input
               type="text"
               id="lastName"
+              placeholder="Enter your last name..."
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
             />
+          </fieldset>
+
+          {/* Date of Birth Section */}
+          <fieldset className="date-of-birth-section">
+            <legend>Date of Birth</legend>
+            <input
+              type="date"
+              className="date-input"
+              placeholder="mm/dd/yyyy"
+              ref={dateInputRef}
+              onInput={handleDateInputChange}
+              onBlur={handleDateInputChange}
+            />
+          </fieldset>
+
+          {/* Location Section */}
+          <fieldset className="location-section">
+            <legend>Location</legend>
+            <LocationsAutocomplete />
           </fieldset>
 
           {/* Languages Section */}
@@ -175,6 +211,7 @@ function ProfileCreationForm() {
               onChange={(selected) =>
                 setNativeLanguage(selected.map((item) => item.value))
               }
+              required
             />
 
             <br />
@@ -194,6 +231,7 @@ function ProfileCreationForm() {
               onChange={(selected) =>
                 setFluentLanguages(selected.map((item) => item.value))
               }
+              required
             />
 
             <br />
@@ -224,6 +262,8 @@ function ProfileCreationForm() {
               value={talkAbout}
               onChange={(e) => setTalkAbout(e.target.value)}
               maxLength="250"
+              placeholder="E.g. Movies, music, travel, cultures, sports, books..."
+              required
             ></textarea>
             <br />
 
@@ -234,6 +274,8 @@ function ProfileCreationForm() {
               value={perfectPartner}
               onChange={(e) => setPerfectPartner(e.target.value)}
               maxLength="250"
+              placeholder="E.g. Patient, friendly, shares my interests, proactive..."
+              required
             ></textarea>
             <br />
 
@@ -244,30 +286,15 @@ function ProfileCreationForm() {
               value={learningGoals}
               onChange={(e) => setLearningGoals(e.target.value)}
               maxLength="250"
+              placeholder="E.g. Improve my pronunciation, learn everyday phrases, prepare for a language exam, be able to travel..."
+              required
             ></textarea>
           </fieldset>
 
           {/* Profile Picture */}
           <fieldset className="profile-picture-section">
             <legend>Profile Picture</legend>
-            <label htmlFor="profilePicture">Profile Picture:</label>
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              onChange={(e) => setProfilePicture(e.target.files[0])}
-            />
-          </fieldset>
-
-          {/* Photos Section */}
-          <fieldset className="photos-section">
-            <legend>Photos</legend>
-            <label htmlFor="photos">Upload Photos:</label>
-            <input
-              type="file"
-              multiple
-              onChange={(e) => setPhotos(e.target.files)}
-            />
+            <ProfileImageUpload />
           </fieldset>
 
           <button type="submit" className="profile-creation-button">

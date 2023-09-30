@@ -1,10 +1,9 @@
 import React from "react";
-import { RegistrationForm, Navbar } from "../../components";
+import { RegistrationForm } from "../../components";
 
 const Register = () => {
   return (
     <>
-      <Navbar />
       <RegistrationForm />
     </>
   );

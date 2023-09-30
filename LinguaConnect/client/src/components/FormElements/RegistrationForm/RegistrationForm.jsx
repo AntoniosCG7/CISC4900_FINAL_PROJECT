@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { addAlert } from "../../slices/alertSlice";
-import { authenticationSuccess, authError } from "../../slices/authSlice";
+import { addAlert } from "../../../slices/alertSlice";
+import { authenticationSuccess, authError } from "../../../slices/authSlice";
 import "./RegistrationForm.css";
 
 const RegistrationForm = () => {

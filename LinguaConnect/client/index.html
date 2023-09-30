@@ -3,17 +3,26 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/assets/images/logo-white.png">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LinguaConnect</title>
 </head>
 
 <body>
   <div id="root"></div>
+
+
+  <script>
+    function initMap() {
+      console.log('initMap')
+    }
+  </script>
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBZKaSqflEpCePfsnaTfjF1ALhSM4HDFU&libraries=places&callback=initMap">
+    </script>
   <script type="module" src="/src/main.jsx"></script>
-  <!-- src/img/logo-white.svg" -->
 </body>
 
 </html>

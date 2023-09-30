@@ -13,7 +13,7 @@
 
 .profile-creation-container {
   max-width: 1000px;
-  max-height: 2000px;
+  max-height: 2300px;
   margin: 0 auto;
   margin-bottom: 4rem;
   padding: 40px;
@@ -42,24 +42,27 @@
 }
 
 .profile-creation-form .name-section input,
+.profile-creation-form .date-of-birth-section input,
 .profile-creation-form .about-section input,
 .profile-creation-form .profile-picture-section input,
 .profile-creation-form .photos-section input,
 .profile-creation-form textarea,
 .profile-creation-form select {
-  font-family: "Times New Roman", Times, serif;
+  font-family: var(--font-family);
+  font-weight: bold;
+  background-color: #e0e0e0;
   width: 100%;
   padding: 10px;
   margin: 5px 0;
   border: 3px solid var(--primary-color);
   border-radius: 5px;
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 20px;
   margin-bottom: 40px;
   transition: all 0.3s ease-in-out;
 }
 
 .profile-creation-form .name-section input:focus,
+.profile-creation-form .date-of-birth-section input:focus,
 .profile-creation-form .about-section input:focus,
 .profile-creation-form .profile-picture-section input:focus,
 .profile-creation-form .photos-section input:focus,
@@ -70,12 +73,34 @@
   box-shadow: 0 0 10px var(--primary-color);
 }
 
+fieldset.date-of-birth-section,
+fieldset.location-section {
+  display: flex;
+  margin: 0 auto;
+  width: 300px;
+}
+
+.date-input {
+  background: url(https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/calendar_2.png)
+    97% 50% no-repeat;
+  color: hsl(0, 0%, 50%);
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.date-input:focus,
+.date-input.has-content:not(:focus) {
+  color: var(--secondary-color);
+}
+
 .about-section {
   margin-top: 40px;
 }
 
 .profile-creation-form textarea {
-  min-height: 100px;
+  min-height: 110px;
 }
 
 .profile-creation-button {
@@ -89,7 +114,6 @@
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  margin-top: 20px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }

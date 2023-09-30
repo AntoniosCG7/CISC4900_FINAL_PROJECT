@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Alert from "./components/Alert/Alert";
+import Alert from "./components/UIElements/Alert/Alert";
 import PrivateRoute from "./routing/PrivateRoute";
 import { loadUser } from "./slices/authSlice";
 import {
