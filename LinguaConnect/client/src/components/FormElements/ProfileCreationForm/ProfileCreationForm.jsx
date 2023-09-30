@@ -36,6 +36,31 @@ function ProfileCreationForm() {
       });
   }, []); // The empty dependency array ensures this useEffect runs once when the component mounts
 
+  // Return a filtered list of language options based on the provided exclusion list.
+  const getFilteredOptions = (exclude = []) => {
+    return availableLanguages
+      .filter((lang) => !exclude.includes(lang))
+      .map((lang) => ({ value: lang, label: lang }));
+  };
+
+  // Get options for the native language dropdown. Exclude any languages that are already selected in the fluent and learning categories.
+  const nativeLanguageOptions = getFilteredOptions([
+    ...fluentLanguages,
+    ...learningLanguages,
+  ]);
+
+  // Get options for the fluent language dropdown. Exclude any languages that are already selected in the native and learning categories.
+  const fluentLanguageOptions = getFilteredOptions([
+    ...nativeLanguage,
+    ...learningLanguages,
+  ]);
+
+  // Get options for the learning language dropdown. Exclude any languages that are already selected in the native and fluent categories.
+  const learningLanguageOptions = getFilteredOptions([
+    ...nativeLanguage,
+    ...fluentLanguages,
+  ]);
+
   const handleDateInputChange = () => {
     const input = dateInputRef.current;
     if (input && input.value) {
@@ -216,7 +241,7 @@ function ProfileCreationForm() {
               isMulti
               styles={customStyles}
               name="nativeLanguages"
-              options={languageOptions}
+              options={nativeLanguageOptions}
               classNamePrefix="select"
               value={nativeLanguage.map((lang) => ({
                 value: lang,
@@ -236,7 +261,7 @@ function ProfileCreationForm() {
               isMulti
               styles={customStyles}
               name="fluentLanguages"
-              options={languageOptions}
+              options={fluentLanguageOptions}
               classNamePrefix="select"
               value={fluentLanguages.map((lang) => ({
                 value: lang,
@@ -256,7 +281,7 @@ function ProfileCreationForm() {
               isMulti
               styles={customStyles}
               name="learningLanguages"
-              options={languageOptions}
+              options={learningLanguageOptions}
               classNamePrefix="select"
               value={learningLanguages.map((lang) => ({
                 value: lang,
