@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./ProfileCreationForm.css";
 import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
-import Select from "react-select";
 import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
+import Select from "react-select";
+import "./ProfileCreationForm.css";
 
 function ProfileCreationForm() {
   const dateInputRef = React.useRef(null);
@@ -16,6 +16,7 @@ function ProfileCreationForm() {
   const [perfectPartner, setPerfectPartner] = useState("");
   const [learningGoals, setLearningGoals] = useState("");
   const [availableLanguages, setAvailableLanguages] = useState([]);
+  const [location, setLocation] = useState(null);
   const languageOptions = availableLanguages.map((lang) => ({
     value: lang,
     label: lang,
@@ -27,6 +28,7 @@ function ProfileCreationForm() {
       .then((response) => response.json())
       .then((data) => {
         const languageNames = data.map((language) => language.name);
+        languageNames.sort();
         setAvailableLanguages(languageNames);
       })
       .catch((error) => {
@@ -41,6 +43,10 @@ function ProfileCreationForm() {
     } else {
       input.classList.remove("has-content");
     }
+  };
+
+  const handleImageSelected = (selectedImageFile) => {
+    setProfilePicture(selectedImageFile);
   };
 
   // Handle form submission
@@ -58,9 +64,17 @@ function ProfileCreationForm() {
     formData.append("talkAbout", talkAbout);
     formData.append("perfectPartner", perfectPartner);
     formData.append("learningGoals", learningGoals);
-    for (let i = 0; i < photos.length; i++) {
-      formData.append("photos", photos[i]);
+
+    // Add location data to the formData object
+    if (location) {
+      formData.append("latitude", location.lat);
+      formData.append("longitude", location.lng);
+      formData.append("fullAddress", location.fullAddress);
     }
+
+    // formData.append("latitude", location.lat);
+    // formData.append("longitude", location.lng);
+    // formData.append("fullAddress", location.fullAddress);
 
     // Log the form data for debugging purposes
     for (let pair of formData.entries()) {
@@ -189,7 +203,7 @@ function ProfileCreationForm() {
           {/* Location Section */}
           <fieldset className="location-section">
             <legend>Location</legend>
-            <LocationsAutocomplete />
+            <LocationsAutocomplete onPlaceSelected={setLocation} />
           </fieldset>
 
           {/* Languages Section */}
@@ -294,7 +308,7 @@ function ProfileCreationForm() {
           {/* Profile Picture */}
           <fieldset className="profile-picture-section">
             <legend>Profile Picture</legend>
-            <ProfileImageUpload />
+            <ProfileImageUpload onImageSelected={handleImageSelected} />
           </fieldset>
 
           <button type="submit" className="profile-creation-button">

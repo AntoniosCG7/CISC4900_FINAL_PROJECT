@@ -19,8 +19,17 @@ const LocationsAutocomplete = ({ onPlaceSelected }) => {
       // Add listener to capture the selected value
       autocompleteInstance.addListener("place_changed", () => {
         const place = autocompleteInstance.getPlace();
-        if (onPlaceSelected) {
-          onPlaceSelected(place);
+        if (place.geometry) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const fullAddress = place.formatted_address;
+          if (onPlaceSelected) {
+            onPlaceSelected({
+              lat,
+              lng,
+              fullAddress,
+            });
+          }
         }
       });
     }
