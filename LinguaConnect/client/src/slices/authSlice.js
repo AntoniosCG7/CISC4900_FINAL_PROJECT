@@ -9,6 +9,7 @@ const initialState = {
   error: null,
 };
 
+// Load user from server
 export const loadUser = createAsyncThunk(
   "auth/loadUser",
   async (_, { rejectWithValue }) => {
@@ -96,6 +97,7 @@ const authSlice = createSlice({
   },
 });
 
+// Export actions
 export const {
   startLoading,
   setUserOnAuthentication,

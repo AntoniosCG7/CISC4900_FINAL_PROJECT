@@ -222,12 +222,21 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 exports.createProfile = catchAsync(async (req, res, next) => {
   // Extract profile data from req.body
   const { firstName, lastName, dateOfBirth } = req.body;
-  console.log("Profile Picture Path:", req.file.path);
+
+  // Check if the user uploaded a profile picture
+  let profilePicturePath;
+  if (req.file) {
+    profilePicturePath = req.file.path;
+  } else {
+    profilePicturePath = "./../public/default.jpg";
+  }
+
+  console.log("Profile Picture Path:", profilePicturePath);
 
   // Extract profile picture data from req.file
   const profilePicture = {
-    url: req.file.path, // URL provided by Cloudinary
-    filename: req.file.filename, // Filename on Cloudinary
+    url: profilePicturePath,
+    filename: req.file ? req.file.filename : "default",
   };
 
   // Extract and restructure location data from req.body
