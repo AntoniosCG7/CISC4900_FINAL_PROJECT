@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Language = require("../models/languageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -147,7 +148,6 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 // Get current user's data
 exports.getMe = catchAsync(async (req, res, next) => {
   // Since the user is authenticated (protected route), req.user should contain the user's data.
-  console.log(req.user);
   const user = await User.findById(req.user.id);
 
   // Respond with the user's data
@@ -221,16 +221,61 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 // Create a user profile
 exports.createProfile = catchAsync(async (req, res, next) => {
   // Extract profile data from req.body
-  const {
-    firstName,
-    lastName,
-    dateOfBirth,
-    profilePicture,
-    languages,
-    about,
-    location,
-    photos,
-  } = req.body;
+  const { firstName, lastName, dateOfBirth } = req.body;
+  console.log("Profile Picture Path:", req.file.path);
+
+  // Extract profile picture data from req.file
+  const profilePicture = {
+    url: req.file.path, // URL provided by Cloudinary
+    filename: req.file.filename, // Filename on Cloudinary
+  };
+
+  // Extract and restructure location data from req.body
+  const location = {
+    coordinates: [
+      parseFloat(req.body.longitude),
+      parseFloat(req.body.latitude),
+    ],
+    locationString: req.body.fullAddress,
+  };
+
+  const userLanguages = {
+    native: req.body.nativeLanguage.split(",").map((lang) => lang.trim()),
+    fluent: req.body.fluentLanguages.split(",").map((lang) => lang.trim()),
+    learning: req.body.learningLanguages.split(",").map((lang) => lang.trim()),
+  };
+
+  // Flatten all user provided languages
+  const allUserLanguages = [
+    ...userLanguages.native,
+    ...userLanguages.fluent,
+    ...userLanguages.learning,
+  ];
+
+  // Fetch the language ObjectIds from the database
+  const languageDocs = await Language.find({
+    name: { $in: allUserLanguages },
+  });
+
+  // Map language names to their corresponding ObjectIds
+  const nameToIdMap = {};
+  languageDocs.forEach((doc) => {
+    nameToIdMap[doc.name] = doc._id;
+  });
+
+  // Create a languages object containing the ObjectIds of the user's languages
+  const languages = {
+    native: userLanguages.native.map((name) => nameToIdMap[name]),
+    fluent: userLanguages.fluent.map((name) => nameToIdMap[name]),
+    learning: userLanguages.learning.map((name) => nameToIdMap[name]),
+  };
+
+  // Create an about object containing the user's answers to the about questions
+  const about = {
+    talkAbout: req.body.talkAbout,
+    perfectPartner: req.body.perfectPartner,
+    learningGoals: req.body.learningGoals,
+  };
 
   // Update the user document
   const updatedUser = await User.findByIdAndUpdate(
@@ -239,11 +284,10 @@ exports.createProfile = catchAsync(async (req, res, next) => {
       firstName,
       lastName,
       dateOfBirth,
-      profilePicture,
       languages,
       about,
+      profilePicture,
       location,
-      photos,
       profileCompleted: true,
     },
     {

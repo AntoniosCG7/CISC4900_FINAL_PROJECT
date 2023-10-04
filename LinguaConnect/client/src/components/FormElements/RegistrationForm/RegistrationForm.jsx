@@ -4,7 +4,12 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addAlert } from "../../../slices/alertSlice";
-import { authenticationSuccess, authError } from "../../../slices/authSlice";
+import {
+  authError,
+  startLoading,
+  setUserOnAuthentication,
+} from "../../../slices/authSlice";
+
 import "./RegistrationForm.css";
 
 const RegistrationForm = () => {
@@ -37,6 +42,7 @@ const RegistrationForm = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    dispatch(startLoading()); // Indicate that a request is being made
 
     try {
       const response = await axios.post(
@@ -48,7 +54,9 @@ const RegistrationForm = () => {
       );
 
       if (response.data.status === "success") {
-        dispatch(authenticationSuccess());
+        // Dispatch setUserOnAuthentication after successful registration
+        dispatch(setUserOnAuthentication(response.data.data.user));
+
         dispatch(
           addAlert({
             message: "User registered successfully!",

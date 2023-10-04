@@ -5,7 +5,7 @@ const initialState = {
   isAuthenticated: false,
   profileCompleted: false,
   user: null,
-  loading: true,
+  loading: false,
   error: null,
 };
 
@@ -19,7 +19,7 @@ export const loadUser = createAsyncThunk(
           withCredentials: true,
         }
       );
-      return response.data.user;
+      return response.data.data.user;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Unable to load user data.";
@@ -32,29 +32,39 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // Loading action, for when we're awaiting a server response
     startLoading: (state) => {
       state.loading = true;
     },
-    userLoaded: (state, action) => {
+    // Called when a user is loaded from the server
+    setUserOnAuthentication: (state, action) => {
       state.isAuthenticated = true;
-      state.loading = false;
       state.user = action.payload;
-    },
-    authenticationSuccess: (state) => {
-      state.isAuthenticated = true;
       state.loading = false;
+      state.error = null;
     },
+    // Called when a user completes their profile
+    profileCompletionSuccess: (state, action) => {
+      state.profileCompleted = true;
+      state.loading = false;
+      state.error = null;
+    },
+    // Logout the user and reset state
     logout: (state) => {
       state.isAuthenticated = false;
-      state.loading = false;
+      state.profileCompleted = false;
       state.user = null;
+      state.loading = false;
+      state.error = null;
     },
+    // Called when an error occurs during authentication
     authError: (state, action) => {
       state.isAuthenticated = false;
       state.loading = false;
       state.user = null;
       state.error = action.payload.message || "An error occurred";
     },
+    // Clear any errors
     clearErrors: (state) => {
       state.error = null;
     },
@@ -65,9 +75,17 @@ const authSlice = createSlice({
         state.loading = true;
       })
       .addCase(loadUser.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.loading = false;
-        state.user = action.payload;
+        if (action.payload && action.payload._id) {
+          state.isAuthenticated = true;
+          state.loading = false;
+          state.user = action.payload;
+          state.profileCompleted = action.payload.profileCompleted;
+        } else {
+          console.warn("No valid user loaded:", action.payload);
+          state.isAuthenticated = false;
+          state.loading = false;
+          state.user = null;
+        }
       })
       .addCase(loadUser.rejected, (state, action) => {
         state.isAuthenticated = false;
@@ -80,8 +98,8 @@ const authSlice = createSlice({
 
 export const {
   startLoading,
-  userLoaded,
-  authenticationSuccess,
+  setUserOnAuthentication,
+  profileCompletionSuccess,
   logout,
   authError,
   clearErrors,

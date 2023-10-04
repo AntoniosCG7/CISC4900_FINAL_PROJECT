@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
 import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
-import Select from "react-select";
+import { useNavigate } from "react-router-dom";
+import { addAlert } from "../../../slices/alertSlice";
+import {
+  authError,
+  profileCompletionSuccess,
+  setUserOnAuthentication,
+} from "../../../slices/authSlice";
 import "./ProfileCreationForm.css";
 
 function ProfileCreationForm() {
   const dateInputRef = React.useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [location, setLocation] = useState(null);
   const [nativeLanguage, setNativeLanguage] = useState([]);
   const [fluentLanguages, setFluentLanguages] = useState([]);
   const [learningLanguages, setLearningLanguages] = useState([]);
@@ -16,7 +29,6 @@ function ProfileCreationForm() {
   const [perfectPartner, setPerfectPartner] = useState("");
   const [learningGoals, setLearningGoals] = useState("");
   const [availableLanguages, setAvailableLanguages] = useState([]);
-  const [location, setLocation] = useState(null);
   const languageOptions = availableLanguages.map((lang) => ({
     value: lang,
     label: lang,
@@ -71,58 +83,87 @@ function ProfileCreationForm() {
   };
 
   const handleImageSelected = (selectedImageFile) => {
+    console.log("File received from child:", selectedImageFile);
     setProfilePicture(selectedImageFile);
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Create a FormData object to send form data
     const formData = new FormData();
-    formData.append("profilePicture", profilePicture);
+
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
-    formData.append("nativeLanguage", nativeLanguage);
-    formData.append("fluentLanguages", fluentLanguages);
-    formData.append("learningLanguages", learningLanguages);
+    formData.append("dateOfBirth", dateOfBirth);
+
+    formData.append("nativeLanguage", nativeLanguage.join(","));
+    formData.append("fluentLanguages", fluentLanguages.join(","));
+    formData.append("learningLanguages", learningLanguages.join(","));
+
     formData.append("talkAbout", talkAbout);
     formData.append("perfectPartner", perfectPartner);
     formData.append("learningGoals", learningGoals);
 
-    // Add location data to the formData object
+    formData.append("profilePicture", profilePicture);
+
+    // Add location data to the form data if it exists
     if (location) {
       formData.append("latitude", location.lat);
       formData.append("longitude", location.lng);
       formData.append("fullAddress", location.fullAddress);
     }
 
-    // formData.append("latitude", location.lat);
-    // formData.append("longitude", location.lng);
-    // formData.append("fullAddress", location.fullAddress);
-
     // Log the form data for debugging purposes
     for (let pair of formData.entries()) {
       console.log(pair[0] + ": " + pair[1]);
     }
 
-    // Send formData to the server for processing (via a POST request)
-    // fetch("http://localhost:3000/api/v1/createProfile", {
-    //   method: "POST",
-    //   body: formData,
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log("Success:", data);
-    //     // Redirect to the profile page
-    //     window.location.href = "/profile";
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error:", error);
-    //   });
-
-    // Maybe I should use libraries like Axios to make the HTTP request.
-    // axios.post('/api/createProfile', formData).then(response => { ... });
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/users/createProfile",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      if (
+        response.status === 200 &&
+        response.data &&
+        response.data.status === "success"
+      ) {
+        dispatch(setUserOnAuthentication(response.data.data.user));
+        dispatch(profileCompletionSuccess());
+        dispatch(
+          addAlert({
+            type: "success",
+            message: "Profile created successfully!",
+          })
+        );
+        navigate("/discover");
+      } else {
+        throw new Error("Server responded with an unsuccessful status");
+      }
+    } catch (error) {
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
+      dispatch(
+        authError(
+          error.response
+            ? error.response.data
+            : { message: "Error creating profile. Please try again." }
+        )
+      );
+      dispatch(
+        addAlert({
+          type: "error",
+          message: "Error creating profile. Please try again.",
+        })
+      );
+    }
   };
 
   const customStyles = {
@@ -222,6 +263,8 @@ function ProfileCreationForm() {
               ref={dateInputRef}
               onInput={handleDateInputChange}
               onBlur={handleDateInputChange}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              required
             />
           </fieldset>
 
@@ -270,7 +313,6 @@ function ProfileCreationForm() {
               onChange={(selected) =>
                 setFluentLanguages(selected.map((item) => item.value))
               }
-              required
             />
 
             <br />
@@ -290,6 +332,7 @@ function ProfileCreationForm() {
               onChange={(selected) =>
                 setLearningLanguages(selected.map((item) => item.value))
               }
+              required
             />
           </fieldset>
 
@@ -333,7 +376,10 @@ function ProfileCreationForm() {
           {/* Profile Picture */}
           <fieldset className="profile-picture-section">
             <legend>Profile Picture</legend>
-            <ProfileImageUpload onImageSelected={handleImageSelected} />
+            <ProfileImageUpload
+              onImageSelected={handleImageSelected}
+              name="profilePicture"
+            />
           </fieldset>
 
           <button type="submit" className="profile-creation-button">

@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProtectedRoute from "./routing/ProtectedRoute";
 import Alert from "./components/UIElements/Alert/Alert";
-import PrivateRoute from "./routing/PrivateRoute";
 import { loadUser } from "./slices/authSlice";
 import {
   Home,
@@ -17,6 +17,7 @@ import {
   User,
   Chat,
   Map,
+  Discover,
 } from "./pages";
 
 function App() {
@@ -43,25 +44,26 @@ function App() {
           theme="colored"
         />
         <Routes>
+          {/* Public routes */}
           <Route index element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/create-profile"
-            element={
-              <PrivateRoute>
-                <ProfileCreation />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/discover" element={<Profile />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/user" element={<User />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/map" element={<Map />} />
+
+          {/* Protected Routes */}
+          <Route path="/create-profile" element={<ProtectedRoute />}>
+            <Route index element={<ProfileCreation />} />
+          </Route>
+
+          <Route path="/" element={<ProtectedRoute profileRequired={true} />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/user" element={<User />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/map" element={<Map />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>

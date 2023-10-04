@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addAlert } from "../../../slices/alertSlice";
-import { authenticationSuccess, authError } from "../../../slices/authSlice";
+import {
+  setUserOnAuthentication,
+  authError,
+  startLoading,
+} from "../../../slices/authSlice";
 import "./LoginForm.css";
 
 const LoginForm = () => {
@@ -36,6 +40,8 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    dispatch(startLoading());
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/users/login",
@@ -46,7 +52,7 @@ const LoginForm = () => {
       );
 
       if (response.data.status === "success") {
-        dispatch(authenticationSuccess());
+        dispatch(setUserOnAuthentication(response.data.user));
         dispatch(
           addAlert({
             message: "User logged in successfully!",
@@ -67,11 +73,11 @@ const LoginForm = () => {
         );
       }
     } catch (error) {
-      dispatch(authError(error));
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data ||
         "Error logging in.";
+      dispatch(authError(errorMessage));
       dispatch(
         addAlert({
           message: errorMessage,

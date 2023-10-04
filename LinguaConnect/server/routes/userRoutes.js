@@ -1,6 +1,9 @@
 // Import the Express module and create a new router instance
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const { storage } = require("./../cloudinary");
+const upload = multer({ storage });
 
 // Import the authentication and user controllers
 const authController = require("./../controllers/authController");
@@ -17,9 +20,13 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 router.use(authController.protect);
 
 // PROTECTED ROUTES (Only logged-in users can access these routes)
-router.post("/createProfile", userController.createProfile); // Create a user profile
+router.post(
+  "/createProfile",
+  upload.single("profilePicture"),
+  userController.createProfile
+); // Create a user profile
 router.get("/me", userController.getMe); // Get current user
-router.patch("/updateMe", userController.updateMe); // Update current user
+router.patch("/updateMe", userController.updateMe);
 router.patch("/updatePassword", authController.updatePassword); // Update user password
 router.delete("/deleteMe", userController.deleteMe); // Delete current user
 // router.get("/me/events", userController.myEvents); // Get events user has joined or created

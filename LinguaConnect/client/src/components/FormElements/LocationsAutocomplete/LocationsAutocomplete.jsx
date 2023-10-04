@@ -1,3 +1,4 @@
+// Desc: Google Places Autocomplete component using the Google Maps and Google Places API
 import React, { useEffect, useRef, useState } from "react";
 import "./LocationsAutocomplete.css";
 
@@ -41,6 +42,7 @@ const LocationsAutocomplete = ({ onPlaceSelected }) => {
       type="text"
       placeholder="Enter your location..."
       className="autofill-input"
+      required
     />
   );
 };

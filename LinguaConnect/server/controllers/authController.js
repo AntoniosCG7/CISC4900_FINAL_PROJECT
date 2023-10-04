@@ -19,6 +19,8 @@ const getCookieOptions = (req) => ({
   expires: new Date(
     Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
   ),
+  domain: req.hostname, // Ensures the cookie is sent only to the domain that set it
+  path: "/", // Ensures the cookie is sent on all routes
   httpOnly: true, // Ensures the cookie is sent only over HTTP(S), not client JavaScript
   secure:
     process.env.NODE_ENV === "production" &&
@@ -92,16 +94,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // Send the JWT token to the client
   createSendToken(user, 200, req, res);
-
-  // Remove the password from the user object
-  user.password = undefined;
-
-  // Send a success response with the JWT token
-  res.status(200).json({
-    status: "success",
-    message: "User logged in successfully.",
-    token,
-  });
 });
 
 // Function to log out a user
@@ -241,19 +233,13 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
-// Middleware to protect routes from unauthorized access
+// Function to protect routes from unauthenticated users
 exports.protect = catchAsync(async (req, res, next) => {
-  let token;
+  // 1. Check if the request contains the token in its cookies.
+  const token = req.cookies.jwt;
 
-  // 1. Check if the request contains the token in its headers or cookies.
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
+  // Log the presence or absence of the token.
+  console.log("Token received:", token ? "Yes" : "No");
 
   // 2. If no token is found, send back an error response.
   if (!token) {
@@ -265,14 +251,23 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 3. Verify the token to ensure it's valid.
-  const decodedPayload = await promisify(jwt.verify)(
-    token,
-    process.env.JWT_SECRET
-  );
+  let decodedPayload;
+  try {
+    // 3. Verify the token to ensure it's valid.
+    decodedPayload = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    console.log("Token verified successfully.");
+  } catch (error) {
+    console.error("Token verification failed:", error.message);
+    return next(new AppError("Invalid token. Please log in again.", 401));
+  }
 
   // 4. Check if the user for which the token was issued still exists.
   const currentUser = await User.findById(decodedPayload.id);
+
+  console.log(
+    "User associated with token:",
+    currentUser ? "Exists" : "Does not exist"
+  );
 
   if (!currentUser) {
     return next(
@@ -282,17 +277,16 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 5. Check if user changed password after the token was issued.
   if (currentUser.changedPasswordAfter(decodedPayload.iat)) {
+    console.warn("User recently changed password.");
     return next(
       new AppError("User recently changed password. Please log in again.", 401)
     );
   }
 
-  // Check if user has completed the profile
   if (
     !currentUser.profileCompleted &&
     req.originalUrl !== "/api/v1/users/createProfile"
   ) {
-    // error response if user has not completed profile and is not trying to access the create-profile route.
     return next(
       new AppError(
         "Please complete your profile before accessing this resource.",
@@ -301,9 +295,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 6. If all checks pass, grant access to the protected route.
-  req.user = currentUser; // Saving user data to the request object to use later.
-
+  // 6. Grant access to the protected route.
+  req.user = currentUser;
   next();
 });
 

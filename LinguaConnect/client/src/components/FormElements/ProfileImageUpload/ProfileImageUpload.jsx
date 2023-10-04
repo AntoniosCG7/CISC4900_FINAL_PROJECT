@@ -12,6 +12,7 @@ const ProfileImageUpload = (props) => {
       reader.onload = function (e) {
         imagePreviewRef.current.style.backgroundImage = `url(${e.target.result})`;
         if (props.onImageSelected) {
+          console.log(selectedFile);
           props.onImageSelected(selectedFile); // Send the file to parent
         }
       };
@@ -33,6 +34,7 @@ const ProfileImageUpload = (props) => {
           <input
             type="file"
             id="imageUpload"
+            name="profilePicture"
             ref={imageUploadRef}
             accept=".png, .jpg, .jpeg"
             onChange={handleImageUploadChange}

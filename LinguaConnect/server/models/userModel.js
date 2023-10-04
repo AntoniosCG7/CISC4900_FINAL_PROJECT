@@ -49,8 +49,9 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     profilePicture: {
-      type: String,
-      default: "default.jpg",
+      default: { type: String, default: "default.jpg" },
+      url: String,
+      filename: String,
     },
 
     // Language Proficiency
@@ -107,13 +108,18 @@ const userSchema = new mongoose.Schema(
 
     // User's Location
     location: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
       coordinates: {
         type: [Number], // [longitude, latitude]
         index: "2dsphere", // to support geospatial queries
       },
       locationString: {
         type: String,
-        required: [true, "Please provide a location"],
+        trim: true,
       },
     },
 
