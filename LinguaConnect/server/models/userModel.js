@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     profilePicture: {
-      default: { type: String, default: "default.jpg" },
+      default: { type: String, default: "server/public/Default.png" },
       url: String,
       filename: String,
     },

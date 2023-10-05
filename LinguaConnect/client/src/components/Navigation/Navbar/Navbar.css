@@ -154,9 +154,71 @@ a.logo:hover {
   }
 }
 
+/* ... existing styles ... */
+
+/* User Profile Picture styles */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+  display: inline-block; /* to line it up next to buttons */
+  vertical-align: middle; /* to align it vertically centered to adjacent elements */
+}
+
+#profile-btn {
+  font-weight: 600;
+  font-size: 0.7rem;
+  cursor: pointer;
+  color: var(--secondary-color);
+  background-color: var(--tertiary-color);
+  border-radius: 0.4rem;
+  width: 5.5rem;
+  height: 2rem;
+  margin-right: 0.6rem;
+  transition: 0.5s ease all;
+}
+
+#profile-btn:hover {
+  color: #000000;
+  background-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+#logout-btn {
+  font-weight: 600;
+  font-size: 0.7rem;
+  cursor: pointer;
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
+  border-radius: 0.4rem;
+  width: 5.5rem;
+  height: 2rem;
+  transition: 0.5s ease all;
+}
+
+#logout-btn:hover {
+  color: #000000;
+  background-color: var(--tertiary-color);
+  transform: scale(1.1);
+}
+
 @media (max-width: 700px) {
   #login-btn,
   #register-btn {
+    width: 3.5rem;
+    height: 2rem;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+  }
+
+  #profile-btn,
+  #logout-btn {
     width: 3.5rem;
     height: 2rem;
   }

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import ProtectedRoute from "./routing/ProtectedRoute";
 import Alert from "./components/UIElements/Alert/Alert";
 import { loadUser } from "./slices/authSlice";
@@ -21,12 +22,6 @@ import {
 } from "./pages";
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(loadUser());
-  }, [dispatch]);
-
   return (
     <>
       <BrowserRouter>
@@ -53,17 +48,35 @@ function App() {
           <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}
-          <Route path="/create-profile" element={<ProtectedRoute />}>
-            <Route index element={<ProfileCreation />} />
-          </Route>
+          <Route
+            path="/create-profile"
+            element={<ProtectedRoute component={ProfileCreation} />}
+          />
 
-          <Route path="/" element={<ProtectedRoute profileRequired={true} />}>
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/user" element={<User />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/map" element={<Map />} />
-          </Route>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute component={Profile} profileRequired={true} />
+            }
+          />
+          <Route
+            path="/discover"
+            element={
+              <ProtectedRoute component={Discover} profileRequired={true} />
+            }
+          />
+          <Route
+            path="/user"
+            element={<ProtectedRoute component={User} profileRequired={true} />}
+          />
+          <Route
+            path="/chat"
+            element={<ProtectedRoute component={Chat} profileRequired={true} />}
+          />
+          <Route
+            path="/map"
+            element={<ProtectedRoute component={Map} profileRequired={true} />}
+          />
         </Routes>
       </BrowserRouter>
     </>

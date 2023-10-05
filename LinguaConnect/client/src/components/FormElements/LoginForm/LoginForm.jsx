@@ -6,6 +6,7 @@ import axios from "axios";
 import { addAlert } from "../../../slices/alertSlice";
 import {
   setUserOnAuthentication,
+  resetLoggedOut,
   authError,
   startLoading,
 } from "../../../slices/authSlice";
@@ -19,7 +20,6 @@ const LoginForm = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const profileCompleted = useSelector((state) => state.auth.profileCompleted);
 
   const handleInputBlur = (e) => {
     if (!e.target.validity.valid) {
@@ -52,14 +52,17 @@ const LoginForm = () => {
       );
 
       if (response.data.status === "success") {
-        dispatch(setUserOnAuthentication(response.data.user));
+        const user = response.data.data.user;
+        dispatch(setUserOnAuthentication(user));
+        dispatch(resetLoggedOut());
+        const firstName = user.firstName;
         dispatch(
           addAlert({
-            message: "User logged in successfully!",
+            message: `Welcome, ${firstName}!`,
             type: "success",
           })
         );
-        if (!profileCompleted) {
+        if (!user.profileCompleted) {
           navigate("/create-profile");
         } else {
           navigate("/discover");

@@ -6,11 +6,7 @@ import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
 import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
 import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
-import {
-  authError,
-  profileCompletionSuccess,
-  setUserOnAuthentication,
-} from "../../../slices/authSlice";
+import { authError, setUserOnAuthentication } from "../../../slices/authSlice";
 import "./ProfileCreationForm.css";
 
 function ProfileCreationForm() {
@@ -83,7 +79,6 @@ function ProfileCreationForm() {
   };
 
   const handleImageSelected = (selectedImageFile) => {
-    console.log("File received from child:", selectedImageFile);
     setProfilePicture(selectedImageFile);
   };
 
@@ -134,7 +129,6 @@ function ProfileCreationForm() {
         response.data.status === "success"
       ) {
         dispatch(setUserOnAuthentication(response.data.data.user));
-        dispatch(profileCompletionSuccess());
         dispatch(
           addAlert({
             type: "success",

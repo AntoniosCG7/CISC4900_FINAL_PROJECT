@@ -7,6 +7,16 @@ const initialState = {
   user: null,
   loading: false,
   error: null,
+  loggedOut: false,
+};
+
+// Reset user state
+const resetUserState = (state) => {
+  state.isAuthenticated = false;
+  state.profileCompleted = false;
+  state.user = null;
+  state.loading = false;
+  state.error = null;
 };
 
 // Load user from server
@@ -29,6 +39,22 @@ export const loadUser = createAsyncThunk(
   }
 );
 
+// Logout user
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      await axios.get("http://localhost:3000/api/v1/users/logout", {
+        withCredentials: true,
+      });
+      dispatch(logout());
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Logout failed.";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -41,12 +67,7 @@ const authSlice = createSlice({
     setUserOnAuthentication: (state, action) => {
       state.isAuthenticated = true;
       state.user = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    // Called when a user completes their profile
-    profileCompletionSuccess: (state, action) => {
-      state.profileCompleted = true;
+      state.profileCompleted = action.payload.profileCompleted;
       state.loading = false;
       state.error = null;
     },
@@ -57,6 +78,11 @@ const authSlice = createSlice({
       state.user = null;
       state.loading = false;
       state.error = null;
+      state.loggedOut = true;
+    },
+    // Reset loggedOut state
+    resetLoggedOut: (state) => {
+      state.loggedOut = false;
     },
     // Called when an error occurs during authentication
     authError: (state, action) => {
@@ -72,28 +98,33 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loadUser.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(loadUser.fulfilled, (state, action) => {
+        state.loading = false;
         if (action.payload && action.payload._id) {
           state.isAuthenticated = true;
-          state.loading = false;
           state.user = action.payload;
           state.profileCompleted = action.payload.profileCompleted;
         } else {
-          console.warn("No valid user loaded:", action.payload);
-          state.isAuthenticated = false;
-          state.loading = false;
-          state.user = null;
+          resetUserState(state);
         }
       })
       .addCase(loadUser.rejected, (state, action) => {
-        state.isAuthenticated = false;
-        state.loading = false;
-        state.user = null;
+        resetUserState(state);
         state.error = action.payload || "Failed to load user";
-      });
+      })
+      .addCase(logoutUser.fulfilled, resetUserState)
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+      })
+      .addMatcher(
+        (action) =>
+          action.type === "auth/loadUser/pending" ||
+          action.type === "auth/logoutUser/pending",
+        (state) => {
+          state.loading = true;
+        }
+      );
   },
 });
 
@@ -101,8 +132,8 @@ const authSlice = createSlice({
 export const {
   startLoading,
   setUserOnAuthentication,
-  profileCompletionSuccess,
   logout,
+  resetLoggedOut,
   authError,
   clearErrors,
 } = authSlice.actions;

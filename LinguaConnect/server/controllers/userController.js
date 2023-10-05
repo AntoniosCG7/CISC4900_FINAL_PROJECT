@@ -228,7 +228,7 @@ exports.createProfile = catchAsync(async (req, res, next) => {
   if (req.file) {
     profilePicturePath = req.file.path;
   } else {
-    profilePicturePath = "./../public/default.jpg";
+    profilePicturePath = "/assets/images/Default.png";
   }
 
   console.log("Profile Picture Path:", profilePicturePath);
@@ -236,7 +236,7 @@ exports.createProfile = catchAsync(async (req, res, next) => {
   // Extract profile picture data from req.file
   const profilePicture = {
     url: profilePicturePath,
-    filename: req.file ? req.file.filename : "default",
+    filename: req.file ? req.file.filename : "Default.png",
   };
 
   // Extract and restructure location data from req.body
