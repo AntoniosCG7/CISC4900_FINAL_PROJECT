@@ -128,11 +128,12 @@ function ProfileCreationForm() {
         response.data &&
         response.data.status === "success"
       ) {
-        dispatch(setUserOnAuthentication(response.data.data.user));
+        const user = response.data.data.user;
+        dispatch(setUserOnAuthentication(user));
         dispatch(
           addAlert({
             type: "success",
-            message: "Profile created successfully!",
+            message: `Profile complete! The world of languages awaits you, ${user.firstName}.`,
           })
         );
         navigate("/discover");

@@ -59,6 +59,7 @@ a.logo:hover {
 .navbar_buttons {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 #login-btn,
@@ -154,54 +155,68 @@ a.logo:hover {
   }
 }
 
-/* ... existing styles ... */
-
-/* User Profile Picture styles */
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   margin-right: 10px;
-  object-fit: cover;
-  display: inline-block; /* to line it up next to buttons */
-  vertical-align: middle; /* to align it vertically centered to adjacent elements */
-}
-
-#profile-btn {
-  font-weight: 600;
-  font-size: 0.7rem;
   cursor: pointer;
-  color: var(--secondary-color);
-  background-color: var(--tertiary-color);
-  border-radius: 0.4rem;
-  width: 5.5rem;
-  height: 2rem;
-  margin-right: 0.6rem;
   transition: 0.5s ease all;
 }
 
-#profile-btn:hover {
-  color: #000000;
-  background-color: var(--primary-color);
-  transform: scale(1.1);
-}
-
-#logout-btn {
-  font-weight: 600;
-  font-size: 0.7rem;
-  cursor: pointer;
-  color: var(--secondary-color);
-  background-color: var(--primary-color);
-  border-radius: 0.4rem;
-  width: 5.5rem;
-  height: 2rem;
-  transition: 0.5s ease all;
-}
-
-#logout-btn:hover {
-  color: #000000;
+.user-menu {
+  position: absolute;
   background-color: var(--tertiary-color);
-  transform: scale(1.1);
+  margin-top: 25px;
+  top: 100%;
+  right: 5px;
+  padding: 10px 20px;
+  width: 200px;
+  border-radius: 15px;
+  z-index: 1010;
+  transition: 0.3s;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.user-menu.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.user-menu h3 {
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  padding-bottom: 10px;
+}
+
+.user-menu::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: 28px;
+  width: 20px;
+  height: 20px;
+  transform: rotate(45deg);
+  background-color: var(--tertiary-color);
+}
+
+.user-menu ul li {
+  list-style: none;
+  padding: 10px 0;
+  border-top: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.user-menu ul li a {
+  transition: text-shadow 0.3s ease;
+}
+
+.user-menu ul li a:hover {
+  text-shadow: 0 0 1px #000, 0 0 1px #000, 0 0 1px #000;
+}
+
+.user-menu ul li .icons {
+  max-width: 20px;
+  margin-right: 10px;
 }
 
 @media (max-width: 700px) {
@@ -212,14 +227,10 @@ a.logo:hover {
   }
 
   .user-avatar {
-    width: 30px;
-    height: 30px;
-    margin-right: 5px;
+    margin: 0 5px;
   }
 
-  #profile-btn,
-  #logout-btn {
-    width: 3.5rem;
-    height: 2rem;
+  .user-menu {
+    right: 0px;
   }
 }

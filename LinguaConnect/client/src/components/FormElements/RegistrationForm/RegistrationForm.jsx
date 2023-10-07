@@ -59,7 +59,7 @@ const RegistrationForm = () => {
 
         dispatch(
           addAlert({
-            message: "User registered successfully!",
+            message: "Registration successful!",
             type: "success",
           })
         );
