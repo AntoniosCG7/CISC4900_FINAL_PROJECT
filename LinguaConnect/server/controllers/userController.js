@@ -148,7 +148,10 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 // Get current user's data
 exports.getMe = catchAsync(async (req, res, next) => {
   // Since the user is authenticated (protected route), req.user should contain the user's data.
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id)
+    .populate("languages.native")
+    .populate("languages.fluent")
+    .populate("languages.learning");
 
   // Respond with the user's data
   res.status(200).json({

@@ -171,21 +171,6 @@ function arrayLimit(val) {
   return val.length <= 10;
 }
 
-// Function to calculate user's age
-userSchema.methods.calculateAge = function () {
-  const today = new Date();
-  const birthDate = new Date(this.dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-  return age;
-};
-
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
   // Only hash the password if it has been modified or is new

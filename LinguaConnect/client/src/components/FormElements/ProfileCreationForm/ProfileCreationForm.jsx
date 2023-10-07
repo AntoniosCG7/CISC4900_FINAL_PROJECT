@@ -345,7 +345,7 @@ function ProfileCreationForm() {
             <br />
 
             <label htmlFor="perfectPartner">
-              What’s your perfect LinguaConnect partner like?
+              What’s your perfect language-exchange partner like?
             </label>
             <textarea
               value={perfectPartner}

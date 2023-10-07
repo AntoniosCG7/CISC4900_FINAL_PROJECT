@@ -11,7 +11,9 @@ import {
   Login,
   Register,
   ProfileCreation,
-  Profile,
+  PersonalProfile,
+  EditProfile,
+  // PublicProfile,
   User,
   Chat,
   Map,
@@ -49,13 +51,30 @@ function App() {
             path="/create-profile"
             element={<ProtectedRoute component={ProfileCreation} />}
           />
-
           <Route
             path="/profile"
             element={
-              <ProtectedRoute component={Profile} profileRequired={true} />
+              <ProtectedRoute
+                component={PersonalProfile}
+                profileRequired={true}
+              />
             }
           />
+          <Route
+            path="/edit-profile"
+            element={
+              <ProtectedRoute component={EditProfile} profileRequired={true} />
+            }
+          />
+          {/* <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute
+                component={PublicProfile}
+                profileRequired={true}
+              />
+            }
+          /> */}
           <Route
             path="/discover"
             element={

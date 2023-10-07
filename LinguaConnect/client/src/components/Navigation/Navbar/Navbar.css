@@ -156,10 +156,10 @@ a.logo:hover {
 }
 
 .user-avatar {
-  width: 70px;
-  height: 70px;
+  border: 3px solid var(--tertiary-color);
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-right: 10px;
   cursor: pointer;
   transition: 0.5s ease all;
 }
@@ -167,9 +167,9 @@ a.logo:hover {
 .user-menu {
   position: absolute;
   background-color: var(--tertiary-color);
-  margin-top: 25px;
+  margin-top: 20px;
   top: 100%;
-  right: 5px;
+  right: 0;
   padding: 10px 20px;
   width: 200px;
   border-radius: 15px;
@@ -231,6 +231,6 @@ a.logo:hover {
   }
 
   .user-menu {
-    right: 0px;
+    right: 5px;
   }
 }

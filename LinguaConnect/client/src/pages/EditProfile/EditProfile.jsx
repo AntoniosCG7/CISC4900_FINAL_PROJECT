@@ -1,16 +1,15 @@
 import React from "react";
 import { Navbar } from "../../components/index";
-import "./Profile.css";
 
-const Profile = () => {
+const EditProfile = () => {
   return (
     <>
       <Navbar />
       <div className="main-container">
-        <p>Profile Page</p>
+        <h1>Edit Profile</h1>
       </div>
     </>
   );
 };
 
-export default Profile;
+export default EditProfile;

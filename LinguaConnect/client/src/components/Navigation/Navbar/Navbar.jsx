@@ -5,6 +5,7 @@ import { logoutUser } from "../../../slices/authSlice";
 import { addAlert } from "../../../slices/alertSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { faUserPen } from "@fortawesome/free-solid-svg-icons";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import "./Navbar.css";
@@ -121,7 +122,11 @@ const Navbar = () => {
               <ul>
                 <li>
                   <FontAwesomeIcon icon={faUser} className="icons" />
-                  <Link to="/my-profile">My Profile</Link>
+                  <Link to="/profile">My Profile</Link>
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faUserPen} className="icons" />
+                  <Link to="/edit-profile">Edit Profile</Link>
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faGear} className="icons" />
