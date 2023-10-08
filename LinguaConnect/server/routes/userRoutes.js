@@ -26,7 +26,11 @@ router.post(
   userController.createProfile
 ); // Create a user profile
 router.get("/me", userController.getMe); // Get current user
-router.patch("/updateMe", userController.updateMe);
+router.patch(
+  "/updateMe",
+  upload.single("profilePicture"),
+  userController.updateMe
+);
 router.patch("/updatePassword", authController.updatePassword); // Update user password
 router.delete("/deleteMe", userController.deleteMe); // Delete current user
 // router.get("/me/events", userController.myEvents); // Get events user has joined or created

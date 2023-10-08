@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Navbar } from "../../components/index";
+import { ProfileEditForm } from "../../components/index";
 
 const EditProfile = () => {
   return (
     <>
       <Navbar />
-      <div className="main-container">
-        <h1>Edit Profile</h1>
-      </div>
+      <ProfileEditForm />
     </>
   );
 };

@@ -1,8 +1,8 @@
-// Desc: Google Places Autocomplete component using the Google Maps and Google Places API
 import React, { useEffect, useRef, useState } from "react";
 import "./LocationsAutocomplete.css";
 
-const LocationsAutocomplete = ({ onPlaceSelected }) => {
+// Component for Google Places Autocomplete
+const LocationsAutocomplete = ({ onPlaceSelected, selectedLocation }) => {
   const inputRef = useRef(null);
   const [autocomplete, setAutocomplete] = useState(null);
 
@@ -35,6 +35,13 @@ const LocationsAutocomplete = ({ onPlaceSelected }) => {
       });
     }
   }, []);
+
+  // If there's a previously selected location, set it as the input value (for editing the profile)
+  useEffect(() => {
+    if (selectedLocation && inputRef.current) {
+      inputRef.current.value = selectedLocation.fullAddress;
+    }
+  }, [selectedLocation]);
 
   return (
     <input

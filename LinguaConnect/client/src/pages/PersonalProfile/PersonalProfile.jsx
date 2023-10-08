@@ -96,7 +96,6 @@ const PersonalProfile = () => {
               <p className="about-answer">{user.about.learningGoals}</p>
             </p>
           </div>
-
           <div className="profile-section" id="languages">
             <h2 className="section-title">Languages</h2>
             <p>
@@ -118,9 +117,23 @@ const PersonalProfile = () => {
               </p>
             </p>
           </div>
-          {/* <div className="profile-section" id="photos">
-            <h2 className="section-title">Photos</h2>
-          </div> */}
+          {/* If the user has photos, render the photos section. If not, don't
+          render anything. */}
+          {user.photos && user.photos.length > 0 && (
+            <div className="profile-section">
+              <h2 className="section-title">Photos</h2>
+              <div className="photos-container">
+                {user.photos.map((photo, index) => (
+                  <img
+                    key={index}
+                    src={photo.url}
+                    alt={`User photo ${index + 1}`}
+                    className="user-photo"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

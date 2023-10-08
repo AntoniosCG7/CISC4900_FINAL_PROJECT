@@ -57,27 +57,21 @@ function filterObj(obj, ...allowedFields) {
 
   // Iterate over each allowed field to process it.
   allowedFields.forEach((field) => {
-    if (field.includes(".")) {
-      // This is a nested field.
-      const keys = field.split(".");
-      let current = obj;
-      // Attempt to navigate to the depth specified by the field in the source object.
-      for (let key of keys) {
-        if (!current[key]) {
-          // Part of the specified path doesn't exist in the source object.
-          break;
-        }
-        current = current[key];
-      }
+    const keys = field.split(".");
+    let current = obj;
 
-      // If we navigated to the end of the keys array, the nested field exists.
-      // So, we set its value in the result object.
-      if (current !== obj) {
-        setValue(newObj, field, current);
+    // Attempt to navigate to the depth specified by the field in the source object.
+    for (let key of keys) {
+      if (!current[key]) {
+        // Part of the specified path doesn't exist in the source object.
+        break;
       }
-    } else if (obj.hasOwnProperty(field)) {
-      // This is a top-level field.
-      newObj[field] = obj[field];
+      current = current[key];
+    }
+
+    // If we navigated to the end of the keys array, the field exists.
+    if (current !== obj) {
+      setValue(newObj, field, Array.isArray(current) ? [...current] : current);
     }
   });
 
@@ -164,7 +158,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
 
 // Update the current user's data
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // 1. Check if user is trying to update their password
+  // Check if user is trying to update their password
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
@@ -174,34 +168,120 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 2. Create a filtered object containing only the fields that are allowed to be updated
-  const filteredBody = filterObj(
-    req.body,
-    "username",
-    "email",
-    "firstName",
-    "lastName",
-    "dateOfBirth",
-    "profilePicture",
-    "languages.native",
-    "languages.fluent",
-    "languages.learning",
-    "about.talkAbout",
-    "about.perfectPartner",
-    "about.learningGoals",
-    "photos",
-    "location.coordinates",
-    "location.city",
-    "location.country"
-  );
+  // Flatten request body for simpler processing
+  let updateData = { ...req.body };
 
-  // 3. Update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true, // This returns the modified document
-    runValidators: true, // Validates the updated document before saving
+  // Convert flat location data to structured format
+  updateData.location = {
+    type: "Point",
+    coordinates: [
+      parseFloat(updateData.longitude),
+      parseFloat(updateData.latitude),
+    ],
+    locationString: updateData.fullAddress,
+  };
+
+  // Convert flat language data to structured format
+  const allUserLanguages = [
+    updateData.nativeLanguage,
+    ...updateData.fluentLanguages.split(","),
+    ...updateData.learningLanguages.split(","),
+  ];
+
+  // Fetch the language ObjectIds from the database
+  const languageDocs = await Language.find({ name: { $in: allUserLanguages } });
+
+  // Map language names to their corresponding ObjectIds
+  const nameToIdMap = {};
+  languageDocs.forEach((doc) => {
+    nameToIdMap[doc.name] = doc._id;
   });
 
-  // 4. Send the updated user data as a response
+  // Create a languages object containing the ObjectIds of the user's languages
+  updateData.languages = {
+    native: [nameToIdMap[updateData.nativeLanguage]],
+    fluent: updateData.fluentLanguages
+      .split(",")
+      .map((name) => nameToIdMap[name]),
+    learning: updateData.learningLanguages
+      .split(",")
+      .map((name) => nameToIdMap[name]),
+  };
+
+  // Convert flat about data to structured format
+  updateData.about = {
+    talkAbout: updateData.talkAbout,
+    perfectPartner: updateData.perfectPartner,
+    learningGoals: updateData.learningGoals,
+  };
+
+  // Check if the user uploaded a profile picture
+  let profilePicturePath;
+  if (req.file) {
+    profilePicturePath = req.file.path;
+  } else if (
+    req.user &&
+    req.user.profilePicture &&
+    req.user.profilePicture.url
+  ) {
+    // If no new file is uploaded, retain the existing profile picture URL
+    profilePicturePath = req.user.profilePicture.url;
+  } else {
+    // Default picture
+    profilePicturePath = "/assets/images/Default.png";
+  }
+
+  // Extract profile picture data from req.file or existing data
+  const profilePicture = {
+    url: profilePicturePath,
+    filename: req.file
+      ? req.file.filename
+      : (req.user &&
+          req.user.profilePicture &&
+          req.user.profilePicture.filename) ||
+        "Default.png",
+  };
+
+  // Update the profilePicture property of the updateData object
+  updateData.profilePicture = profilePicture;
+
+  // Use the filterObj to filter out unwanted fields
+  const filteredBody = filterObj(
+    updateData,
+    ...[
+      "username",
+      "email",
+      "firstName",
+      "lastName",
+      "dateOfBirth",
+      "location",
+      "profilePicture",
+      "languages.native",
+      "languages.fluent",
+      "languages.learning",
+      "about.talkAbout",
+      "about.perfectPartner",
+      "about.learningGoals",
+    ]
+  );
+
+  // Update the user document
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  // Check if update was successful
+  if (!updatedUser) {
+    return next(
+      new AppError(
+        "Failed to update user. Please check the provided data and try again.",
+        500
+      )
+    );
+  }
+
+  // Send the updated user data as a response
   res.status(200).json({
     status: "success",
     data: {
@@ -233,8 +313,6 @@ exports.createProfile = catchAsync(async (req, res, next) => {
   } else {
     profilePicturePath = "/assets/images/Default.png";
   }
-
-  console.log("Profile Picture Path:", profilePicturePath);
 
   // Extract profile picture data from req.file
   const profilePicture = {
