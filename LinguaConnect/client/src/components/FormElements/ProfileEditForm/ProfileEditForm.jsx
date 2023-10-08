@@ -6,7 +6,7 @@ import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
 import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
 import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
-import { authError, updateUserAvatar } from "../../../slices/authSlice";
+import { authError, updateUser } from "../../../slices/authSlice";
 
 const ProfileEditForm = () => {
   const dateInputRef = React.useRef(null);
@@ -181,8 +181,8 @@ const ProfileEditForm = () => {
         response.data &&
         response.data.status === "success"
       ) {
-        // Update the user's avatar in the Redux store
-        dispatch(updateUserAvatar(response.data.data.user.profilePicture.url));
+        // Update the user in the Redux store
+        dispatch(updateUser(response.data.data.user));
         dispatch(
           addAlert({
             type: "success",
@@ -281,6 +281,7 @@ const ProfileEditForm = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
           />
 
           <label>Email:</label>
@@ -288,6 +289,7 @@ const ProfileEditForm = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </fieldset>
 
@@ -298,6 +300,7 @@ const ProfileEditForm = () => {
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            required
           />
 
           <label>Last Name:</label>
@@ -305,6 +308,7 @@ const ProfileEditForm = () => {
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            required
           />
         </fieldset>
 
@@ -317,6 +321,7 @@ const ProfileEditForm = () => {
             onInput={handleDateInputChange}
             onBlur={handleDateInputChange}
             onChange={(e) => setDateOfBirth(e.target.value)}
+            required
           />
         </fieldset>
 
@@ -331,6 +336,7 @@ const ProfileEditForm = () => {
             onChange={(selected) =>
               setNativeLanguage(selected.map((item) => item.value))
             }
+            required
           />
 
           <label>Fluent:</label>
@@ -345,6 +351,7 @@ const ProfileEditForm = () => {
             onChange={(selected) =>
               setFluentLanguages(selected.map((item) => item.value))
             }
+            required
           />
 
           <label>Learning:</label>
@@ -359,6 +366,7 @@ const ProfileEditForm = () => {
             onChange={(selected) =>
               setLearningLanguages(selected.map((item) => item.value))
             }
+            required
           />
         </fieldset>
 
@@ -367,6 +375,7 @@ const ProfileEditForm = () => {
           <LocationsAutocomplete
             selectedLocation={location}
             onPlaceSelected={setLocation}
+            required
           />
         </fieldset>
 
@@ -376,18 +385,21 @@ const ProfileEditForm = () => {
           <textarea
             value={talkAbout}
             onChange={(e) => setTalkAbout(e.target.value)}
+            required
           />
 
           <label>What’s your perfect language-exchange partner like?</label>
           <textarea
             value={perfectPartner}
             onChange={(e) => setPerfectPartner(e.target.value)}
+            required
           />
 
           <label>What are your language learning goals?</label>
           <textarea
             value={learningGoals}
             onChange={(e) => setLearningGoals(e.target.value)}
+            required
           />
         </fieldset>
 
@@ -396,6 +408,7 @@ const ProfileEditForm = () => {
           <ProfileImageUpload
             onImageSelected={handleImageSelected}
             initialImageUrl={profilePicture}
+            required
           />
         </fieldset>
 

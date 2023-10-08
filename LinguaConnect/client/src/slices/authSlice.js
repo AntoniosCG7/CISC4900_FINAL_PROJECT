@@ -95,11 +95,9 @@ const authSlice = createSlice({
     clearErrors: (state) => {
       state.error = null;
     },
-    // Update user avatar
-    updateUserAvatar: (state, action) => {
-      if (state.user && state.user.profilePicture) {
-        state.user.profilePicture.url = action.payload;
-      }
+    // Update user
+    updateUser: (state, action) => {
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -142,7 +140,7 @@ export const {
   resetLoggedOut,
   authError,
   clearErrors,
-  updateUserAvatar,
+  updateUser,
 } = authSlice.actions;
 
 export default authSlice.reducer;
