@@ -28,9 +28,15 @@ router.post(
 router.get("/me", userController.getMe); // Get current user
 router.patch(
   "/updateMe",
-  upload.single("profilePicture"),
+  upload.fields([{ name: "profilePicture", maxCount: 1 }]),
   userController.updateMe
-);
+); // Update current user
+router.post(
+  "/uploadPhotos",
+  upload.fields([{ name: "photos", maxCount: 10 }]),
+  userController.uploadUserPhotos
+); // Upload photos to current user
+router.post("/deletePhoto", userController.deleteUserPhoto); // Delete photo from current user
 router.patch("/updatePassword", authController.updatePassword); // Update user password
 router.delete("/deleteMe", userController.deleteMe); // Delete current user
 // router.get("/me/events", userController.myEvents); // Get events user has joined or created

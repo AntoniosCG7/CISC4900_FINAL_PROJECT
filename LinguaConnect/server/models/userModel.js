@@ -166,11 +166,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Function to limit the number of photos uploaded
-function arrayLimit(val) {
-  return val.length <= 10;
-}
-
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
   // Only hash the password if it has been modified or is new

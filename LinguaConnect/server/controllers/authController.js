@@ -238,9 +238,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   // 1. Check if the request contains the token in its cookies.
   const token = req.cookies.jwt;
 
-  // Log the presence or absence of the token.
-  console.log("Token received:", token ? "Yes" : "No");
-
   // 2. If no token is found, send back an error response.
   if (!token) {
     return next(
@@ -255,7 +252,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   try {
     // 3. Verify the token to ensure it's valid.
     decodedPayload = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log("Token verified successfully.");
   } catch (error) {
     console.error("Token verification failed:", error.message);
     return next(new AppError("Invalid token. Please log in again.", 401));
@@ -263,11 +259,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 4. Check if the user for which the token was issued still exists.
   const currentUser = await User.findById(decodedPayload.id);
-
-  console.log(
-    "User associated with token:",
-    currentUser ? "Exists" : "Does not exist"
-  );
 
   if (!currentUser) {
     return next(

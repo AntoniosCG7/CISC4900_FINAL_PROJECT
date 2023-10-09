@@ -3,11 +3,32 @@ import axios from "axios";
 import { Navbar } from "../../components/index";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { Modal, Carousel } from "antd";
 import "./PersonalProfile.css";
 
 const PersonalProfile = () => {
   const [user, setUser] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
+
+  // This function is called when the user clicks on a photo in the photos
+  const handleOpenModal = (index) => {
+    setInitialSlide(index);
+    setIsCarouselModalOpen(true);
+  };
+
+  // This function is called when the user clicks on the background of the modal (for the photos)
+  const handleCloseModal = () => {
+    setIsCarouselModalOpen(false);
+  };
+
+  // This function is called when the user clicks on the background of the modal (for the profile picture)
+  const handleModalClick = (event) => {
+    if (event.target.classList.contains("modal")) {
+      setModalOpen(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchCurrentUser() {
@@ -27,12 +48,7 @@ const PersonalProfile = () => {
     fetchCurrentUser();
   }, []);
 
-  const handleModalClick = (event) => {
-    if (event.target.classList.contains("modal")) {
-      setModalOpen(false);
-    }
-  };
-
+  // This function calculates the user's age based on their date of birth
   function calculateAge(dateOfBirth) {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -120,7 +136,7 @@ const PersonalProfile = () => {
           {/* If the user has photos, render the photos section. If not, don't
           render anything. */}
           {user.photos && user.photos.length > 0 && (
-            <div className="profile-section">
+            <div className="profile-section" id="photos">
               <h2 className="section-title">Photos</h2>
               <div className="photos-container">
                 {user.photos.map((photo, index) => (
@@ -129,11 +145,33 @@ const PersonalProfile = () => {
                     src={photo.url}
                     alt={`User photo ${index + 1}`}
                     className="user-photo"
+                    onClick={() => handleOpenModal(index)}
                   />
                 ))}
               </div>
             </div>
           )}
+
+          <Modal
+            wrapClassName="my-custom-modal"
+            open={isCarouselModalOpen}
+            onCancel={handleCloseModal}
+            footer={null}
+            width={800}
+            height={800}
+          >
+            <Carousel key={initialSlide} initialSlide={initialSlide}>
+              {user.photos.map((photo, index) => (
+                <div key={index}>
+                  <img
+                    src={photo.url}
+                    alt={`User photo ${index + 1}`}
+                    style={{ width: "100%" }}
+                  />
+                </div>
+              ))}
+            </Carousel>
+          </Modal>
         </div>
       </div>
     </>

@@ -253,7 +253,6 @@ function ProfileCreationForm() {
             <legend>Date of Birth</legend>
             <input
               type="date"
-              className="date-input"
               placeholder="mm/dd/yyyy"
               ref={dateInputRef}
               onInput={handleDateInputChange}

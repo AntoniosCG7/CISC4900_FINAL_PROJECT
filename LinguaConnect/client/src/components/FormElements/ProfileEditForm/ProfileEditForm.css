@@ -1,0 +1,147 @@
+.page-title {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.form-container {
+  font-size: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  max-height: 2700px;
+  margin: 0 auto;
+  margin-bottom: 4rem;
+  padding: 40px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.form-container legend {
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 20px;
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  padding: 10px 18px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.form-container .username-email-section input,
+.form-container .name-section input,
+.form-container .date-of-birth-section input,
+.form-container .location-section input,
+.form-container .language-section input,
+.form-container .about-section input,
+.form-container .profile-picture-section input,
+.form-container textarea,
+.form-container select {
+  font-family: var(--font-family);
+  font-size: 1.2rem;
+  background-color: #e0e0e0;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 3px solid var(--primary-color);
+  border-radius: 5px;
+  margin-bottom: 40px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-container .username-email-section input:focus,
+.form-container .name-section input:focus,
+.form-container .date-of-birth-section input:focus,
+.form-container .location-section input:focus,
+.form-container .about-section input:focus,
+.form-container .profile-picture-section input:focus,
+.form-container textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.about-section {
+  margin-top: 40px;
+}
+
+.form-container textarea {
+  min-height: 110px;
+}
+
+fieldset.location-section input {
+  font-weight: 400;
+}
+
+.form-container .update-profile-button {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--tertiary-color);
+  background-color: var(--secondary-color);
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.update-profile-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  box-shadow: 0 0 30px var(--primary-color);
+}
+
+.pictures-wall-container {
+  font-size: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin-bottom: 4rem;
+  padding: 40px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.pictures-wall-container .photos-section {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.pictures-wall-container legend {
+  text-align: center;
+}
+
+.upload-delete-photos-button {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--tertiary-color);
+  background-color: var(--secondary-color);
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.upload-delete-photos-button:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  box-shadow: 0 0 30px var(--primary-color);
+}
+
+.ant-modal-content {
+  position: absolute;
+  top: 200px;
+}

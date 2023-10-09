@@ -35,23 +35,25 @@ const ProfileImageUpload = ({ onImageSelected, initialImageUrl }) => {
   };
 
   return (
-    <div className="avatar-upload">
-      <div className="avatar-edit">
-        <input
-          type="file"
-          id="imageUpload"
-          name="profilePicture"
-          ref={imageUploadRef}
-          accept=".png, .jpg, .jpeg"
-          onChange={handleImageUploadChange}
-        />
-        <label htmlFor="imageUpload"></label>
-      </div>
-      <div className="avatar-preview">
-        <div
-          ref={imagePreviewRef}
-          style={{ backgroundImage: `url(${DEFAULT_IMAGE_URL})` }}
-        ></div>
+    <div className="container">
+      <div className="avatar-upload">
+        <div className="avatar-edit">
+          <input
+            type="file"
+            id="imageUpload"
+            name="profilePicture"
+            ref={imageUploadRef}
+            accept=".png, .jpg, .jpeg"
+            onChange={handleImageUploadChange}
+          />
+          <label htmlFor="imageUpload"></label>
+        </div>
+        <div className="avatar-preview">
+          <div
+            ref={imagePreviewRef}
+            style={{ backgroundImage: `url(${DEFAULT_IMAGE_URL})` }}
+          ></div>
+        </div>
       </div>
     </div>
   );

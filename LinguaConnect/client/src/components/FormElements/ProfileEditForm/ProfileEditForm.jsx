@@ -7,13 +7,13 @@ import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplet
 import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
 import { authError, updateUser } from "../../../slices/authSlice";
+import PicturesWall from "../PicturesWall/PicturesWall";
+import "./ProfileEditForm.css";
 
 const ProfileEditForm = () => {
   const dateInputRef = React.useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -26,6 +26,9 @@ const ProfileEditForm = () => {
   const [learningGoals, setLearningGoals] = useState("");
   const [availableLanguages, setAvailableLanguages] = useState([]);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [existingPhotos, setExistingPhotos] = useState([]);
+  const [photosToDelete, setPhotosToDelete] = useState([]);
+  const [newPhotos, setNewPhotos] = useState([]);
   const languageOptions = availableLanguages.map((lang) => ({
     value: lang,
     label: lang,
@@ -42,9 +45,6 @@ const ProfileEditForm = () => {
         const userData = response.data.data.user;
 
         // Set the states with fetched data
-        setUsername(userData.username);
-        setEmail(userData.email);
-
         setFirstName(userData.firstName);
         setLastName(userData.lastName);
 
@@ -70,6 +70,9 @@ const ProfileEditForm = () => {
         setLearningGoals(userData.about.learningGoals);
 
         setProfilePicture(userData.profilePicture.url);
+
+        // Set the existing photos state with the user's existing photos
+        setExistingPhotos(userData.photos.map((photo) => photo.url));
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
@@ -139,9 +142,6 @@ const ProfileEditForm = () => {
     // Create a FormData object to send form data
     const formData = new FormData();
 
-    formData.append("username", username);
-    formData.append("email", email);
-
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
     formData.append("dateOfBirth", dateOfBirth);
@@ -162,6 +162,16 @@ const ProfileEditForm = () => {
       formData.append("longitude", location.lng);
       formData.append("fullAddress", location.fullAddress);
     }
+
+    // Add each new photo to the formData
+    newPhotos.forEach((photo, index) => {
+      formData.append(`photos[${index}]`, photo);
+    });
+
+    // Add each photo to delete to the formData
+    photosToDelete.forEach((photoId, index) => {
+      formData.append(`photosToDelete[${index}]`, photoId);
+    });
 
     // Log the form data for debugging purposes
     for (let pair of formData.entries()) {
@@ -220,11 +230,11 @@ const ProfileEditForm = () => {
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
       backgroundColor: "#e0e0e0",
-      fontSize: "20px",
+      fontSize: "1.2rem",
       fontWeight: "bold",
       padding: "5px",
       "&:hover": {
-        borderColor: "var(--primary-color)",
+        cursor: "pointer",
       },
     }),
     option: (base, state) => ({
@@ -242,7 +252,7 @@ const ProfileEditForm = () => {
     }),
     multiValueLabel: (base) => ({
       ...base,
-      fontSize: "20px",
+      fontSize: "1.2rem",
     }),
     multiValueRemove: (base) => ({
       ...base,
@@ -272,148 +282,155 @@ const ProfileEditForm = () => {
 
   return (
     <div className="main-container">
-      <h1>Edit Your Profile</h1>
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>Username & Email</legend>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+      <h1 className="page-title">Edit Your Profile</h1>
+      <div className="form-container">
+        <form onSubmit={handleSubmit}>
+          <fieldset className="name-section">
+            <legend>Name</legend>
+            <label>First Name:</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
 
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </fieldset>
+            <label>Last Name:</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </fieldset>
 
-        <fieldset>
-          <legend>Name</legend>
-          <label>First Name:</label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
+          <fieldset className="date-of-birth-section">
+            <legend>Date of Birth</legend>
+            <input
+              type="date"
+              ref={dateInputRef}
+              value={dateOfBirth}
+              onInput={handleDateInputChange}
+              onBlur={handleDateInputChange}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              required
+            />
+          </fieldset>
 
-          <label>Last Name:</label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </fieldset>
+          <fieldset className="location-section">
+            <legend>Location</legend>
+            <LocationsAutocomplete
+              selectedLocation={location}
+              onPlaceSelected={setLocation}
+              required
+            />
+          </fieldset>
 
-        <fieldset>
-          <legend>Date of Birth</legend>
-          <input
-            type="date"
-            ref={dateInputRef}
-            value={dateOfBirth}
-            onInput={handleDateInputChange}
-            onBlur={handleDateInputChange}
-            onChange={(e) => setDateOfBirth(e.target.value)}
-            required
-          />
-        </fieldset>
+          <fieldset className="language-section">
+            <legend>Languages</legend>
+            <label>Native:</label>
+            <Select
+              options={nativeLanguageOptions}
+              styles={customStyles}
+              isMulti
+              value={nativeLanguage.map((lang) => ({
+                value: lang,
+                label: lang,
+              }))}
+              onChange={(selected) =>
+                setNativeLanguage(selected.map((item) => item.value))
+              }
+              required
+            />
 
-        <fieldset>
-          <legend>Languages</legend>
-          <label>Native:</label>
-          <Select
-            options={nativeLanguageOptions}
-            styles={customStyles}
-            isMulti
-            value={nativeLanguage.map((lang) => ({ value: lang, label: lang }))}
-            onChange={(selected) =>
-              setNativeLanguage(selected.map((item) => item.value))
-            }
-            required
-          />
+            <label>Fluent:</label>
+            <Select
+              options={fluentLanguageOptions}
+              styles={customStyles}
+              isMulti
+              value={fluentLanguages.map((lang) => ({
+                value: lang,
+                label: lang,
+              }))}
+              onChange={(selected) =>
+                setFluentLanguages(selected.map((item) => item.value))
+              }
+              required
+            />
 
-          <label>Fluent:</label>
-          <Select
-            options={fluentLanguageOptions}
-            styles={customStyles}
-            isMulti
-            value={fluentLanguages.map((lang) => ({
-              value: lang,
-              label: lang,
-            }))}
-            onChange={(selected) =>
-              setFluentLanguages(selected.map((item) => item.value))
-            }
-            required
-          />
+            <label>Learning:</label>
+            <Select
+              options={learningLanguageOptions}
+              styles={customStyles}
+              isMulti
+              value={learningLanguages.map((lang) => ({
+                value: lang,
+                label: lang,
+              }))}
+              onChange={(selected) =>
+                setLearningLanguages(selected.map((item) => item.value))
+              }
+              required
+            />
+          </fieldset>
 
-          <label>Learning:</label>
-          <Select
-            options={learningLanguageOptions}
-            styles={customStyles}
-            isMulti
-            value={learningLanguages.map((lang) => ({
-              value: lang,
-              label: lang,
-            }))}
-            onChange={(selected) =>
-              setLearningLanguages(selected.map((item) => item.value))
-            }
-            required
-          />
-        </fieldset>
+          <fieldset className="about-section">
+            <legend>About</legend>
+            <label>What do you like to talk about?</label>
+            <textarea
+              value={talkAbout}
+              onChange={(e) => setTalkAbout(e.target.value)}
+              required
+            />
 
-        <fieldset>
-          <legend>Location</legend>
-          <LocationsAutocomplete
-            selectedLocation={location}
-            onPlaceSelected={setLocation}
-            required
-          />
-        </fieldset>
+            <label>What’s your perfect language-exchange partner like?</label>
+            <textarea
+              value={perfectPartner}
+              onChange={(e) => setPerfectPartner(e.target.value)}
+              required
+            />
 
-        <fieldset>
-          <legend>About</legend>
-          <label>What do you like to talk about?</label>
-          <textarea
-            value={talkAbout}
-            onChange={(e) => setTalkAbout(e.target.value)}
-            required
-          />
+            <label>What are your language learning goals?</label>
+            <textarea
+              value={learningGoals}
+              onChange={(e) => setLearningGoals(e.target.value)}
+              required
+            />
+          </fieldset>
 
-          <label>What’s your perfect language-exchange partner like?</label>
-          <textarea
-            value={perfectPartner}
-            onChange={(e) => setPerfectPartner(e.target.value)}
-            required
-          />
+          <fieldset className="profile-picture-section">
+            <legend>Profile Picture</legend>
+            <ProfileImageUpload
+              onImageSelected={handleImageSelected}
+              initialImageUrl={profilePicture}
+              required
+            />
+          </fieldset>
 
-          <label>What are your language learning goals?</label>
-          <textarea
-            value={learningGoals}
-            onChange={(e) => setLearningGoals(e.target.value)}
-            required
-          />
-        </fieldset>
+          <button type="submit" className="update-profile-button">
+            Update Profile
+          </button>
+        </form>
+      </div>
 
-        <fieldset>
-          <legend>Profile Picture</legend>
-          <ProfileImageUpload
-            onImageSelected={handleImageSelected}
-            initialImageUrl={profilePicture}
-            required
-          />
-        </fieldset>
+      <h1 className="page-title">Upload/Delete Photos</h1>
 
-        <button type="submit">Update Profile</button>
-      </form>
+      <div className="pictures-wall-container">
+        <form onSubmit={handleSubmit}>
+          <fieldset className="photos-section">
+            <div className="box-container">
+              <PicturesWall
+                existingPhotos={existingPhotos}
+                onNewPhotosChange={(photos) => setNewPhotos(photos)}
+                onPhotosToDeleteChange={(photos) => setPhotosToDelete(photos)}
+              />
+            </div>
+          </fieldset>
+          <button type="submit" className="upload-delete-photos-button">
+            Save
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

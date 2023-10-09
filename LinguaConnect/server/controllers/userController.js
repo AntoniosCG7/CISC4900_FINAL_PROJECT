@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Language = require("../models/languageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const { cloudinary } = require("../cloudinary");
 
 // Get all users
 exports.getAllUsers = catchAsync(async (req, res, next) => {
@@ -217,25 +218,25 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // Check if the user uploaded a profile picture
   let profilePicturePath;
-  if (req.file) {
-    profilePicturePath = req.file.path;
+  if (req.files.profilePicture) {
+    // If the user uploaded a profile picture, use the uploaded one
+    profilePicturePath = req.files.profilePicture[0].path;
   } else if (
     req.user &&
     req.user.profilePicture &&
     req.user.profilePicture.url
   ) {
-    // If no new file is uploaded, retain the existing profile picture URL
+    // If the user didn't upload a profile picture, use the existing one
     profilePicturePath = req.user.profilePicture.url;
   } else {
-    // Default picture
     profilePicturePath = "/assets/images/Default.png";
   }
 
   // Extract profile picture data from req.file or existing data
   const profilePicture = {
     url: profilePicturePath,
-    filename: req.file
-      ? req.file.filename
+    filename: req.files.profilePicture
+      ? req.files.profilePicture[0].filename
       : (req.user &&
           req.user.profilePicture &&
           req.user.profilePicture.filename) ||
@@ -249,8 +250,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(
     updateData,
     ...[
-      "username",
-      "email",
       "firstName",
       "lastName",
       "dateOfBirth",
@@ -288,6 +287,91 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       user: updatedUser,
     },
   });
+});
+
+// Upload user photos
+exports.uploadUserPhotos = catchAsync(async (req, res, next) => {
+  if (!req.files.photos) {
+    return next(new AppError("No photos uploaded", 400));
+  }
+
+  const additionalPhotoUploads = req.files.photos.map((file) => ({
+    url: file.path,
+    filename: file.filename,
+  }));
+
+  let updateData = {};
+
+  if (req.user && req.user.photos) {
+    updateData.photos = [...req.user.photos, ...additionalPhotoUploads];
+  } else {
+    updateData.photos = additionalPhotoUploads;
+  }
+
+  // Update user's photos in the database
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { photos: updateData.photos },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  // Check if update was successful
+  if (!updatedUser) {
+    return next(
+      new AppError("Failed to upload photos. Please try again.", 500)
+    );
+  }
+
+  // Send the updated user data as a response
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+// Delete a user photo
+exports.deleteUserPhoto = catchAsync(async (req, res, next) => {
+  // 1. Retrieve filename of the photo from the request
+  const { filename } = req.body;
+
+  // 2. Sanitize the filename by removing the file extension
+  const sanitizedFilename = filename.split(".").slice(0, -1).join(".");
+
+  // 3. Delete the photo from Cloudinary
+  const cloudinaryResult = await cloudinary.uploader.destroy(
+    `LinguaConnect/${sanitizedFilename}`
+  );
+
+  // 4. Check if the deletion from Cloudinary was successful
+  if (cloudinaryResult.result !== "ok") {
+    throw new AppError("Failed to delete photo from Cloudinary", 500);
+  }
+
+  // 5. Update the photos field in the user's MongoDB document by filtering out the deleted photo
+  const updateResult = await User.updateOne(
+    { _id: req.user.id },
+    {
+      $pull: { photos: { filename: `LinguaConnect/${sanitizedFilename}` } },
+    }
+  );
+
+  // 6. Check if the photo reference was successfully removed from the user's photos array
+  if (updateResult.nModified === 0) {
+    throw new AppError(
+      "Failed to remove photo reference from the user's photos array",
+      400
+    );
+  }
+
+  // 7. If everything went smoothly, send a success response
+  res
+    .status(200)
+    .json({ status: "success", message: "Photo deleted successfully." });
 });
 
 // Perform a "soft delete" on the current user
