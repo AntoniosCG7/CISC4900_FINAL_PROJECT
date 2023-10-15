@@ -13,7 +13,7 @@ import {
   ProfileCreation,
   PersonalProfile,
   EditProfile,
-  // PublicProfile,
+  PublicProfile,
   User,
   Chat,
   Map,
@@ -66,7 +66,7 @@ function App() {
               <ProtectedRoute component={EditProfile} profileRequired={true} />
             }
           />
-          {/* <Route
+          <Route
             path="/profile/:userId"
             element={
               <ProtectedRoute
@@ -74,7 +74,7 @@ function App() {
                 profileRequired={true}
               />
             }
-          /> */}
+          />
           <Route
             path="/discover"
             element={

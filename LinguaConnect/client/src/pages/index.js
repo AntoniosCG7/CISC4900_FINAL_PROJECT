@@ -6,7 +6,7 @@ export { default as Register } from "./Register/Register";
 export { default as ProfileCreation } from "./ProfileCreation/ProfileCreation";
 export { default as PersonalProfile } from "./PersonalProfile/PersonalProfile";
 export { default as EditProfile } from "./EditProfile/EditProfile";
-// export { default as PublicProfile } from "./PublicProfile/PublicProfile";
+export { default as PublicProfile } from "./PublicProfile/PublicProfile";
 export { default as Discover } from "./Discover/Discover";
 export { default as User } from "./User/User";
 export { default as Chat } from "./Chat/Chat";

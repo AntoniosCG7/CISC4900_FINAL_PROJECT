@@ -162,9 +162,30 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // This will add createdAt and updatedAt fields
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Virtual property to calculate user's age
+userSchema.virtual("age").get(function () {
+  if (!this.dateOfBirth) return undefined;
+
+  const today = new Date();
+  const birthDate = new Date(this.dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+});
 
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {

@@ -1,0 +1,92 @@
+.user-card {
+  width: 300px;
+  height: 370px;
+  border-radius: 15px;
+  background-color: var(--tertiary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transform-origin: top left;
+  transition: 0.3s all ease-in-out;
+}
+
+.user-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.9);
+}
+
+.user-card-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  align-self: center;
+  transition: 0.3s all ease-in-out;
+}
+
+.user-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.3s all ease-in-out;
+}
+
+.user-card:hover .user-card-img {
+  transform: scale(1.1);
+}
+
+.user-card p {
+  font-family: var(--secondary-font-family);
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+h3.user-name-and-age {
+  font-family: var(--secondary-font-family);
+  font-weight: bold;
+  font-size: 28px;
+}
+
+.location {
+  font-family: var(--secondary-font-family);
+  font-size: 22px;
+  margin: 10px 0;
+}
+
+.location i {
+  color: red;
+}
+
+.user-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.user-details .label {
+  align-self: center;
+  font-family: var(--secondary-font-family);
+  font-size: 22px;
+  font-weight: bold;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.user-details p {
+  max-width: 62%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.language-list-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.language-list-details:not(:last-child) {
+  margin-bottom: 10px;
+}

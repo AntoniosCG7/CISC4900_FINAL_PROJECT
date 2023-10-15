@@ -48,24 +48,7 @@ const PersonalProfile = () => {
     fetchCurrentUser();
   }, []);
 
-  // This function calculates the user's age based on their date of birth
-  function calculateAge(dateOfBirth) {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDifference < 0 ||
-      (monthDifference === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age;
-  }
-
   if (!user) return <div>Loading...</div>; // This is necessary because the useEffect hook asynchronously fetches user data from an API endpoint. When the component first renders, the user state is null because the data hasn't been fetched yet. This conditional prevents the component from trying to render the user data before it's available.
-
-  const age = user.dateOfBirth ? calculateAge(user.dateOfBirth) : null;
 
   return (
     <>
@@ -86,52 +69,52 @@ const PersonalProfile = () => {
           </div>
         )}
         <h1 className="user-name-age">
-          {user.firstName} {user.lastName}, {age}
+          {user.firstName} {user.lastName}, {user.age}
         </h1>
         <h2 className="user-location">
-          <FontAwesomeIcon icon={faLocationDot} />{" "}
+          <FontAwesomeIcon id="location-icon" icon={faLocationDot} />{" "}
           {user.location.locationString}
         </h2>
         <div className="profile-details">
           <div className="profile-section">
             <h2 className="section-title">About {user.firstName}</h2>
-            <p>
+            <div>
               <p className="about-question">What do you like to talk about?</p>
               <p className="about-answer">{user.about.talkAbout}</p>
-            </p>
-            <p>
+            </div>
+            <div>
               <p className="about-question">
                 What’s your perfect language-exchange partner like?
               </p>
               <p className="about-answer">{user.about.perfectPartner}</p>
-            </p>
-            <p>
+            </div>
+            <div>
               <p className="about-question">
                 What are your language learning goals?
               </p>
               <p className="about-answer">{user.about.learningGoals}</p>
-            </p>
+            </div>
           </div>
           <div className="profile-section" id="languages">
             <h2 className="section-title">Languages</h2>
-            <p>
+            <div>
               <p className="language-category">Native:</p>
               <p className="language-answer">
                 {user.languages.native.map((lang) => lang.name).join(", ")}
               </p>
-            </p>
-            <p>
+            </div>
+            <div>
               <p className="language-category">Fluent:</p>
               <p className="language-answer">
                 {user.languages.fluent.map((lang) => lang.name).join(", ")}
               </p>
-            </p>
-            <p>
+            </div>
+            <div>
               <p className="language-category">Learning:</p>
               <p className="language-answer">
                 {user.languages.learning.map((lang) => lang.name).join(", ")}
               </p>
-            </p>
+            </div>
           </div>
           {/* If the user has photos, render the photos section. If not, don't
           render anything. */}

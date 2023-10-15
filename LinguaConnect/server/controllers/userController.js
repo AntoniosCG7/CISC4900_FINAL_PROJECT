@@ -6,8 +6,11 @@ const { cloudinary } = require("../cloudinary");
 
 // Get all users
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
+  // Fetch all users except the currently logged-in user
+  const users = await User.find({ _id: { $ne: req.user._id } })
+    .populate("languages.native")
+    .populate("languages.fluent")
+    .populate("languages.learning");
   res.status(200).json({
     status: "success",
     results: users.length,
@@ -19,7 +22,11 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 
 // Get a user
 exports.getSingleUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id)
+    .select("-password")
+    .populate("languages.native")
+    .populate("languages.fluent")
+    .populate("languages.learning");
 
   if (!user) {
     return next(new AppError("No user found with that ID", 404));

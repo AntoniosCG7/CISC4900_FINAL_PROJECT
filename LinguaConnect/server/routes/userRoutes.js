@@ -25,7 +25,9 @@ router.post(
   upload.single("profilePicture"),
   userController.createProfile
 ); // Create a user profile
+router.route("/").get(userController.getAllUsers); // Get all users
 router.get("/me", userController.getMe); // Get current user
+router.route("/:id").get(userController.getSingleUser); // Get a single user by ID
 router.patch(
   "/updateMe",
   upload.fields([{ name: "profilePicture", maxCount: 1 }]),
@@ -45,11 +47,7 @@ router.delete("/deleteMe", userController.deleteMe); // Delete current user
 router.use(authController.restrictTo("admin"));
 
 // ADMIN ROUTES (Only admins can access these routes)
-router.route("/").get(userController.getAllUsers); // Get all users
-
 router
-  .route("/:id")
-  .get(userController.getSingleUser) // Get a single user by ID
   .patch(userController.updateUser) // Update a user by ID
   .delete(userController.deleteUser); // Delete a user by ID
 
