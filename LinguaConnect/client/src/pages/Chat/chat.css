@@ -1,0 +1,363 @@
+.chat-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background-color);
+  font-family: var(--secondary-font-family);
+  font-weight: bold;
+}
+
+.chat-sidebar {
+  width: 20%;
+  border-right: 1px solid var(--quinary-color);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.chat-settings {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--secondary-color);
+  height: 80px;
+}
+
+.profile-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 20px;
+  border: 3px solid var(--tertiary-color);
+  cursor: pointer;
+}
+
+.chat-search-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.chat-search {
+  font-family: var(--secondary-font-family);
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 15px 40px 15px 10px;
+  width: 95%;
+  margin: 20px auto;
+  background-color: var(--tertiary-color);
+  color: var(--secondary-color);
+  border: 1px solid var(--quinary-color);
+  border-radius: 25px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s, transform 0.3s;
+  position: relative;
+}
+
+.chat-search::placeholder {
+  color: var(--quinary-color);
+  font-style: italic;
+}
+
+.chat-search:focus {
+  outline: none;
+  box-shadow: 0 1px 10px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-search-icon {
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  fill: var(--quinary-color);
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+.chat-search-icon.clicked {
+  transform: translateY(-50%) rotate(-20deg);
+}
+
+.active-users {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px;
+  white-space: nowrap;
+  border-top: 1px solid var(--quinary-color);
+}
+
+.active-user {
+  position: relative;
+  margin: 0 10px;
+}
+
+.active-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.active-indicator {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--secondary-color);
+  border-radius: 50%;
+  background-color: rgb(8, 167, 8);
+}
+
+.chat-list {
+  overflow-y: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
+  max-height: calc(100vh - 245px);
+}
+
+.chat-item {
+  padding: 30px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--quinary-color);
+  transition: background-color 0.3s;
+}
+
+.chat-item:first-child {
+  border-top: 1px solid var(--quinary-color);
+}
+
+.chat-item:hover {
+  background-color: var(--quaternary-color);
+}
+
+.chat-item.active {
+  background-color: var(--secondary-color);
+  color: var(--tertiary-color);
+}
+
+.active-chat {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--tertiary-color);
+  transition: width 0.3s ease-in-out;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  border-bottom: 1px solid var(--quinary-color);
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
+  position: relative;
+}
+
+.chat-header h1 {
+  font-family: var(--secondary-font-family);
+  font-size: 1.3em;
+  margin-left: 30px;
+  cursor: pointer;
+}
+
+.chat-header h1:hover {
+  text-decoration: underline;
+}
+
+.chat-header-ellipsis-icon {
+  position: absolute;
+  right: 2%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  fill: var(--secondary-color);
+  transition: transform 0.3s ease;
+}
+
+.chat-header-ellipsis-icon:hover {
+  transform: scale(1.1);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.message {
+  padding: 8px 12px;
+  margin: 5px;
+  border-radius: 5px;
+  max-width: 50%;
+  display: inline-block;
+  word-wrap: break-word;
+}
+
+.message.sent {
+  background-color: var(--background-color);
+  align-self: flex-end;
+}
+
+.message.received {
+  background-color: var(--quinary-color);
+}
+
+.shared-media {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.chat-controls {
+  position: relative;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--primary-color);
+}
+
+.message-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.chat-controls button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s;
+  color: var(--tertiary-color);
+}
+
+.chat-controls button:hover {
+  color: var(--secondary-color);
+}
+
+.chat-controls .message-input-wrapper input {
+  font-family: var(--secondary-font-family);
+  font-size: 24px;
+  font-weight: bold;
+  background-color: var(--tertiary-color);
+  color: var(--secondary-color);
+  border: 1px solid var(--quinary-color);
+  border-radius: 25px;
+  flex: 1;
+  margin: 0 4px;
+  padding: 15px 50px 15px 10px;
+  width: 97%;
+  position: relative;
+}
+
+.chat-controls .message-input-wrapper input:focus {
+  outline: none;
+}
+
+.emoji-icon {
+  position: absolute;
+  right: 65px;
+  top: 30%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  fill: var(--primary-color);
+  transition: transform 0.3s ease;
+}
+
+.send-icon {
+  position: absolute;
+  right: 0.6%;
+  top: 30%;
+  width: 30px;
+  height: 30px;
+  margin-right: 7px;
+  cursor: pointer;
+  fill: var(--tertiary-color);
+  transition: transform 0.3s ease;
+}
+
+.send-icon:hover {
+  transform: scale(1.1);
+}
+
+.send-icon:active {
+  transform: scale(0.9);
+}
+
+.user-details-sidebar {
+  width: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--quinary-color);
+  background-color: var(--primary-color);
+  flex-direction: column;
+  align-items: center;
+  transition: width 0.3s ease-in-out;
+}
+
+.user-details-sidebar.visible {
+  opacity: 1;
+  width: 20%;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  gap: 15px;
+}
+
+.details h2 {
+  font-family: var(--secondary-font-family);
+  font-size: 1.3em;
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.details h2:hover {
+  text-decoration: underline;
+}
+
+.details p {
+  font-family: var(--secondary-font-family);
+  font-size: 1em;
+  color: var(--secondary-color);
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.user-detail-photo {
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--tertiary-color);
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.shared-media-icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin-left: 2px;
+  fill: var(--secondary-color);
+  transition: transform 0.3s ease;
+}

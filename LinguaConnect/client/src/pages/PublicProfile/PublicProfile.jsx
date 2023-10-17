@@ -78,6 +78,9 @@ const PublicProfile = () => {
           <FontAwesomeIcon id="location-icon" icon={faLocationDot} />{" "}
           {user.location.locationString}
         </h2>
+        <div>
+          <button id="chat-initiation-btn">Chat with {user.firstName}</button>
+        </div>
         <div className="profile-details">
           <div className="profile-section">
             <h2 className="section-title">About {user.firstName}</h2>
@@ -158,9 +161,6 @@ const PublicProfile = () => {
               ))}
             </Carousel>
           </Modal>
-        </div>
-        <div>
-          <button id="chat-initiation-btn">Chat with {user.firstName}</button>
         </div>
       </div>
     </>
