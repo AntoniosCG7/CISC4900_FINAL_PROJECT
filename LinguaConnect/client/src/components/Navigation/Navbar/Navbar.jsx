@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../../../slices/authSlice";
+import { resetChatState } from "../../../slices/chatSlice";
 import { addAlert } from "../../../slices/alertSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -54,6 +55,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    dispatch(resetChatState());
     dispatch(
       addAlert({
         message: `Goodbye, ${user.firstName}!`,

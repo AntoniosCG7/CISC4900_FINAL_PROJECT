@@ -1,17 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/index";
+import { setCurrentChat, fetchUserDetails } from "./../../slices/chatSlice";
+import { addAlert } from "./../../slices/alertSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Carousel } from "antd";
 import "./PublicProfile.css";
 
 const PublicProfile = () => {
-  const [user, setUser] = useState(null);
+  const [otherUser, setOtherUser] = useState(null);
+  const currentUser = useSelector((state) => state.auth.user);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
+  const { userId } = useParams();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Create a new chat between the current user and the user whose profile is being viewed
+  const initiateChat = async (receiverId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/chats/",
+        {
+          senderId: currentUser._id,
+          receiverId: receiverId,
+        },
+        { withCredentials: true }
+      );
+
+      // Navigate the user to the new chat page. The chat page will fetch the chat data from the server and render it.
+      if (response.status === 201) {
+        dispatch(
+          addAlert({
+            type: "success",
+            message: `Chat initiated with ${otherUser.firstName}!`,
+          })
+        );
+        // set the current chat in the redux store
+        dispatch(
+          setCurrentChat({
+            currentChat: response.data.data.chat,
+            currentUserId: currentUser._id,
+          })
+        );
+        dispatch(fetchUserDetails(otherUser._id));
+
+        setTimeout(() => {
+          navigate("/chat", { state: { fromInitiation: true } });
+        }, 500);
+      }
+    } catch (error) {
+      dispatch(
+        addAlert({ type: "error", message: error.response.data.message })
+      );
+      console.error("Failed to initiate chat:", error);
+    }
+  };
 
   // This function is called when the user clicks on a photo in the photos
   const handleOpenModal = (index) => {
@@ -31,9 +81,9 @@ const PublicProfile = () => {
     }
   };
 
-  const { userId } = useParams();
+  // Fetch the data of the user whose profile is being viewed
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchOtherUser() {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/v1/users/${userId}`,
@@ -42,23 +92,23 @@ const PublicProfile = () => {
           }
         );
 
-        setUser(response.data.data.user);
+        setOtherUser(response.data.data.user);
       } catch (error) {
         console.error("Failed to fetch personal data:", error);
       }
     }
 
-    fetchUser();
-  }, []);
+    fetchOtherUser();
+  }, [userId]);
 
-  if (!user) return <div>Loading...</div>;
+  if (!otherUser) return <div>Loading...</div>;
 
   return (
     <>
       <Navbar />
       <div className="main-container">
         <img
-          src={user.profilePicture.url || user.profilePicture.default}
+          src={otherUser.profilePicture.url || otherUser.profilePicture.default}
           alt="Profile"
           className="profile-picture"
           onClick={() => setModalOpen(true)}
@@ -66,39 +116,48 @@ const PublicProfile = () => {
         {isModalOpen && (
           <div className="modal" onClick={handleModalClick}>
             <img
-              src={user.profilePicture.url || user.profilePicture.default}
+              src={
+                otherUser.profilePicture.url || otherUser.profilePicture.default
+              }
               className="modal-content"
             />
           </div>
         )}
         <h1 className="user-name-age">
-          {user.firstName} {user.lastName}, {user.age}
+          {otherUser.firstName} {otherUser.lastName}, {otherUser.age}
         </h1>
         <h2 className="user-location">
           <FontAwesomeIcon id="location-icon" icon={faLocationDot} />{" "}
-          {user.location.locationString}
+          {otherUser.location.locationString}
         </h2>
-        <div>
-          <button id="chat-initiation-btn">Chat with {user.firstName}</button>
-        </div>
+        {currentUser._id !== otherUser._id && (
+          <div>
+            <button
+              id="chat-initiation-btn"
+              onClick={() => initiateChat(otherUser._id)}
+            >
+              Chat with {otherUser.firstName}
+            </button>
+          </div>
+        )}
         <div className="profile-details">
           <div className="profile-section">
-            <h2 className="section-title">About {user.firstName}</h2>
+            <h2 className="section-title">About {otherUser.firstName}</h2>
             <div>
               <p className="about-question">What do you like to talk about?</p>
-              <p className="about-answer">{user.about.talkAbout}</p>
+              <p className="about-answer">{otherUser.about.talkAbout}</p>
             </div>
             <div>
               <p className="about-question">
                 What’s your perfect language-exchange partner like?
               </p>
-              <p className="about-answer">{user.about.perfectPartner}</p>
+              <p className="about-answer">{otherUser.about.perfectPartner}</p>
             </div>
             <div>
               <p className="about-question">
                 What are your language learning goals?
               </p>
-              <p className="about-answer">{user.about.learningGoals}</p>
+              <p className="about-answer">{otherUser.about.learningGoals}</p>
             </div>
           </div>
           <div className="profile-section" id="languages">
@@ -106,29 +165,31 @@ const PublicProfile = () => {
             <div>
               <p className="language-category">Native:</p>
               <p className="language-answer">
-                {user.languages.native.map((lang) => lang.name).join(", ")}
+                {otherUser.languages.native.map((lang) => lang.name).join(", ")}
               </p>
             </div>
             <div>
               <p className="language-category">Fluent:</p>
               <p className="language-answer">
-                {user.languages.fluent.map((lang) => lang.name).join(", ")}
+                {otherUser.languages.fluent.map((lang) => lang.name).join(", ")}
               </p>
             </div>
             <div>
               <p className="language-category">Learning:</p>
               <p className="language-answer">
-                {user.languages.learning.map((lang) => lang.name).join(", ")}
+                {otherUser.languages.learning
+                  .map((lang) => lang.name)
+                  .join(", ")}
               </p>
             </div>
           </div>
           {/* If the user has photos, render the photos section. If not, don't
           render anything. */}
-          {user.photos && user.photos.length > 0 && (
+          {otherUser.photos && otherUser.photos.length > 0 && (
             <div className="profile-section" id="photos">
               <h2 className="section-title">Photos</h2>
               <div className="photos-container">
-                {user.photos.map((photo, index) => (
+                {otherUser.photos.map((photo, index) => (
                   <img
                     key={index}
                     src={photo.url}
@@ -150,7 +211,7 @@ const PublicProfile = () => {
             height={800}
           >
             <Carousel key={initialSlide} initialSlide={initialSlide}>
-              {user.photos.map((photo, index) => (
+              {otherUser.photos.map((photo, index) => (
                 <div key={index}>
                   <img
                     src={photo.url}

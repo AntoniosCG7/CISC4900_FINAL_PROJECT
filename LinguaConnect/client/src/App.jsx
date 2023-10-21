@@ -89,6 +89,10 @@ function App() {
             path="/chat"
             element={<ProtectedRoute component={Chat} profileRequired={true} />}
           />
+          {/* <Route
+            path="/chat/:chatId"
+            element={<ProtectedRoute component={Chat} profileRequired={true} />}
+          /> */}
           <Route
             path="/map"
             element={<ProtectedRoute component={Map} profileRequired={true} />}

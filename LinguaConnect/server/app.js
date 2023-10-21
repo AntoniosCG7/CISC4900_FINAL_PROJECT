@@ -10,6 +10,8 @@ const morgan = require("morgan");
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 const userRouter = require("./routes/userRoutes");
+const chatRouter = require("./routes/chatRoutes");
+const messageRouter = require("./routes/messageRoutes");
 const languageRouter = require("./routes/languageRoutes");
 
 // Create a new Express application
@@ -66,6 +68,8 @@ app.use((req, res, next) => {
 // ROUTES
 // Mount routers at their corresponding endpoint
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/languages", languageRouter);
 
 // Handle errors when API route is not found

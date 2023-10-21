@@ -18,6 +18,29 @@ const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
 });
 
+// Integrate Socket.io with the Express application and start listening for incoming connections
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("send_message", (data) => {
+    // Broadcast the message to others except the sender
+    socket.broadcast.emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
 // Listen for uncaught exception events
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");

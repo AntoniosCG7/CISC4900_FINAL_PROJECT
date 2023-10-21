@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, ProfileCreationForm } from "../../components";
+import { ProfileCreationForm } from "../../components";
 
 const ProfileCreation = () => {
   return (
