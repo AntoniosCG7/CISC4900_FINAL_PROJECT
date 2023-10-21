@@ -52,6 +52,7 @@ exports.listChatsForUser = catchAsync(async (req, res, next) => {
   const chats = await Chat.find({
     $or: [{ user1: userId }, { user2: userId }],
   })
+    .sort({ lastMessageTimestamp: -1 }) // Sorting by lastMessageTimestamp in descending order
     .populate({
       path: "user1",
       select:

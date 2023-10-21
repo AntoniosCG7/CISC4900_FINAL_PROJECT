@@ -13,13 +13,17 @@ const chatSchema = new Schema(
       ref: "User",
       required: true,
     },
+    lastMessageTimestamp: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
 
-// Middleware to update 'updated_at' on save
+// Middleware to update 'lastMessageTimestamp' on save
 chatSchema.pre("save", function (next) {
-  this.updated_at = Date.now();
+  this.lastMessageTimestamp = Date.now();
   next();
 });
 
