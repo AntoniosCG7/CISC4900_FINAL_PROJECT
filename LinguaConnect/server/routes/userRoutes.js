@@ -12,7 +12,6 @@ const userController = require("./../controllers/userController");
 // PUBLIC ROUTES
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-router.get("/logout", authController.logout);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
@@ -20,14 +19,16 @@ router.patch("/resetPassword/:token", authController.resetPassword);
 router.use(authController.protect);
 
 // PROTECTED ROUTES (Only logged-in users can access these routes)
+router.get("/logout", authController.logout);
 router.post(
   "/createProfile",
   upload.single("profilePicture"),
   userController.createProfile
 ); // Create a user profile
-router.route("/").get(userController.getAllUsers); // Get all users
+router.get("/", userController.getAllUsers); // Get all users
 router.get("/me", userController.getMe); // Get current user
-router.route("/:id").get(userController.getSingleUser); // Get a single user by ID
+router.get("/activeChatUsers", userController.getActiveChatUsers); // Get active users a user has chatted with
+router.get("/:id", userController.getSingleUser); // Get a single user by ID
 router.patch(
   "/updateMe",
   upload.fields([{ name: "profilePicture", maxCount: 1 }]),
@@ -48,6 +49,7 @@ router.use(authController.restrictTo("admin"));
 
 // ADMIN ROUTES (Only admins can access these routes)
 router
+  .route("/:id")
   .patch(userController.updateUser) // Update a user by ID
   .delete(userController.deleteUser); // Delete a user by ID
 

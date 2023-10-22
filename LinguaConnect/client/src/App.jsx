@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SocketProvider } from "./contexts/SocketContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./routing/ProtectedRoute";
@@ -49,53 +50,76 @@ function App() {
           {/* Protected Routes */}
           <Route
             path="/create-profile"
-            element={<ProtectedRoute component={ProfileCreation} />}
+            element={
+              <SocketProvider>
+                <ProtectedRoute component={ProfileCreation} />
+              </SocketProvider>
+            }
           />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute
-                component={PersonalProfile}
-                profileRequired={true}
-              />
+              <SocketProvider>
+                <ProtectedRoute
+                  component={PersonalProfile}
+                  profileRequired={true}
+                />
+              </SocketProvider>
             }
           />
           <Route
             path="/edit-profile"
             element={
-              <ProtectedRoute component={EditProfile} profileRequired={true} />
+              <SocketProvider>
+                <ProtectedRoute
+                  component={EditProfile}
+                  profileRequired={true}
+                />
+              </SocketProvider>
             }
           />
           <Route
             path="/profile/:userId"
             element={
-              <ProtectedRoute
-                component={PublicProfile}
-                profileRequired={true}
-              />
+              <SocketProvider>
+                <ProtectedRoute
+                  component={PublicProfile}
+                  profileRequired={true}
+                />
+              </SocketProvider>
             }
           />
           <Route
             path="/discover"
             element={
-              <ProtectedRoute component={Discover} profileRequired={true} />
+              <SocketProvider>
+                <ProtectedRoute component={Discover} profileRequired={true} />
+              </SocketProvider>
             }
           />
           <Route
             path="/user"
-            element={<ProtectedRoute component={User} profileRequired={true} />}
+            element={
+              <SocketProvider>
+                <ProtectedRoute component={User} profileRequired={true} />
+              </SocketProvider>
+            }
           />
           <Route
             path="/chat"
-            element={<ProtectedRoute component={Chat} profileRequired={true} />}
+            element={
+              <SocketProvider>
+                <ProtectedRoute component={Chat} profileRequired={true} />
+              </SocketProvider>
+            }
           />
-          {/* <Route
-            path="/chat/:chatId"
-            element={<ProtectedRoute component={Chat} profileRequired={true} />}
-          /> */}
           <Route
             path="/map"
-            element={<ProtectedRoute component={Map} profileRequired={true} />}
+            element={
+              <SocketProvider>
+                <ProtectedRoute component={Map} profileRequired={true} />
+              </SocketProvider>
+            }
           />
         </Routes>
       </BrowserRouter>

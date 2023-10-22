@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Chat = require("../models/chatModel");
 const Language = require("../models/languageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -108,7 +109,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     "location.city",
     "location.country",
     "role",
-    "active",
+    "accountActive",
     "events"
   );
 
@@ -485,3 +486,48 @@ exports.createProfile = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get all active users
+exports.getActiveChatUsers = catchAsync(
+  async (req, res, next) => {
+    // Get the user ID from the request object (set by the protect middleware which is called before this handler)
+    const userId = req.user.id;
+    console.log("userId:", userId);
+
+    if (!userId) {
+      return next(new AppError("User not authenticated", 401));
+    }
+
+    // Get chats where the user is either user1 or user2
+    const chats = await Chat.find({
+      $or: [{ user1: userId }, { user2: userId }],
+    });
+
+    // Extract the user IDs
+    const chatUserIds = chats.map((chat) =>
+      chat.user1.toString() === userId.toString() ? chat.user2 : chat.user1
+    );
+
+    // Now fetch these users who are active
+    const activeChatUsers = await User.find({
+      _id: { $in: chatUserIds },
+      currentlyActive: true,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        users: activeChatUsers,
+      },
+    });
+  },
+  (error, req, res, next) => {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    res.status(error.statusCode).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+);

@@ -21,7 +21,7 @@ const UserCard = ({ user }) => {
   };
 
   // Truncate location string if it's too long
-  const truncateLocation = (locationString, maxLength = 28) => {
+  const truncateLocation = (locationString, maxLength = 20) => {
     if (locationString.length <= maxLength) {
       return locationString;
     }

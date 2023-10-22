@@ -155,10 +155,13 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    active: {
+    accountActive: {
       type: Boolean,
-      default: true, // User must verify email address before account is active
-      select: false, // Exclude the active field by default
+      default: true,
+    },
+    currentlyActive: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -204,7 +207,7 @@ userSchema.pre("save", async function (next) {
 // Middleware to exclude inactive users from query results
 userSchema.pre(/^find/, function (next) {
   // "this" points to the current query
-  this.find({ active: { $ne: false } });
+  this.find({ accountActive: { $ne: false } });
   next();
 });
 

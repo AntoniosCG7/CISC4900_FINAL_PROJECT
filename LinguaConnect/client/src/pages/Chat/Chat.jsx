@@ -2,16 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { setCurrentChat } from "./../../slices/chatSlice";
+import axios from "axios";
 import { fetchChatsForUser, clearCurrentChat } from "./../../slices/chatSlice";
-import io from "socket.io-client";
 import "./Chat.css";
-
-const socket = io("http://localhost:3000", { withCredentials: true });
 
 const Chat = () => {
   const currentUser = useSelector((state) => state.auth.user);
   const otherUser = useSelector((state) => state.chat.otherUser);
   const currentChat = useSelector((state) => state.chat.currentChat);
+  const [activeUsers, setActiveUsers] = useState([]);
   const { chats } = useSelector((state) => state.chat);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -49,16 +48,36 @@ const Chat = () => {
     }
   }, [messages]);
 
-  // Listen for new messages
   useEffect(() => {
-    socket.on("new-message", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    fetchActiveUsers();
   }, []);
+
+  // Listen for new messages
+  // useEffect(() => {
+  //   socket.on("new-message", (message) => {
+  //     setMessages((prevMessages) => [...prevMessages, message]);
+  //   });
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  // Fetch the active users
+  const fetchActiveUsers = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/v1/users/activeChatUsers",
+        {
+          withCredentials: true,
+        }
+      );
+
+      setActiveUsers(response.data.data.users);
+    } catch (error) {
+      console.error("An error occurred while fetching active users:", error);
+    }
+  };
 
   // Set the chat as current in the Redux store when the user clicks on a chat
   const handleChatClick = (chat) => {
@@ -125,6 +144,7 @@ const Chat = () => {
               }
               alt="Profile"
               className="profile-photo"
+              onClick={() => redirectToUserProfile(currentUser._id)}
             />
           </div>
           <div className="chat-search-wrapper">
@@ -144,7 +164,24 @@ const Chat = () => {
             </svg>
           </div>
 
-          <div className="active-users"></div>
+          <div className="active-users">
+            {activeUsers.length === 0 ? (
+              <p></p>
+            ) : (
+              activeUsers.map((user) => (
+                <div key={user._id} className="active-user">
+                  <img
+                    src={user.profilePicture.url}
+                    alt={user.username}
+                    className="active-user-avatar"
+                  />
+                  {user.currentlyActive && (
+                    <div className="active-indicator"></div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
 
           <div className="chat-list">
             {chats && chats.length > 0 ? (

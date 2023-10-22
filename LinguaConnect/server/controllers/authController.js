@@ -89,6 +89,10 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect email or password.", 401));
   }
 
+  // Set the user as currently active
+  user.currentlyActive = true;
+  await user.save({ validateBeforeSave: false });
+
   // Generate a JWT token for the user
   const token = signToken(user._id);
 
@@ -97,19 +101,25 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 // Function to log out a user
-exports.logout = (req, res) => {
+exports.logout = catchAsync(async (req, res) => {
   // Set the JWT cookie to an empty string with an expiration date in the past
   res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000), // 10 seconds
     httpOnly: true,
   });
 
+  // If the user is found in the request (meaning they are authenticated), set them as not currently active
+  if (req.user && req.user.currentlyActive) {
+    req.user.currentlyActive = false;
+    await req.user.save({ validateBeforeSave: false });
+  }
+
   // Send a success response
   res.status(200).json({
     status: "success",
     message: "Logged out successfully.",
   });
-};
+});
 
 // Function to send a password reset email to the user
 exports.forgotPassword = catchAsync(async (req, res, next) => {
