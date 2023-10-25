@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { createSelector } from "reselect";
 import { useNavigate, useLocation } from "react-router-dom";
 import { setCurrentChat } from "./../../slices/chatSlice";
 import axios from "axios";
 import { fetchChatsForUser, clearCurrentChat } from "./../../slices/chatSlice";
+import { useSocket } from "./../../contexts/SocketContext";
 import "./Chat.css";
 
 const Chat = () => {
@@ -11,7 +13,11 @@ const Chat = () => {
   const otherUser = useSelector((state) => state.chat.otherUser);
   const currentChat = useSelector((state) => state.chat.currentChat);
   const [activeUsers, setActiveUsers] = useState([]);
-  const { chats } = useSelector((state) => state.chat);
+  const selectChats = createSelector(
+    (state) => state.chat.chats,
+    (chats) => Object.values(chats)
+  );
+  const chats = useSelector(selectChats);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [iconClicked, setIconClicked] = useState(false);
@@ -21,6 +27,7 @@ const Chat = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const socket = useSocket();
 
   // Check if the user is redirected from the profile page
   const fromInitiation = location.state?.fromInitiation;
@@ -48,20 +55,23 @@ const Chat = () => {
     }
   }, [messages]);
 
+  // Fetch the active users on component mount
   useEffect(() => {
     fetchActiveUsers();
   }, []);
 
-  // Listen for new messages
-  // useEffect(() => {
-  //   socket.on("new-message", (message) => {
-  //     setMessages((prevMessages) => [...prevMessages, message]);
-  //   });
+  // Listen for changes in the active users list
+  useEffect(() => {
+    if (socket) {
+      // Listen for user status changes and fetch active users again.
+      socket.on("user-status-change", fetchActiveUsers);
 
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
+      // Clean up listener on component unmount.
+      return () => {
+        socket.off("user-status-change", fetchActiveUsers);
+      };
+    }
+  }, [socket]);
 
   // Fetch the active users
   const fetchActiveUsers = async () => {

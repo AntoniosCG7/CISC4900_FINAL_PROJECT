@@ -52,7 +52,7 @@ const chatSlice = createSlice({
     // Action to add a new chat
     addChat: (state, action) => {
       const chat = action.payload;
-      state.chats[chat._id] = chat;
+      state.chats.unshift(chat); // Adds chat at the start of the array
     },
 
     // Action to set all chats

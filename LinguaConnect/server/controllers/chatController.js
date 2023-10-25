@@ -5,6 +5,7 @@ const AppError = require("../utils/appError");
 
 // Create a new chat
 exports.createChat = catchAsync(async (req, res, next) => {
+  // Extract the sender and receiver IDs from the request body
   const { senderId: user1, receiverId: user2 } = req.body;
 
   // Ensure users are not the same
@@ -14,35 +15,47 @@ exports.createChat = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Check if both users exist in the database
-  const usersExist = await Promise.all([
-    User.exists({ _id: user1 }),
-    User.exists({ _id: user2 }),
+  // Fetch complete user details for user1 and user2
+  const [user1Details, user2Details] = await Promise.all([
+    User.findById(user1),
+    User.findById(user2),
   ]);
 
-  if (!usersExist[0] || !usersExist[1]) {
+  // Ensure both users exist
+  if (!user1Details || !user2Details) {
     return next(new AppError("One or both users do not exist.", 400));
   }
 
-  // Check if chat already exists
+  // Check if chat already exists between the two users
   const chat = await Chat.findOne({
     $or: [
-      { user1, user2 },
-      { user1: user2, user2: user1 },
+      { user1: user1Details._id, user2: user2Details._id },
+      { user1: user2Details._id, user2: user1Details._id },
     ],
   });
 
+  // If chat already exists, return an error
   if (chat) {
     return next(new AppError("Chat already exists.", 400));
   }
 
-  const newChat = await Chat.create({ user1, user2 });
-  res.status(201).json({
-    status: "success",
-    data: {
-      chat: newChat,
-    },
+  // Create a new chat using the user IDs
+  const newChat = await Chat.create({
+    user1: user1Details._id,
+    user2: user2Details._id,
   });
+
+  // Fetch the newly created chat with populated user details
+  const populatedChat = await Chat.findById(newChat._id)
+    .populate("user1")
+    .populate("user2");
+
+  // Store the populated chat and the action type in res.locals
+  res.locals.chat = populatedChat;
+  res.locals.action = "created";
+  res.locals.success = true;
+
+  next(); // Pass control to the next middleware
 });
 
 // Get all chats for a user

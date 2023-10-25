@@ -18,73 +18,16 @@ const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
 });
 
-// Integrate Socket.io with the Express application and start listening for incoming connections
-const { Server } = require("socket.io");
-const User = require("./models/userModel");
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+const socketSetup = require("./utils/socketSetup");
 
-// Maintain a list of active users
-const currentlyActiveUsers = {};
+// Import the Socket.io setup function, currentlyActiveUsers object, and ioData
+const {
+  initializeSocket,
+  currentlyActiveUsers,
+  ioData,
+} = require("./utils/socketSetup");
 
-// Listen for incoming connections
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  // Handle manual disconnect from the client side
-  socket.on("manual-disconnect", async (data) => {
-    const { userId } = data;
-    try {
-      await User.findByIdAndUpdate(userId, { currentlyActive: false }); // Set the user's currentlyActive status to false
-      delete currentlyActiveUsers[socket.id];
-      io.emit("user-status-change");
-    } catch (error) {
-      console.error(
-        "Error updating user active status on manual disconnect:",
-        error
-      );
-    }
-  });
-
-  // Handle when user provides their details after connecting
-  socket.on("user-details", async (data) => {
-    const { userId } = data;
-    currentlyActiveUsers[socket.id] = userId;
-    try {
-      await User.findByIdAndUpdate(userId, { currentlyActive: true }); // Set the user's currentlyActive status to true upon connection
-      io.emit("user-status-change");
-    } catch (error) {
-      console.error("Error updating user active status:", error);
-    }
-  });
-
-  // Listen for the "send_message" event
-  socket.on("send_message", (data) => {
-    socket.broadcast.emit("receive_message", data);
-  });
-
-  // Listen for the "disconnect" event
-  socket.on("disconnect", async () => {
-    const userId = currentlyActiveUsers[socket.id];
-    console.log("User disconnected:", socket.id);
-
-    try {
-      const updatedUser = await User.findByIdAndUpdate(userId, {
-        currentlyActive: false,
-      }); // Set the user's currentlyActive status to false upon disconnection
-      io.emit("user-status-change");
-    } catch (error) {
-      console.error("Error updating user inactive status:", error);
-    }
-
-    delete currentlyActiveUsers[socket.id];
-  });
-});
+initializeSocket(server); // This initializes ioData.io with the actual io instance
 
 // Endpoint to fetch active users
 app.get("/activeChatUsers", (req, res) => {
@@ -92,15 +35,11 @@ app.get("/activeChatUsers", (req, res) => {
   res.json(Object.values(currentlyActiveUsers));
 });
 
-// Listen for uncaught exception events
-process.on("uncaughtException", (err) => {
-  console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
-  console.error(err.name, err.message);
-
-  server.close(() => {
-    process.exit(1); // exit with a non-zero status code to indicate an error
-  });
-});
+// Reset user active statuses function
+const User = require("./models/userModel");
+async function resetUserActiveStatuses() {
+  await User.updateMany({}, { currentlyActive: false });
+}
 
 // Construct the MongoDB connection string using environment variables
 const DB = process.env.DATABASE.replace(
@@ -152,7 +91,12 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-// Reset user active statuses function
-async function resetUserActiveStatuses() {
-  await User.updateMany({}, { active: false });
-}
+// Listen for uncaught exception events
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+
+  server.close(() => {
+    process.exit(1); // exit with a non-zero status code to indicate an error
+  });
+});
