@@ -4,6 +4,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import { setActiveUsers } from "../slices/activeUsersSlice";
 import { addChat } from "../slices/chatSlice";
+import { addAlert } from "../slices/alertSlice";
 
 const SocketContext = createContext();
 
@@ -13,11 +14,33 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000", { withCredentials: true });
+    const newSocket = io("http://localhost:3000", {
+      withCredentials: true,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: Infinity,
+    });
     setSocket(newSocket);
 
     // Emit user details after establishing the socket connection
     newSocket.emit("user-details", { userId: currentUserId });
+
+    // Reconnect to the server if the connection is lost unexpectedly and refresh the list of active users.
+    newSocket.on("connect", async () => {
+      // Emit user details after establishing the socket connection
+      newSocket.emit("user-details", { userId: currentUserId });
+
+      // Directly fetch the list of active users to refresh the client's state
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/v1/users/activeChatUsers",
+          { withCredentials: true }
+        );
+        dispatch(setActiveUsers(response.data));
+      } catch (error) {
+        console.error("Failed to fetch active users on connect:", error);
+      }
+    });
 
     newSocket.on("disconnect", () => {
       // Emit a custom event to notify the server of a manual disconnect
@@ -39,8 +62,23 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for new chats initiated by other users
     newSocket.on("newChatInitiated", (chat) => {
-      console.log("Received new chat:", chat);
       dispatch(addChat(chat));
+    });
+
+    // Error handling
+    newSocket.on("error", (error) => {
+      // Log the error
+      console.error("Socket Error:", error);
+
+      // Dispatch an alert with a user-friendly message
+      const userFriendlyMessage =
+        "There was a problem with the chat service. We're trying to reconnect...";
+      dispatch(addAlert({ type: "error", message: userFriendlyMessage }));
+
+      // Manually reconnect after a delay
+      setTimeout(() => {
+        newSocket.connect();
+      }, 5000);
     });
 
     return () => {

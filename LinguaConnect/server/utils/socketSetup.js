@@ -20,21 +20,6 @@ const initializeSocket = (server) => {
   ioData.io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
-    // Handle manual disconnect from the client side
-    socket.on("manual-disconnect", async (data) => {
-      const { userId } = data;
-      try {
-        await User.findByIdAndUpdate(userId, { currentlyActive: false }); // Set the user's currentlyActive status to false
-        delete currentlyActiveUsers[socket.id];
-        ioData.io.emit("user-status-change");
-      } catch (error) {
-        console.error(
-          "Error updating user active status on manual disconnect:",
-          error
-        );
-      }
-    });
-
     // Handle when user provides their details after connecting
     socket.on("user-details", async (data) => {
       const { userId } = data;
@@ -50,6 +35,46 @@ const initializeSocket = (server) => {
     // Listen for the "send_message" event
     socket.on("send_message", (data) => {
       socket.broadcast.emit("receive_message", data);
+    });
+
+    // Handle manual disconnect from the client side
+    socket.on("manual-disconnect", async (data) => {
+      const { userId } = data;
+      try {
+        await User.findByIdAndUpdate(userId, { currentlyActive: false }); // Set the user's currentlyActive status to false
+        delete currentlyActiveUsers[socket.id];
+        ioData.io.emit("user-status-change");
+      } catch (error) {
+        console.error(
+          "Error updating user active status on manual disconnect:",
+          error
+        );
+      }
+    });
+
+    // Listen for the "error" event
+    socket.on("error", async (error) => {
+      // 1. Update the user's status to inactive:
+      const userId = currentlyActiveUsers[socket.id];
+      if (userId) {
+        try {
+          await User.findByIdAndUpdate(userId, { currentlyActive: false });
+        } catch (error) {
+          console.error(
+            "Error updating user inactive status on error event:",
+            error
+          );
+        }
+
+        // 2. Emit the "user-status-change" event to the client side to update the UI:
+        ioData.io.emit("user-status-change");
+
+        // 3. Log the error to the console:
+        console.error("Socket Error:", error);
+
+        // 4. Remove user from currentlyActiveUsers:
+        delete currentlyActiveUsers[socket.id];
+      }
     });
 
     // Listen for the "disconnect" event

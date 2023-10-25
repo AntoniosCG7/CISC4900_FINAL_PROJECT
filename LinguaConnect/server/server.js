@@ -18,28 +18,20 @@ const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
 });
 
-const socketSetup = require("./utils/socketSetup");
-
-// Import the Socket.io setup function, currentlyActiveUsers object, and ioData
+// Import the Socket.io setup function and currentlyActiveUsers object
 const {
   initializeSocket,
   currentlyActiveUsers,
-  ioData,
 } = require("./utils/socketSetup");
 
-initializeSocket(server); // This initializes ioData.io with the actual io instance
+// Call the initializeSocket function to set up Socket.io
+initializeSocket(server);
 
 // Endpoint to fetch active users
 app.get("/activeChatUsers", (req, res) => {
   // Return the list of active user IDs
   res.json(Object.values(currentlyActiveUsers));
 });
-
-// Reset user active statuses function
-const User = require("./models/userModel");
-async function resetUserActiveStatuses() {
-  await User.updateMany({}, { currentlyActive: false });
-}
 
 // Construct the MongoDB connection string using environment variables
 const DB = process.env.DATABASE.replace(
@@ -56,7 +48,6 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
     console.log("DB connection successful!");
-    await resetUserActiveStatuses(); // Reset the active status of all users upon server start
   } catch (error) {
     console.error("DB connection failed:", error);
     // Close the server and exit the process if the database connection fails

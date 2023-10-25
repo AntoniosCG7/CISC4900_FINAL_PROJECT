@@ -492,7 +492,6 @@ exports.getActiveChatUsers = catchAsync(
   async (req, res, next) => {
     // Get the user ID from the request object (set by the protect middleware which is called before this handler)
     const userId = req.user.id;
-    console.log("userId:", userId);
 
     if (!userId) {
       return next(new AppError("User not authenticated", 401));
