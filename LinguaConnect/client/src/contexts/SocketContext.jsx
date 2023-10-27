@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import io from "socket.io-client";
 import { setActiveUsers } from "../slices/activeUsersSlice";
-import { addChat } from "../slices/chatSlice";
+import { addChat, moveChatToTop } from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
 import { addMessageToChat } from "../slices/messageSlice";
 
@@ -63,11 +63,12 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for new chats initiated by other users
     newSocket.on("newChatInitiated", (chat) => {
+      console.log("New chat initiated:", chat);
       dispatch(addChat(chat));
       dispatch(
         addAlert({
           type: "info",
-          message: `A new chat has been initiated`,
+          message: `A new chat has been initiated by ${chat.user1.firstName} ${chat.user1.lastName}.`,
         })
       );
     });
@@ -81,6 +82,11 @@ export const SocketProvider = ({ children }) => {
           messages: message,
         })
       );
+
+      // Move the chat to the top of the list if the message is from another user
+      if (message.userId !== currentUserId) {
+        dispatch(moveChatToTop(message.chat._id));
+      }
     });
 
     // Error handling

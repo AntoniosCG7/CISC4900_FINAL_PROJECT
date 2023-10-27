@@ -3,8 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { useNavigate, useLocation } from "react-router-dom";
 import { setCurrentChat } from "./../../slices/chatSlice";
+import { animated, useTransition } from "@react-spring/web";
 import axios from "axios";
-import { fetchChatsForUser, clearCurrentChat } from "./../../slices/chatSlice";
+import {
+  fetchChatsForUser,
+  clearCurrentChat,
+  moveChatToTop,
+} from "./../../slices/chatSlice";
 import {
   addMessageToChat,
   setInitialMessages,
@@ -164,12 +169,16 @@ const Chat = () => {
         if (response.status === 201) {
           const savedMessage = response.data.data.message;
 
+          // Add the message to the Redux store
           dispatch(
             addMessageToChat({
               chat: { _id: currentChat._id },
               messages: savedMessage,
             })
           );
+
+          // Move the chat to the top of the list
+          dispatch(moveChatToTop(currentChat._id));
         } else {
           console.error("Failed to save the message to the backend.");
         }
@@ -235,6 +244,23 @@ const Chat = () => {
     }, 300);
   };
 
+  // Animate the chat list using react-spring
+  const chatTransitions = useTransition(chats, {
+    keys: (chat) => chat._id,
+    from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
+    enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
+    leave: { transform: "translate3d(0,-40px,0)", opacity: 0 },
+    update: { transform: "translate3d(0,0,0)" },
+  });
+
+  // Animate the active users list using react-spring
+  const activeUserTransitions = useTransition(activeUsers, {
+    keys: (user) => user._id,
+    from: { transform: "translate3d(40px,0,0)", opacity: 0 },
+    enter: { transform: "translate3d(0,0,0)", opacity: 1 },
+    leave: { transform: "translate3d(40px,0,0)", opacity: 0 },
+  });
+
   if (!currentUser) return <div>Loading...</div>;
 
   return (
@@ -270,11 +296,9 @@ const Chat = () => {
           </div>
 
           <div className="active-users">
-            {activeUsers.length === 0 ? (
-              <p></p>
-            ) : (
-              activeUsers.map((user) => (
-                <div key={user._id} className="active-user">
+            {activeUserTransitions((styles, user) => (
+              <animated.div style={styles} key={user._id}>
+                <div className="active-user">
                   <img
                     src={user.profilePicture.url}
                     alt={user.username}
@@ -284,35 +308,36 @@ const Chat = () => {
                     <div className="active-indicator"></div>
                   )}
                 </div>
-              ))
-            )}
+              </animated.div>
+            ))}
           </div>
 
           <div className="chat-list">
             {chats && chats.length > 0 ? (
-              chats.map((chat) => {
+              chatTransitions((styles, chat) => {
                 let chatOtherUser =
                   chat.user1._id === currentUser._id ? chat.user2 : chat.user1;
 
                 return (
-                  <div
-                    key={chat._id}
-                    className={`chat-item ${
-                      currentChat && chat._id === currentChat._id
-                        ? "active"
-                        : ""
-                    }`}
-                    onClick={() => handleChatClick(chat)}
-                  >
-                    <img
-                      src={chatOtherUser.profilePicture.url}
-                      alt="profile picture"
-                      className="chat-user-image"
-                    />
-                    <span className="chat-user-name">
-                      {chatOtherUser.firstName} {chatOtherUser.lastName}
-                    </span>
-                  </div>
+                  <animated.div style={styles} key={chat._id}>
+                    <div
+                      className={`chat-item ${
+                        currentChat && chat._id === currentChat._id
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => handleChatClick(chat)}
+                    >
+                      <img
+                        src={chatOtherUser.profilePicture.url}
+                        alt="profile picture"
+                        className="chat-user-image"
+                      />
+                      <span className="chat-user-name">
+                        {chatOtherUser.firstName} {chatOtherUser.lastName}
+                      </span>
+                    </div>
+                  </animated.div>
                 );
               })
             ) : (

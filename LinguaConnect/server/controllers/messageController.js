@@ -8,7 +8,7 @@ exports.createMessage = catchAsync(async (req, res, next) => {
 
   // Populate the sender and chat using a query
   const populatedMessage = await Message.findById(newMessage._id)
-    .populate("sender", "firstName _id")
+    .populate("sender", "firstName lastName _id")
     .populate("chat", "_id");
 
   // Set the populated message and the action type in res.locals

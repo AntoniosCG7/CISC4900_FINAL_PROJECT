@@ -79,6 +79,18 @@ const chatSlice = createSlice({
       state.otherUser = null;
     },
 
+    // Action to move a chat to the top of the list
+    moveChatToTop: (state, action) => {
+      const chatId = action.payload;
+      const chatIndex = state.chats.findIndex((chat) => chat._id === chatId);
+
+      // If chat is found, remove it from its current position and add it to the top
+      if (chatIndex > -1) {
+        const [chat] = state.chats.splice(chatIndex, 1);
+        state.chats.unshift(chat);
+      }
+    },
+
     // Action to set the loading state
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -118,6 +130,7 @@ export const {
   setChats,
   setCurrentChat,
   clearCurrentChat,
+  moveChatToTop,
   setLoading,
   setError,
   resetChatState,

@@ -17,9 +17,13 @@ const getSocketIdOfUser = (userId) => {
 
 // Create a new chat event
 const handleChatCreation = async (res) => {
+  // Get the chat from the response
   const chat = res.locals.chat;
+
+  // Get the socket ID of the recipient
   const recipientSocketId = getSocketIdOfUser(chat.user2.id);
 
+  // Emit the new chat event to the recipient
   if (recipientSocketId) {
     ioData.io.to(recipientSocketId).emit("newChatInitiated", chat);
     ioData.io.emit("user-status-change");
@@ -35,16 +39,31 @@ const handleChatCreation = async (res) => {
 
 // Send a new message event
 const handleNewMessage = async (res) => {
+  // Get the message from the response
   const message = res.locals.message;
+
+  // Find the chat that the message belongs to
   const chat = await Chat.findById(message.chat)
     .populate("user1")
     .populate("user2");
+
+  // Update the lastMessageTimestamp of the chat
+  const updatedChat = await Chat.findByIdAndUpdate(
+    message.chat,
+    { lastMessageTimestamp: message.timestamp },
+    { new: true }
+  );
+
+  // Get the ID of the recipient
   const recipientId =
     message.sender._id.toString() === chat.user1._id.toString()
       ? chat.user2._id
       : chat.user1._id;
+
+  // Get the socket ID of the recipient
   const recipientSocketId = getSocketIdOfUser(recipientId);
 
+  // Emit the new message event to the recipient
   if (recipientSocketId) {
     ioData.io.to(recipientSocketId).emit("new-message", message);
   } else {
