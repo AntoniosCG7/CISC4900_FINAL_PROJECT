@@ -193,6 +193,29 @@ const Chat = () => {
     }
   };
 
+  // Format the timestamp to a readable format (e.g. December 20 2023 - 12:34 AM)
+  const formatTimestamp = (timestamp) => {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+
+    const date = new Date(timestamp);
+    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
+      date
+    );
+
+    // Split date and time
+    const [datePart, timePart] = formattedDate.split(", ");
+
+    // Return the formatted timestamp
+    return `${datePart} ${timePart}`;
+  };
+
   // Redirect to the user's profile page
   const redirectToUserProfile = (userId) => {
     navigate(`/profile/${userId}`);
@@ -320,21 +343,34 @@ const Chat = () => {
               <div className="messages" ref={messagesContainerRef}>
                 {messages.length > 0 ? (
                   messages.map((msg) => {
+                    const isSent = msg.sender._id === currentUser._id;
                     return (
                       <div
                         key={msg._id}
-                        className={`message ${
-                          msg.sender._id === currentUser._id
-                            ? "sent"
-                            : "received"
+                        className={`message-container ${
+                          isSent ? "sent" : "received"
                         }`}
                       >
-                        <span className="sender">
-                          {msg.sender._id === currentUser._id
-                            ? currentUser.firstName
-                            : msg.sender.firstName}
-                        </span>
-                        : {msg.content}
+                        {isSent && (
+                          <span className="message-timestamp">
+                            {formatTimestamp(msg.timestamp)}
+                          </span>
+                        )}
+                        <div
+                          className={`message ${isSent ? "sent" : "received"}`}
+                        >
+                          <span className="sender">
+                            {isSent
+                              ? currentUser.firstName
+                              : msg.sender.firstName}
+                          </span>
+                          : {msg.content}
+                        </div>
+                        {!isSent && (
+                          <span className="message-timestamp">
+                            {formatTimestamp(msg.timestamp)}
+                          </span>
+                        )}
                       </div>
                     );
                   })

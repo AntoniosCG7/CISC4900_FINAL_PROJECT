@@ -222,6 +222,17 @@
   align-items: flex-start;
 }
 
+.message-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.message-container.received {
+  justify-content: flex-start;
+}
+
 .message {
   padding: 8px 12px;
   margin: 5px;
@@ -229,6 +240,24 @@
   max-width: 50%;
   display: inline-block;
   word-wrap: break-word;
+  position: relative;
+}
+
+.message-timestamp {
+  margin: 0 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 5px;
+  padding: 2px 5px;
+  font-size: 0.9em;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.message-container:hover .message-timestamp {
+  opacity: 1;
 }
 
 .no-messages {
