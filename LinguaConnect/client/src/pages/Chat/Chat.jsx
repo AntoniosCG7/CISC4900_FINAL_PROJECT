@@ -5,6 +5,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { setCurrentChat } from "./../../slices/chatSlice";
 import axios from "axios";
 import { fetchChatsForUser, clearCurrentChat } from "./../../slices/chatSlice";
+import {
+  addMessageToChat,
+  setInitialMessages,
+  selectMessagesByChatId,
+} from "./../../slices/messageSlice";
 import { useSocket } from "./../../contexts/SocketContext";
 import "./Chat.css";
 
@@ -19,10 +24,12 @@ const Chat = () => {
   );
   const chats = useSelector(selectChats);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const messages = useSelector((state) =>
+    selectMessagesByChatId(state, currentChat?._id)
+  );
   const [iconClicked, setIconClicked] = useState(false);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
-  const messagesEndRef = React.useRef(null);
+  const messagesContainerRef = React.useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -38,22 +45,6 @@ const Chat = () => {
       dispatch(fetchChatsForUser(currentUser._id));
     }
   }, [currentUser, dispatch]);
-
-  // Cleanup function when the component is unmounted, but first check if the user is redirected from the profile page because in that case we don't want to clear the current chat
-  useEffect(() => {
-    return () => {
-      if (!fromInitiation) {
-        dispatch(clearCurrentChat());
-      }
-    };
-  }, [dispatch, fromInitiation]);
-
-  // Scroll to the bottom of the messages list on every render
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
 
   // Fetch the active users on component mount
   useEffect(() => {
@@ -73,6 +64,55 @@ const Chat = () => {
     }
   }, [socket]);
 
+  // Fetch the message history for the current chat
+  useEffect(() => {
+    if (currentChat && currentChat._id) {
+      axios
+        .get(`http://localhost:3000/api/v1/messages/${currentChat._id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            const returnedMessages = response.data.messages;
+            const sortedMessages = returnedMessages.sort(
+              (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+            );
+            dispatch(
+              setInitialMessages({
+                chatId: currentChat._id,
+                messages: sortedMessages,
+              })
+            );
+          } else {
+            console.error("Failed to fetch messages. No success flag.");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Error fetching messages:",
+            error.response?.data || error.message
+          );
+        });
+    }
+  }, [currentChat]);
+
+  // Scroll to the bottom of the messages list on every render
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      const element = messagesContainerRef.current;
+      element.scrollTop = element.scrollHeight;
+    }
+  }, [messages]);
+
+  // Cleanup function when the component is unmounted, but first check if the user is redirected from the profile page because in that case we don't want to clear the current chat
+  useEffect(() => {
+    return () => {
+      if (!fromInitiation) {
+        dispatch(clearCurrentChat());
+      }
+    };
+  }, [dispatch, fromInitiation]);
+
   // Fetch the active users
   const fetchActiveUsers = async () => {
     try {
@@ -90,7 +130,7 @@ const Chat = () => {
   };
 
   // Set the chat as current in the Redux store when the user clicks on a chat
-  const handleChatClick = (chat) => {
+  const handleChatClick = async (chat) => {
     dispatch(
       setCurrentChat({
         currentChat: chat,
@@ -100,16 +140,56 @@ const Chat = () => {
   };
 
   // Send a message when the user clicks the send button
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() !== "") {
       const newMessage = {
-        id: Date.now(),
-        text: message,
-        sender: currentUser.name,
+        chat: currentChat._id,
+        content: message,
+        sender: currentUser._id,
       };
+
+      // Send the message through the socket
       socket.emit("send-message", newMessage);
-      setMessages([...messages, newMessage]);
+
+      // Send the message to the backend for persistence
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/v1/messages",
+          newMessage,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 201) {
+          const savedMessage = response.data.data.message;
+
+          dispatch(
+            addMessageToChat({
+              chat: { _id: currentChat._id },
+              messages: savedMessage,
+            })
+          );
+        } else {
+          console.error("Failed to save the message to the backend.");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while sending the message to the backend:",
+          error
+        );
+      }
+
+      // Clear the input field
       setMessage("");
+    }
+  };
+
+  // Send a message when the user presses the Enter key
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && message.trim() !== "") {
+      handleSendMessage();
+      e.preventDefault();
     }
   };
 
@@ -130,14 +210,6 @@ const Chat = () => {
     setTimeout(() => {
       setIconClicked(false);
     }, 300);
-  };
-
-  // Send a message when the user presses the Enter key
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && message.trim() !== "") {
-      handleSendMessage();
-      e.preventDefault();
-    }
   };
 
   if (!currentUser) return <div>Loading...</div>;
@@ -245,18 +317,32 @@ const Chat = () => {
                   <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
                 </svg>
               </div>
-              <div className="messages" ref={messagesEndRef}>
-                {/* {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`message ${
-                  msg.sender === user.name ? "sent" : "received"
-                }`}
-              >
-                <span>{msg.text}</span>
+              <div className="messages" ref={messagesContainerRef}>
+                {messages.length > 0 ? (
+                  messages.map((msg) => {
+                    return (
+                      <div
+                        key={msg._id}
+                        className={`message ${
+                          msg.sender._id === currentUser._id
+                            ? "sent"
+                            : "received"
+                        }`}
+                      >
+                        <span className="sender">
+                          {msg.sender._id === currentUser._id
+                            ? currentUser.firstName
+                            : msg.sender.firstName}
+                        </span>
+                        : {msg.content}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="no-messages">No messages in this chat yet.</p>
+                )}
               </div>
-            ))} */}
-              </div>
+
               <div className="shared-media"></div>
               <div className="chat-controls">
                 <button>📎</button>
@@ -264,7 +350,7 @@ const Chat = () => {
                   <input
                     type="text"
                     placeholder="Type a message..."
-                    value={message}
+                    value={message || ""}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
@@ -303,17 +389,8 @@ const Chat = () => {
                   <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
                 </svg>
               </div>
-              <div className="messages" ref={messagesEndRef}>
-                {/* {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`message ${
-                  msg.sender === user.name ? "sent" : "received"
-                }`}
-              >
-                <span>{msg.text}</span>
-              </div>
-            ))} */}
+              <div className="messages" ref={messagesContainerRef}>
+                <p></p>
               </div>
               <div className="shared-media"></div>
               <div className="chat-controls">
@@ -322,7 +399,7 @@ const Chat = () => {
                   <input
                     type="text"
                     placeholder="Type a message..."
-                    value={message}
+                    value={message || ""}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />

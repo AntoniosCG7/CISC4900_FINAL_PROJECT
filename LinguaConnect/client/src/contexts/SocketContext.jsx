@@ -5,6 +5,7 @@ import io from "socket.io-client";
 import { setActiveUsers } from "../slices/activeUsersSlice";
 import { addChat } from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
+import { addMessageToChat } from "../slices/messageSlice";
 
 const SocketContext = createContext();
 
@@ -63,6 +64,23 @@ export const SocketProvider = ({ children }) => {
     // Listen for new chats initiated by other users
     newSocket.on("newChatInitiated", (chat) => {
       dispatch(addChat(chat));
+      dispatch(
+        addAlert({
+          type: "info",
+          message: `A new chat has been initiated`,
+        })
+      );
+    });
+
+    // Listen for new messages
+    newSocket.on("new-message", (message) => {
+      // Update the state or store with the new message.
+      dispatch(
+        addMessageToChat({
+          chat: { _id: message.chat._id },
+          messages: message,
+        })
+      );
     });
 
     // Error handling

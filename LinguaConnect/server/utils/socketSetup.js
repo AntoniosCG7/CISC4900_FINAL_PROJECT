@@ -32,11 +32,6 @@ const initializeSocket = (server) => {
       }
     });
 
-    // Listen for the "send_message" event
-    socket.on("send_message", (data) => {
-      socket.broadcast.emit("receive_message", data);
-    });
-
     // Handle manual disconnect from the client side
     socket.on("manual-disconnect", async (data) => {
       const { userId } = data;

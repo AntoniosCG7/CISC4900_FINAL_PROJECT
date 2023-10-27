@@ -213,6 +213,7 @@
 .messages {
   flex: 1;
   overflow-y: scroll;
+  scroll-behavior: smooth;
   overflow-x: hidden;
   padding: 15px;
   display: flex;
@@ -228,6 +229,17 @@
   max-width: 50%;
   display: inline-block;
   word-wrap: break-word;
+}
+
+.no-messages {
+  font-family: var(--secondary-font-family);
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 245px);
 }
 
 .message.sent {
