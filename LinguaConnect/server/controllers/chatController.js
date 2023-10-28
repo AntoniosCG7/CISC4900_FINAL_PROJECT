@@ -1,5 +1,6 @@
-const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -110,6 +111,15 @@ exports.listChatsForUser = catchAsync(async (req, res, next) => {
         },
       ],
     });
+
+  // Loop through each chat and fetch the most recent message
+  for (let chat of chats) {
+    const recentMessage = await Message.findOne({ chat: chat._id })
+      .sort({ timestamp: -1 })
+      .limit(1);
+
+    chat._doc.recentMessage = recentMessage; // Add the recentMessage to the chat object
+  }
 
   res.status(200).json(chats);
 });

@@ -91,6 +91,25 @@ const chatSlice = createSlice({
       }
     },
 
+    // Action to update the most recent message for a chat
+    updateRecentMessage: (state, action) => {
+      const { chatId, message, currentUserId } = action.payload;
+      const chatToUpdate = state.chats.find((chat) => chat._id === chatId);
+
+      // If chat is found, update the recent message
+      if (chatToUpdate) {
+        // Check if the message is sent by the current user
+        if (message.sender._id === currentUserId) {
+          chatToUpdate.recentMessage = {
+            ...message,
+            content: "You: " + message.content,
+          };
+        } else {
+          chatToUpdate.recentMessage = message;
+        }
+      }
+    },
+
     // Action to set the loading state
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -131,6 +150,7 @@ export const {
   setCurrentChat,
   clearCurrentChat,
   moveChatToTop,
+  updateRecentMessage,
   setLoading,
   setError,
   resetChatState,

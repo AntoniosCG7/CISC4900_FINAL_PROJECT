@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { useNavigate, useLocation } from "react-router-dom";
-import { setCurrentChat } from "./../../slices/chatSlice";
 import { animated, useTransition } from "@react-spring/web";
 import axios from "axios";
 import {
+  setCurrentChat,
   fetchChatsForUser,
   clearCurrentChat,
   moveChatToTop,
+  updateRecentMessage,
 } from "./../../slices/chatSlice";
 import {
   addMessageToChat,
@@ -179,6 +180,15 @@ const Chat = () => {
 
           // Move the chat to the top of the list
           dispatch(moveChatToTop(currentChat._id));
+
+          // Update the recent message in the chats list
+          dispatch(
+            updateRecentMessage({
+              chatId: currentChat._id,
+              message: savedMessage,
+              currentUserId: currentUser._id,
+            })
+          );
         } else {
           console.error("Failed to save the message to the backend.");
         }
@@ -318,6 +328,10 @@ const Chat = () => {
                 let chatOtherUser =
                   chat.user1._id === currentUser._id ? chat.user2 : chat.user1;
 
+                let isActiveUser = activeUsers.some(
+                  (user) => user._id === chatOtherUser._id
+                );
+
                 return (
                   <animated.div style={styles} key={chat._id}>
                     <div
@@ -333,8 +347,24 @@ const Chat = () => {
                         alt="profile picture"
                         className="chat-user-image"
                       />
-                      <span className="chat-user-name">
-                        {chatOtherUser.firstName} {chatOtherUser.lastName}
+                      {isActiveUser && (
+                        <div className="chat-active-indicator"></div>
+                      )}
+                      <span className="chat-user-info">
+                        <span className="chat-user-name">
+                          {chatOtherUser.firstName} {chatOtherUser.lastName}
+                        </span>
+                        {chat.recentMessage && (
+                          <span className="chat-recent-message">
+                            {chat.recentMessage.sender === currentUser._id
+                              ? "You: "
+                              : ""}
+                            {chat.recentMessage.content.length > 40
+                              ? chat.recentMessage.content.substring(0, 37) +
+                                "..."
+                              : chat.recentMessage.content}
+                          </span>
+                        )}
                       </span>
                     </div>
                   </animated.div>

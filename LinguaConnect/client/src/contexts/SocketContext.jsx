@@ -3,7 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import io from "socket.io-client";
 import { setActiveUsers } from "../slices/activeUsersSlice";
-import { addChat, moveChatToTop } from "../slices/chatSlice";
+import {
+  addChat,
+  moveChatToTop,
+  updateRecentMessage,
+} from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
 import { addMessageToChat } from "../slices/messageSlice";
 
@@ -87,6 +91,15 @@ export const SocketProvider = ({ children }) => {
       if (message.userId !== currentUserId) {
         dispatch(moveChatToTop(message.chat._id));
       }
+
+      // Update the recent message in the chat list
+      dispatch(
+        updateRecentMessage({
+          chatId: message.chat._id,
+          message: message,
+          currentUserId: currentUserId,
+        })
+      );
     });
 
     // Error handling
