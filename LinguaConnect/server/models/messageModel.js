@@ -11,13 +11,27 @@ const messageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  imageUrl: {
+    type: String,
+    default: null,
+  },
   content: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.imageUrl; // Content is required if imageUrl is not provided
+    },
   },
   timestamp: {
     type: Date,
     default: Date.now,
+  },
+  delivered: {
+    type: Date,
+    default: null,
+  },
+  read: {
+    type: Date,
+    default: null,
   },
 });
 

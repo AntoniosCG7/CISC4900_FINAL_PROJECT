@@ -7,15 +7,17 @@ import {
   addChat,
   moveChatToTop,
   updateRecentMessage,
+  incrementUnreadCount,
 } from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
-import { addMessageToChat } from "../slices/messageSlice";
+import { addMessageToChat, markMessagesAsRead } from "../slices/messageSlice";
 
 const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const currentUserId = useSelector((state) => state.auth.user._id);
+  const currentChat = useSelector((state) => state.chat?.currentChat);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -67,7 +69,6 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for new chats initiated by other users
     newSocket.on("newChatInitiated", (chat) => {
-      console.log("New chat initiated:", chat);
       dispatch(addChat(chat));
       dispatch(
         addAlert({
@@ -77,29 +78,9 @@ export const SocketProvider = ({ children }) => {
       );
     });
 
-    // Listen for new messages
-    newSocket.on("new-message", (message) => {
-      // Update the state or store with the new message.
-      dispatch(
-        addMessageToChat({
-          chat: { _id: message.chat._id },
-          messages: message,
-        })
-      );
-
-      // Move the chat to the top of the list if the message is from another user
-      if (message.userId !== currentUserId) {
-        dispatch(moveChatToTop(message.chat._id));
-      }
-
-      // Update the recent message in the chat list
-      dispatch(
-        updateRecentMessage({
-          chatId: message.chat._id,
-          message: message,
-          currentUserId: currentUserId,
-        })
-      );
+    // Listen for message-read-confirmation events
+    newSocket.on("message-read-confirmation", (updatedMessages) => {
+      dispatch(markMessagesAsRead({ messages: updatedMessages }));
     });
 
     // Error handling
@@ -125,6 +106,53 @@ export const SocketProvider = ({ children }) => {
       }
     };
   }, [currentUserId, dispatch]);
+
+  // Keep socket initialization separate from the chat update logic. This way the socket won't be repeatedly initialized when currentChat changes.
+  useEffect(() => {
+    if (!socket) return;
+
+    // Listen for new messages
+    const handleNewMessage = (message) => {
+      // Update the state or store with the new message.
+      dispatch(
+        addMessageToChat({
+          chat: { _id: message.chat._id },
+          messages: message,
+        })
+      );
+
+      // Move the chat to the top of the list if the message is from another user
+      if (message.userId !== currentUserId) {
+        dispatch(moveChatToTop(message.chat._id));
+      }
+
+      // Update the recent message in the chat list
+      dispatch(
+        updateRecentMessage({
+          chatId: message.chat._id,
+          message: message,
+          currentUserId: currentUserId,
+        })
+      );
+
+      // If the chat is currently open, emit a message-read event
+      if (currentChat?._id === message.chat._id) {
+        socket.emit("message-read", { message: message });
+      } else {
+        // Increment the unread message count for the chat if the chat is not currently open
+        dispatch(incrementUnreadCount(message.chat._id));
+      }
+    };
+
+    socket.on("new-message", handleNewMessage);
+
+    return () => {
+      if (socket) {
+        // Remove the event listener when the component unmounts
+        socket.off("new-message");
+      }
+    };
+  }, [socket, currentChat, currentUserId, dispatch]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

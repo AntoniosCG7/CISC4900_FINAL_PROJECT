@@ -11,7 +11,8 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find({ _id: { $ne: req.user._id } })
     .populate("languages.native")
     .populate("languages.fluent")
-    .populate("languages.learning");
+    .populate("languages.learning")
+    .populate("profileCompleted");
   res.status(200).json({
     status: "success",
     results: users.length,

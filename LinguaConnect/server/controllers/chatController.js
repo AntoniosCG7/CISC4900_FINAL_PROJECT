@@ -119,6 +119,20 @@ exports.listChatsForUser = catchAsync(async (req, res, next) => {
       .limit(1);
 
     chat._doc.recentMessage = recentMessage; // Add the recentMessage to the chat object
+
+    // Count the number of unread messages for the chat
+    // Determine the other user in the chat
+    const otherUserId =
+      chat.user1._id.toString() === userId ? chat.user2._id : chat.user1._id;
+
+    // Fetch the count of unread messages for the chat
+    const unreadCount = await Message.countDocuments({
+      chat: chat._id,
+      read: null,
+      sender: otherUserId, // count messages sent by the other user and not read by the current user
+    });
+
+    chat._doc.unreadCount = unreadCount; // Add the count to the chat object
   }
 
   res.status(200).json(chats);

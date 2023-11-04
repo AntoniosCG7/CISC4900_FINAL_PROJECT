@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { useNavigate, useLocation } from "react-router-dom";
-import { animated, useTransition } from "@react-spring/web";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { animated, update, useTransition } from "@react-spring/web";
 import axios from "axios";
 import {
   setCurrentChat,
@@ -17,6 +17,18 @@ import {
   selectMessagesByChatId,
 } from "./../../slices/messageSlice";
 import { useSocket } from "./../../contexts/SocketContext";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Modal, Carousel } from "antd";
+import {
+  faFileImage,
+  faFaceLaughBeam,
+  faPaperPlane,
+  faEllipsis,
+  faMagnifyingGlass,
+  faSquareCaretDown,
+} from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
 const Chat = () => {
@@ -33,9 +45,17 @@ const Chat = () => {
   const messages = useSelector((state) =>
     selectMessagesByChatId(state, currentChat?._id)
   );
+  const messagesContainerRef = useRef(null);
   const [iconClicked, setIconClicked] = useState(false);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
-  const messagesContainerRef = React.useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiButtonRef = useRef(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState(null);
+  const [isSharedMediaVisible, setSharedMediaVisible] = useState(false);
+  const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
+  const carouselRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -100,6 +120,35 @@ const Chat = () => {
           );
         });
     }
+  }, [currentChat]);
+
+  // Fetch unread messages for the current chat and mark them as read
+  useEffect(() => {
+    // Check if there's a valid current chat
+    if (!currentChat || !currentChat._id) return;
+
+    const fetchUnreadMessages = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/messages/${currentChat._id}/unread`,
+          { withCredentials: true }
+        );
+        if (response.status === 200) {
+          const unreadMessages = response.data?.messages || [];
+
+          if (unreadMessages.length > 0) {
+            socket.emit("messages-read", {
+              chat: currentChat,
+              userId: currentUser._id,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching unread messages:", error);
+      }
+    };
+
+    fetchUnreadMessages();
   }, [currentChat]);
 
   // Scroll to the bottom of the messages list on every render
@@ -212,8 +261,85 @@ const Chat = () => {
     }
   };
 
+  // Handle image message upload
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]; // Get the selected file
+
+    if (file) {
+      // Ensure it's an image
+      if (file.type.match("image.*")) {
+        // Create a FormData object to prepare the file for upload
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("chat", currentChat._id);
+        formData.append("sender", currentUser._id);
+
+        try {
+          const response = await axios.post(
+            "http://localhost:3000/api/v1/messages/sendImage",
+            formData,
+            {
+              withCredentials: true,
+            }
+          );
+
+          if (response.data.status === "success") {
+            const imageMessage = response.data.data.message;
+
+            // Send the image message through the socket
+            socket.emit("send-message", imageMessage);
+
+            // Add the image message to the Redux store
+            dispatch(
+              addMessageToChat({
+                chat: { _id: currentChat._id },
+                messages: imageMessage,
+              })
+            );
+
+            // Move the chat to the top of the list
+            dispatch(moveChatToTop(currentChat._id));
+
+            // Update the recent message in the chats list
+            dispatch(
+              updateRecentMessage({
+                chatId: currentChat._id,
+                message: imageMessage,
+                currentUserId: currentUser._id,
+              })
+            );
+          } else {
+            console.error("Image upload failed:", response.data.error);
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
+      } else {
+        console.error("Selected file is not an image.");
+      }
+    }
+  };
+
+  // Scroll to the bottom of the messages list when the image is loaded
+  const handleImageLoad = () => {
+    if (messagesContainerRef.current) {
+      const element = messagesContainerRef.current;
+      element.scrollTop = element.scrollHeight;
+    }
+  };
+
+  // This function is called when the user clicks on the background of the modal
+  const handleModalClick = (event) => {
+    if (event.target.classList.contains("modal")) {
+      setModalOpen(false);
+      setModalImageUrl(null);
+    }
+  };
+
   // Format the timestamp to a readable format (e.g. December 20 2023 - 12:34 AM)
   const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "";
+
     const options = {
       year: "numeric",
       month: "long",
@@ -254,8 +380,53 @@ const Chat = () => {
     }, 300);
   };
 
+  // Handle emoji selection
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji.native);
+  };
+
+  // Toggle the shared media visibility
+  const toggleSharedMedia = () => {
+    setSharedMediaVisible((prevState) => !prevState);
+  };
+
+  // Get the image URLs from the image messages
+  const getImageUrls = () => {
+    return messages.filter((msg) => msg.imageUrl).map((msg) => msg.imageUrl);
+  };
+
+  // This function is called when the user clicks on a photo from the shared media
+  const handleOpenModal = (index) => {
+    setIsCarouselModalOpen(true);
+    setTimeout(() => {
+      carouselRef.current.goTo(index, false);
+    }, 0);
+  };
+
+  // This function is called when the user clicks on the background of the modal (for the shared media)
+  const handleCloseModal = () => {
+    setIsCarouselModalOpen(false);
+  };
+
+  // Filter the chats based on the search term
+  const filteredChats = chats.filter((chat) => {
+    let chatOtherUser =
+      chat.user1._id === currentUser._id ? chat.user2 : chat.user1;
+
+    if (
+      chatOtherUser.firstName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      chatOtherUser.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
   // Animate the chat list using react-spring
-  const chatTransitions = useTransition(chats, {
+  const chatTransitions = useTransition(filteredChats, {
     keys: (chat) => chat._id,
     from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
     enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
@@ -269,6 +440,13 @@ const Chat = () => {
     from: { transform: "translate3d(40px,0,0)", opacity: 0 },
     enter: { transform: "translate3d(0,0,0)", opacity: 1 },
     leave: { transform: "translate3d(40px,0,0)", opacity: 0 },
+  });
+
+  // Animate the shared media using react-spring
+  const sharedMediaTransitions = useTransition(isSharedMediaVisible, {
+    from: { opacity: 0, transform: "translateY(10%)" },
+    enter: { opacity: 1, transform: "translateY(0%)" },
+    leave: { opacity: 0, transform: "translateY(10%)" },
   });
 
   if (!currentUser) return <div>Loading...</div>;
@@ -287,90 +465,108 @@ const Chat = () => {
               className="profile-photo"
               onClick={() => redirectToUserProfile(currentUser._id)}
             />
+            <ul className="nav-options">
+              <li>
+                <Link to="/discover">Discover</Link>
+              </li>
+              <li>
+                <Link to="/chat">Chat</Link>
+              </li>
+              <li>
+                <Link to="/map">Map</Link>
+              </li>
+            </ul>
           </div>
           <div className="chat-search-wrapper">
             <input
               className="chat-search"
               type="text"
-              placeholder="Search..."
+              placeholder="Search for a chat..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <svg
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
               className={`chat-search-icon ${iconClicked ? "clicked" : ""}`}
               onClick={handleIconClick}
-              xmlns="http://www.w3.org/2000/svg"
-              height="1em"
-              viewBox="0 0 512 512"
-            >
-              <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-            </svg>
+            />
           </div>
 
           <div className="active-users">
-            {activeUserTransitions((styles, user) => (
-              <animated.div style={styles} key={user._id}>
-                <div className="active-user">
-                  <img
-                    src={user.profilePicture.url}
-                    alt={user.username}
-                    className="active-user-avatar"
-                  />
-                  {user.currentlyActive && (
-                    <div className="active-indicator"></div>
-                  )}
-                </div>
-              </animated.div>
-            ))}
+            {activeUsers.length > 0 ? (
+              activeUserTransitions((styles, user) => (
+                <animated.div style={styles} key={user._id}>
+                  <div className="active-user">
+                    <img
+                      src={user.profilePicture.url}
+                      alt={user.username}
+                      className="active-user-avatar"
+                    />
+                    {user.currentlyActive && (
+                      <div className="active-indicator"></div>
+                    )}
+                  </div>
+                </animated.div>
+              ))
+            ) : (
+              <div className="no-active-users">No active users currently.</div>
+            )}
           </div>
 
           <div className="chat-list">
-            {chats && chats.length > 0 ? (
-              chatTransitions((styles, chat) => {
-                let chatOtherUser =
-                  chat.user1._id === currentUser._id ? chat.user2 : chat.user1;
+            {chatTransitions((styles, chat) => {
+              let chatOtherUser =
+                chat.user1._id === currentUser._id ? chat.user2 : chat.user1;
 
-                let isActiveUser = activeUsers.some(
-                  (user) => user._id === chatOtherUser._id
-                );
+              let isActiveUser = activeUsers.some(
+                (user) => user._id === chatOtherUser._id
+              );
 
-                return (
-                  <animated.div style={styles} key={chat._id}>
-                    <div
-                      className={`chat-item ${
-                        currentChat && chat._id === currentChat._id
-                          ? "active"
-                          : ""
-                      }`}
-                      onClick={() => handleChatClick(chat)}
-                    >
-                      <img
-                        src={chatOtherUser.profilePicture.url}
-                        alt="profile picture"
-                        className="chat-user-image"
-                      />
-                      {isActiveUser && (
-                        <div className="chat-active-indicator"></div>
-                      )}
-                      <span className="chat-user-info">
-                        <span className="chat-user-name">
-                          {chatOtherUser.firstName} {chatOtherUser.lastName}
-                        </span>
-                        {chat.recentMessage && (
-                          <span className="chat-recent-message">
-                            {chat.recentMessage.sender === currentUser._id
-                              ? "You: "
-                              : ""}
-                            {chat.recentMessage.content.length > 40
-                              ? chat.recentMessage.content.substring(0, 37) +
-                                "..."
-                              : chat.recentMessage.content}
-                          </span>
-                        )}
+              return (
+                <animated.div style={styles} key={chat._id}>
+                  <div
+                    className={`chat-item ${
+                      currentChat && chat._id === currentChat._id
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() => handleChatClick(chat)}
+                  >
+                    <img
+                      src={chatOtherUser.profilePicture.url}
+                      alt="profile picture"
+                      className="chat-user-image"
+                    />
+                    {isActiveUser && (
+                      <div className="chat-active-indicator"></div>
+                    )}
+                    <span className="chat-user-info">
+                      <span className="chat-user-name">
+                        {chatOtherUser.firstName} {chatOtherUser.lastName}
                       </span>
-                    </div>
-                  </animated.div>
-                );
-              })
-            ) : (
+                      {chat.recentMessage && (
+                        <span className="chat-recent-message">
+                          {chat.recentMessage.sender === currentUser._id
+                            ? "You: "
+                            : ""}
+                          {chat.recentMessage.imageUrl
+                            ? "Sent a Photo."
+                            : chat.recentMessage.content.length > 35
+                            ? chat.recentMessage.content.substring(0, 32) +
+                              "..."
+                            : chat.recentMessage.content}
+                        </span>
+                      )}
+                    </span>
+                    {chat.unreadCount > 0 && (
+                      <div className="unread-count">{chat.unreadCount}</div>
+                    )}
+                  </div>
+                </animated.div>
+              );
+            })}
+
+            {filteredChats.length === 0 && (
               <div className="no-chats">No chats yet</div>
             )}
           </div>
@@ -385,15 +581,11 @@ const Chat = () => {
                 <h1 onClick={() => redirectToUserProfile(otherUser._id)}>
                   {`${otherUser.firstName} ${otherUser.lastName}`}
                 </h1>
-                <svg
+                <FontAwesomeIcon
+                  icon={faEllipsis}
                   className="chat-header-ellipsis-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="1em"
-                  viewBox="0 0 448 512"
                   onClick={handleToggleSidebar}
-                >
-                  <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                </svg>
+                />
               </div>
               <div className="messages" ref={messagesContainerRef}>
                 {messages.length > 0 ? (
@@ -406,24 +598,56 @@ const Chat = () => {
                           isSent ? "sent" : "received"
                         }`}
                       >
+                        {!isSent && (
+                          <img
+                            src={
+                              otherUser.profilePicture.url ||
+                              otherUser.profilePicture.default
+                            }
+                            alt="Sender"
+                            className="sender-avatar"
+                          />
+                        )}
                         {isSent && (
                           <span className="message-timestamp">
-                            {formatTimestamp(msg.timestamp)}
+                            {msg.timestamp && formatTimestamp(msg.timestamp)}
                           </span>
                         )}
                         <div
                           className={`message ${isSent ? "sent" : "received"}`}
                         >
-                          <span className="sender">
-                            {isSent
-                              ? currentUser.firstName
-                              : msg.sender.firstName}
-                          </span>
-                          : {msg.content}
+                          {/* Conditionally render the image or text message */}
+                          {msg.imageUrl ? (
+                            <img
+                              src={msg.imageUrl}
+                              alt="Sent Image"
+                              className="chat-image"
+                              onLoad={handleImageLoad}
+                              onClick={() => {
+                                setModalImageUrl(msg.imageUrl);
+                                setModalOpen(true);
+                              }}
+                            />
+                          ) : (
+                            <>{msg.content}</>
+                          )}
                         </div>
+
+                        {isSent && (
+                          <div className="message-status">
+                            <i
+                              className="fas fa-check-double"
+                              title={msg.read ? "Read" : "Delivered"}
+                              style={{
+                                color: msg.read ? "rgb(43, 132, 215)" : "grey",
+                              }}
+                            ></i>
+                          </div>
+                        )}
+
                         {!isSent && (
                           <span className="message-timestamp">
-                            {formatTimestamp(msg.timestamp)}
+                            {msg.timestamp && formatTimestamp(msg.timestamp)}
                           </span>
                         )}
                       </div>
@@ -432,11 +656,51 @@ const Chat = () => {
                 ) : (
                   <p className="no-messages">No messages in this chat yet.</p>
                 )}
+
+                {isModalOpen && modalImageUrl && (
+                  <div className="modal" onClick={handleModalClick}>
+                    <button
+                      className="modal-close-btn"
+                      onClick={() => setModalOpen(false)}
+                    >
+                      &times;
+                    </button>
+                    <img src={modalImageUrl} className="modal-content" />
+                  </div>
+                )}
+              </div>
+              <div className="picker-wrapper">
+                {showEmojiPicker && (
+                  <Picker
+                    onEmojiSelect={handleEmojiSelect}
+                    onClickOutside={(e) => {
+                      if (e.target !== emojiButtonRef.current) {
+                        setShowEmojiPicker(!showEmojiPicker);
+                      }
+                    }}
+                    title="Pick your emoji..."
+                    previewEmoji="point_up"
+                    data={data}
+                    style={{
+                      position: "absolute",
+                      left: "0",
+                      bottom: "100%",
+                      zIndex: "1",
+                    }}
+                  />
+                )}
               </div>
 
-              <div className="shared-media"></div>
               <div className="chat-controls">
-                <button>📎</button>
+                <label className="file-upload-label">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleImageUpload}
+                  />
+                  <FontAwesomeIcon icon={faFileImage} className="file-image" />
+                </label>
                 <div className="message-input-wrapper">
                   <input
                     type="text"
@@ -445,47 +709,46 @@ const Chat = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-
-                  <svg
-                    className="emoji-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="1em"
-                    viewBox="0 0 512 512"
+                  <button
+                    ref={emojiButtonRef}
+                    className="emoji-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEmojiPicker(!showEmojiPicker);
+                    }}
                   >
-                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM96.8 314.1c-3.8-13.7 7.4-26.1 21.6-26.1H393.6c14.2 0 25.5 12.4 21.6 26.1C396.2 382 332.1 432 256 432s-140.2-50-159.2-117.9zM217.6 212.8l0 0 0 0-.2-.2c-.2-.2-.4-.5-.7-.9c-.6-.8-1.6-2-2.8-3.4c-2.5-2.8-6-6.6-10.2-10.3c-8.8-7.8-18.8-14-27.7-14s-18.9 6.2-27.7 14c-4.2 3.7-7.7 7.5-10.2 10.3c-1.2 1.4-2.2 2.6-2.8 3.4c-.3 .4-.6 .7-.7 .9l-.2 .2 0 0 0 0 0 0c-2.1 2.8-5.7 3.9-8.9 2.8s-5.5-4.1-5.5-7.6c0-17.9 6.7-35.6 16.6-48.8c9.8-13 23.9-23.2 39.4-23.2s29.6 10.2 39.4 23.2c9.9 13.2 16.6 30.9 16.6 48.8c0 3.4-2.2 6.5-5.5 7.6s-6.9 0-8.9-2.8l0 0 0 0zm160 0l0 0-.2-.2c-.2-.2-.4-.5-.7-.9c-.6-.8-1.6-2-2.8-3.4c-2.5-2.8-6-6.6-10.2-10.3c-8.8-7.8-18.8-14-27.7-14s-18.9 6.2-27.7 14c-4.2 3.7-7.7 7.5-10.2 10.3c-1.2 1.4-2.2 2.6-2.8 3.4c-.3 .4-.6 .7-.7 .9l-.2 .2 0 0 0 0 0 0c-2.1 2.8-5.7 3.9-8.9 2.8s-5.5-4.1-5.5-7.6c0-17.9 6.7-35.6 16.6-48.8c9.8-13 23.9-23.2 39.4-23.2s29.6 10.2 39.4 23.2c9.9 13.2 16.6 30.9 16.6 48.8c0 3.4-2.2 6.5-5.5 7.6s-6.9 0-8.9-2.8l0 0 0 0 0 0z" />
-                  </svg>
+                    <FontAwesomeIcon
+                      icon={faFaceLaughBeam}
+                      className="emoji-icon"
+                      height="1em"
+                    />
+                  </button>
                 </div>
-                <svg
+                <FontAwesomeIcon
+                  icon={faPaperPlane}
                   className="send-icon"
                   onClick={handleSendMessage}
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="1em"
-                  viewBox="0 0 512 512"
-                >
-                  <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
-                </svg>
+                />
               </div>
             </>
           ) : (
             <>
               <div className="chat-header">
                 <h1>Select a chat</h1>
-                <svg
+                <FontAwesomeIcon
+                  icon={faEllipsis}
                   className="chat-header-ellipsis-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="1em"
-                  viewBox="0 0 448 512"
                   onClick={handleToggleSidebar}
-                >
-                  <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                </svg>
+                />
               </div>
               <div className="messages" ref={messagesContainerRef}>
                 <p></p>
               </div>
-              <div className="shared-media"></div>
               <div className="chat-controls">
-                <button>📎</button>
+                <label className="file-upload-label">
+                  <FontAwesomeIcon icon={faFileImage} className="file-image" />
+                </label>
+
                 <div className="message-input-wrapper">
                   <input
                     type="text"
@@ -494,25 +757,17 @@ const Chat = () => {
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
-
-                  <svg
+                  <FontAwesomeIcon
+                    icon={faFaceLaughBeam}
                     className="emoji-icon"
-                    xmlns="http://www.w3.org/2000/svg"
                     height="1em"
-                    viewBox="0 0 512 512"
-                  >
-                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM96.8 314.1c-3.8-13.7 7.4-26.1 21.6-26.1H393.6c14.2 0 25.5 12.4 21.6 26.1C396.2 382 332.1 432 256 432s-140.2-50-159.2-117.9zM217.6 212.8l0 0 0 0-.2-.2c-.2-.2-.4-.5-.7-.9c-.6-.8-1.6-2-2.8-3.4c-2.5-2.8-6-6.6-10.2-10.3c-8.8-7.8-18.8-14-27.7-14s-18.9 6.2-27.7 14c-4.2 3.7-7.7 7.5-10.2 10.3c-1.2 1.4-2.2 2.6-2.8 3.4c-.3 .4-.6 .7-.7 .9l-.2 .2 0 0 0 0 0 0c-2.1 2.8-5.7 3.9-8.9 2.8s-5.5-4.1-5.5-7.6c0-17.9 6.7-35.6 16.6-48.8c9.8-13 23.9-23.2 39.4-23.2s29.6 10.2 39.4 23.2c9.9 13.2 16.6 30.9 16.6 48.8c0 3.4-2.2 6.5-5.5 7.6s-6.9 0-8.9-2.8l0 0 0 0zm160 0l0 0-.2-.2c-.2-.2-.4-.5-.7-.9c-.6-.8-1.6-2-2.8-3.4c-2.5-2.8-6-6.6-10.2-10.3c-8.8-7.8-18.8-14-27.7-14s-18.9 6.2-27.7 14c-4.2 3.7-7.7 7.5-10.2 10.3c-1.2 1.4-2.2 2.6-2.8 3.4c-.3 .4-.6 .7-.7 .9l-.2 .2 0 0 0 0 0 0c-2.1 2.8-5.7 3.9-8.9 2.8s-5.5-4.1-5.5-7.6c0-17.9 6.7-35.6 16.6-48.8c9.8-13 23.9-23.2 39.4-23.2s29.6 10.2 39.4 23.2c9.9 13.2 16.6 30.9 16.6 48.8c0 3.4-2.2 6.5-5.5 7.6s-6.9 0-8.9-2.8l0 0 0 0 0 0z" />
-                  </svg>
+                  />
                 </div>
-                <svg
+                <FontAwesomeIcon
+                  icon={faPaperPlane}
                   className="send-icon"
                   onClick={handleSendMessage}
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="1em"
-                  viewBox="0 0 512 512"
-                >
-                  <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
-                </svg>
+                />
               </div>
             </>
           )}
@@ -563,17 +818,56 @@ const Chat = () => {
                   </p>
                 </div>
 
-                <p>
+                <div onClick={toggleSharedMedia}>
                   Shared Media
-                  <svg
+                  <FontAwesomeIcon
+                    icon={faSquareCaretDown}
                     className="shared-media-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="1em"
-                    viewBox="0 0 448 512"
-                  >
-                    <path d="M384 480c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0zM224 352c-6.7 0-13-2.8-17.6-7.7l-104-112c-6.5-7-8.2-17.2-4.4-25.9s12.5-14.4 22-14.4l208 0c9.5 0 18.2 5.7 22 14.4s2.1 18.9-4.4 25.9l-104 112c-4.5 4.9-10.9 7.7-17.6 7.7z" />
-                  </svg>
-                </p>
+                  />
+                </div>
+
+                {sharedMediaTransitions(
+                  (style, item) =>
+                    item && (
+                      <animated.div
+                        style={style}
+                        className="shared-media-section"
+                      >
+                        {getImageUrls().map((url, index) => (
+                          <div
+                            key={index}
+                            onClick={() => handleOpenModal(index)}
+                          >
+                            <img
+                              src={url}
+                              alt="Shared Media"
+                              className="shared-media-image"
+                            />
+                          </div>
+                        ))}
+                        <Modal
+                          wrapClassName="my-custom-modal"
+                          open={isCarouselModalOpen}
+                          onCancel={handleCloseModal}
+                          footer={null}
+                          width={850}
+                          height={850}
+                        >
+                          <Carousel ref={carouselRef} dots={true}>
+                            {getImageUrls().map((url, index) => (
+                              <div key={index}>
+                                <img
+                                  src={url}
+                                  alt="Shared Media"
+                                  className="carousel-image"
+                                />
+                              </div>
+                            ))}
+                          </Carousel>
+                        </Modal>
+                      </animated.div>
+                    )
+                )}
               </div>
             </>
           ) : (

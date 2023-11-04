@@ -5,3 +5,4 @@ export { default as ProfileCreationForm } from "./FormElements/ProfileCreationFo
 export { default as ProfileEditForm } from "./FormElements/ProfileEditForm/ProfileEditForm";
 export { default as Alert } from "./UIElements/Alert/Alert";
 export { default as UserCard } from "./UIElements/UserCard/UserCard";
+export { default as Spinner } from "./UIElements/Spinner/Spinner";

@@ -1,4 +1,5 @@
 const User = require("./../models/userModel");
+const Message = require("./../models/messageModel");
 const { Server } = require("socket.io");
 
 // Maintain a list of active users
@@ -44,6 +45,106 @@ const initializeSocket = (server) => {
           "Error updating user active status on manual disconnect:",
           error
         );
+      }
+    });
+
+    // Mark a message as read
+    socket.on("message-read", async (data) => {
+      const { chat, sender } = data.message;
+      const chatId = chat._id;
+      const senderId = sender._id;
+
+      // Update the messages in the chat as read.
+      try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Update unread messages using the current date
+        await Message.updateMany(
+          {
+            chat: chatId,
+            sender: senderId,
+            read: null,
+          },
+          { read: currentDate }
+        );
+
+        // Fetch the updated messages
+        const fetchedUpdatedMessages = await Message.find({
+          chat: chatId,
+          sender: senderId,
+          read: currentDate,
+        });
+
+        // Retrieve the socket ID of the sender directly
+        let senderSocketId = null;
+        for (let [socketId, id] of Object.entries(currentlyActiveUsers)) {
+          if (id.toString() === senderId.toString()) {
+            senderSocketId = socketId;
+            break;
+          }
+        }
+
+        // Emit the read confirmation to the sender
+        if (senderSocketId) {
+          ioData.io
+            .to(senderSocketId)
+            .emit("message-read-confirmation", fetchedUpdatedMessages);
+        } else {
+          console.error("Couldn't find a socket ID for sender:", senderId);
+        }
+      } catch (error) {
+        console.error("Error updating messages as read:", error);
+      }
+    });
+
+    // Mark multiple messages as read
+    socket.on("messages-read", async (data) => {
+      const { chat, userId } = data;
+
+      try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Update all unread messages in the specified chat (that were NOT sent by the current user) using the current date
+        await Message.updateMany(
+          {
+            chat: chat._id,
+            sender: { $ne: userId.toString() }, // Messages that were not sent by the current user
+            read: null,
+          },
+          { read: currentDate }
+        );
+
+        // Fetch the updated messages
+        const fetchedUpdatedMessages = await Message.find({
+          chat: chat._id,
+          sender: { $ne: userId.toString() },
+          read: currentDate,
+        });
+
+        // Retrieve the id of the current user
+        const currentUserId = userId;
+
+        // Retrieve the socket id of the other user (sender)
+        let senderSocketId = null;
+        for (let [socketId, id] of Object.entries(currentlyActiveUsers)) {
+          if (id.toString() !== currentUserId.toString()) {
+            senderSocketId = socketId;
+            break;
+          }
+        }
+
+        // Emit the read confirmation to the sender
+        if (senderSocketId) {
+          ioData.io
+            .to(senderSocketId)
+            .emit("message-read-confirmation", fetchedUpdatedMessages);
+        } else {
+          console.error("Couldn't find a socket ID for sender:", userId);
+        }
+      } catch (error) {
+        console.error("Error marking multiple messages as read:", error);
       }
     });
 

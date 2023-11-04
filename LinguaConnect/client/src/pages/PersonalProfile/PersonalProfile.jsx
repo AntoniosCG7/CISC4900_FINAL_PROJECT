@@ -4,6 +4,7 @@ import { Navbar } from "../../components/index";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Carousel } from "antd";
+import { useLoading } from "../../contexts/LoadingContext";
 import "./PersonalProfile.css";
 
 const PersonalProfile = () => {
@@ -11,6 +12,7 @@ const PersonalProfile = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
+  const { loading, setLoading } = useLoading();
 
   // This function is called when the user clicks on a photo in the photos
   const handleOpenModal = (index) => {
@@ -32,6 +34,7 @@ const PersonalProfile = () => {
 
   useEffect(() => {
     async function fetchCurrentUser() {
+      setLoading(true);
       try {
         const response = await axios.get(
           "http://localhost:3000/api/v1/users/me",
@@ -42,13 +45,17 @@ const PersonalProfile = () => {
         setUser(response.data.data.user);
       } catch (error) {
         console.error("Failed to fetch personal data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchCurrentUser();
-  }, []);
+  }, [setLoading]);
 
-  if (!user) return <div>Loading...</div>; // This is necessary because the useEffect hook asynchronously fetches user data from an API endpoint. When the component first renders, the user state is null because the data hasn't been fetched yet. This conditional prevents the component from trying to render the user data before it's available.
+  if (!user) return null;
+
+  // This is necessary because the useEffect hook asynchronously fetches user data from an API endpoint. When the component first renders, the user state is null because the data hasn't been fetched yet. This conditional prevents the component from trying to render the user data before it's available.
 
   return (
     <>

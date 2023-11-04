@@ -3,6 +3,7 @@ import axios from "axios";
 
 const initialChatState = {
   chats: {},
+  unreadCounts: {},
   currentChat: null,
   otherUser: null,
   loading: false,
@@ -58,6 +59,23 @@ const chatSlice = createSlice({
     // Action to set all chats
     setChats: (state, action) => {
       state.chats = action.payload;
+      state.unreadCounts = action.payload.reduce((acc, chat) => {
+        acc[chat._id] = chat.unreadCount;
+        return acc;
+      }, {});
+    },
+
+    // Action to increment unread message count for a specific chat
+    incrementUnreadCount: (state, action) => {
+      const chatId = action.payload;
+      const chatToUpdate = state.chats.find((chat) => chat._id === chatId);
+      if (chatToUpdate) {
+        if (chatToUpdate.unreadCount) {
+          chatToUpdate.unreadCount += 1;
+        } else {
+          chatToUpdate.unreadCount = 1;
+        }
+      }
     },
 
     // Action to set the current chat and other user
@@ -70,6 +88,14 @@ const chatSlice = createSlice({
         state.otherUser = currentChat.user1;
       } else {
         state.otherUser = null;
+      }
+
+      // Reset unread count for the selected chat
+      const chatToUpdate = state.chats.find(
+        (chat) => chat._id === currentChat._id
+      );
+      if (chatToUpdate) {
+        chatToUpdate.unreadCount = 0;
       }
     },
 
@@ -147,6 +173,7 @@ const chatSlice = createSlice({
 export const {
   addChat,
   setChats,
+  incrementUnreadCount,
   setCurrentChat,
   clearCurrentChat,
   moveChatToTop,

@@ -9,6 +9,7 @@ import { addAlert } from "./../../slices/alertSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Carousel } from "antd";
+import { useLoading } from "../../contexts/LoadingContext";
 import "./PublicProfile.css";
 
 const PublicProfile = () => {
@@ -17,6 +18,7 @@ const PublicProfile = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
+  const { loading, setLoading } = useLoading();
   const { userId } = useParams();
 
   const dispatch = useDispatch();
@@ -84,6 +86,7 @@ const PublicProfile = () => {
   // Fetch the data of the user whose profile is being viewed
   useEffect(() => {
     async function fetchOtherUser() {
+      setLoading(true);
       try {
         const response = await axios.get(
           `http://localhost:3000/api/v1/users/${userId}`,
@@ -95,13 +98,15 @@ const PublicProfile = () => {
         setOtherUser(response.data.data.user);
       } catch (error) {
         console.error("Failed to fetch personal data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchOtherUser();
-  }, [userId]);
+  }, [userId, setLoading]);
 
-  if (!otherUser) return <div>Loading...</div>;
+  if (!otherUser) return null;
 
   return (
     <>

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
 import { authError, updateUser } from "../../../slices/authSlice";
 import PicturesWall from "../PicturesWall/PicturesWall";
+import { useLoading } from "../../../contexts/LoadingContext";
 import "./ProfileEditForm.css";
 
 const ProfileEditForm = () => {
@@ -33,10 +34,13 @@ const ProfileEditForm = () => {
     value: lang,
     label: lang,
   }));
+  const { loading, setLoading } = useLoading();
 
   // Fetch the user's data when the component mounts
   useEffect(() => {
     async function fetchUserData() {
+      setLoading(true);
+
       try {
         const response = await axios.get(
           "http://localhost:3000/api/v1/users/me",
@@ -75,11 +79,13 @@ const ProfileEditForm = () => {
         setExistingPhotos(userData.photos.map((photo) => photo.url));
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchUserData();
-  }, []);
+  }, [setLoading]);
 
   // Using the useEffect hook to fetch languages when the component mounts
   useEffect(() => {

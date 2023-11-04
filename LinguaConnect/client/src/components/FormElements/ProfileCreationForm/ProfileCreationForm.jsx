@@ -7,6 +7,7 @@ import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplet
 import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
 import { authError, setUserOnAuthentication } from "../../../slices/authSlice";
+import { useLoading } from "../../../contexts/LoadingContext";
 import "./ProfileCreationForm.css";
 
 function ProfileCreationForm() {
@@ -29,6 +30,7 @@ function ProfileCreationForm() {
     value: lang,
     label: lang,
   }));
+  const { loading, setLoading } = useLoading();
 
   // Using the useEffect hook to fetch languages when the component mounts
   useEffect(() => {
@@ -110,12 +112,8 @@ function ProfileCreationForm() {
       formData.append("fullAddress", location.fullAddress);
     }
 
-    // Log the form data for debugging purposes
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     try {
+      setLoading(true);
       const response = await axios.post(
         "http://localhost:3000/api/v1/users/createProfile",
         formData,
@@ -158,6 +156,8 @@ function ProfileCreationForm() {
           message: "Error creating profile. Please try again.",
         })
       );
+    } finally {
+      setLoading(false);
     }
   };
 

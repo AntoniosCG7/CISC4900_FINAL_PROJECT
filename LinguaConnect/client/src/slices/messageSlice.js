@@ -33,11 +33,31 @@ export const messageSlice = createSlice({
       const { chatId, messages } = action.payload;
       state.byChatId[chatId] = messages;
     },
+
+    // Mark messages as read
+    markMessagesAsRead: (state, action) => {
+      const { messages } = action.payload;
+
+      messages.forEach((updatedMessage) => {
+        const chatId = updatedMessage.chat;
+        const messageIndex = state.byChatId[chatId].findIndex(
+          (message) => message._id === updatedMessage._id
+        );
+
+        if (messageIndex !== -1) {
+          state.byChatId[chatId][messageIndex].read = Date.now();
+        }
+      });
+    },
   },
 });
 
-export const { addMessageToChat, clearMessagesFromChat, setInitialMessages } =
-  messageSlice.actions;
+export const {
+  addMessageToChat,
+  clearMessagesFromChat,
+  setInitialMessages,
+  markMessagesAsRead,
+} = messageSlice.actions;
 
 const getMessagesByChatId = (state, chatId) => state.messages?.byChatId[chatId];
 
