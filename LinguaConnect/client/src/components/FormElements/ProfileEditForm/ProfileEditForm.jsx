@@ -185,6 +185,7 @@ const ProfileEditForm = () => {
     }
 
     try {
+      setLoading(true);
       const response = await axios.patch(
         "http://localhost:3000/api/v1/users/updateMe",
         formData,
@@ -227,6 +228,8 @@ const ProfileEditForm = () => {
           message: "Error Updating Profile.",
         })
       );
+    } finally {
+      setLoading(false);
     }
   };
 
