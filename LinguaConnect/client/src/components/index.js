@@ -6,3 +6,7 @@ export { default as ProfileEditForm } from "./FormElements/ProfileEditForm/Profi
 export { default as Alert } from "./UIElements/Alert/Alert";
 export { default as UserCard } from "./UIElements/UserCard/UserCard";
 export { default as Spinner } from "./UIElements/Spinner/Spinner";
+export { default as MiniNavBar } from "./Navigation/MiniNavBar/MiniNavBar";
+export { default as MinimalSelect } from "./FormElements/MinimalSelect/MinimalSelect";
+export { default as EventList } from "./UIElements/EventList/EventList";
+export { default as GoogleMap } from "./UIElements/GoogleMap/GoogleMap";

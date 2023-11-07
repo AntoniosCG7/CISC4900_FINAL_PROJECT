@@ -1,37 +1,61 @@
 "use client";
 import React, { useState } from "react";
+import { APIProvider } from "@vis.gl/react-google-maps";
+import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import {
-  APIProvider,
-  Map as GoogleMap,
-  AdvancedMarker,
-  Pin,
-  InfoWindow,
-} from "@vis.gl/react-google-maps";
+  MiniNavBar,
+  MinimalSelect,
+  EventList,
+  GoogleMap,
+} from "../../components";
 
 const Map = () => {
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
-  const position = { lat: 40.73061, lng: -73.935242 };
-  const [open, setOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("createdByMe");
+
   return (
     <APIProvider apiKey={API_KEY}>
-      <div style={{ height: "100vh", width: "80%" }}>
-        <GoogleMap zoom={13} center={position} mapId={MAP_ID}>
-          <AdvancedMarker position={position} onClick={() => setOpen(true)}>
-            <Pin
-              background={"#ffb500"}
-              borderColor={"red"}
-              glyphColor={"red"}
-            />
-          </AdvancedMarker>
-
-          {open && (
-            <InfoWindow position={position} onCloseClick={() => setOpen(false)}>
-              <div style={{ padding: "5px" }}>Hello World!</div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
-      </div>
+      <Box sx={{ display: "flex", height: "100vh" }}>
+        <Drawer
+          sx={{
+            width: "20%",
+            height: "auto",
+            maxHeight: "100vh",
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: "20%",
+              backgroundColor: "var(--primary-color)",
+            },
+          }}
+          variant="permanent"
+          anchor="left"
+        >
+          <MiniNavBar />
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              paddingTop: 2,
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            Events
+          </Typography>
+          <MinimalSelect
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+          <Divider />
+          <EventList selectedCategory={selectedCategory} />
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
+          <GoogleMap />
+        </Box>
+      </Box>
     </APIProvider>
   );
 };

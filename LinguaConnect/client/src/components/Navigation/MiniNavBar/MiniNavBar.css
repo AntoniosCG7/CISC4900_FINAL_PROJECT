@@ -1,0 +1,78 @@
+.mini-navbar {
+  display: flex;
+  align-items: center;
+  background-color: var(--secondary-color);
+  height: 80px;
+  overflow: hidden;
+}
+
+.nav-options {
+  padding: 0 1rem;
+  display: flex;
+  gap: 2.2rem;
+  margin-left: 1rem;
+  color: var(--tertiary-color);
+  font-weight: bold;
+}
+
+.nav-options li {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.nav-options li a {
+  font-family: var(--secondary-font-family);
+  font-size: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.nav-options li a:hover {
+  color: var(--primary-color);
+}
+
+.nav-options li a::after {
+  content: "";
+  position: absolute;
+  background-color: var(--tertiary-color);
+  height: 3px;
+  width: 0;
+  left: 0;
+  bottom: -1px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-options li a:hover::after {
+  width: 100%;
+  background-color: var(--primary-color);
+}
+
+@media (max-width: 2300px) {
+  .nav-options li a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 2150px) {
+  .nav-options {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 2000px) {
+  .nav-options {
+    gap: 1.3rem;
+  }
+}
+
+@media (max-width: 1800px) {
+  .nav-options {
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 1900px) {
+  .nav-options li a {
+    font-size: 0.8rem;
+  }
+}
