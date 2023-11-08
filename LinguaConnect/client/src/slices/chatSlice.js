@@ -125,11 +125,20 @@ const chatSlice = createSlice({
       // If chat is found, update the recent message
       if (chatToUpdate) {
         // Check if the message is sent by the current user
-        if (message.sender._id === currentUserId) {
-          chatToUpdate.recentMessage = {
-            ...message,
-            content: "You: " + message.content,
-          };
+        if (message.sender.$oid === currentUserId) {
+          // If the message has an imageUrl, it's an image message
+          if (message.imageUrl) {
+            chatToUpdate.recentMessage = {
+              ...message,
+              content: "You: Sent a Photo.",
+            };
+          } else {
+            // Otherwise, it's a text message
+            chatToUpdate.recentMessage = {
+              ...message,
+              content: "You: " + message.content,
+            };
+          }
         } else {
           chatToUpdate.recentMessage = message;
         }

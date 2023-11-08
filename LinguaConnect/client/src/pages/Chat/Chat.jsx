@@ -526,7 +526,7 @@ const Chat = () => {
                       </span>
                       {chat.recentMessage && (
                         <span className="chat-recent-message">
-                          {chat.recentMessage.sender === currentUser._id
+                          {chat.recentMessage.sender._id === currentUser._id
                             ? "You: "
                             : ""}
                           {chat.recentMessage.imageUrl
