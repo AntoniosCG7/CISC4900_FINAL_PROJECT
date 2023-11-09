@@ -39,6 +39,10 @@ const MinimalSelect = ({ selectedCategory, setSelectedCategory }) => {
                 marginTop: "5px",
                 borderRadius: 1,
               },
+              "& .MuiMenuItem-root.Mui-selected": {
+                background: "#a7a5a5",
+                color: "var(--tertiary-color)",
+              },
               "& .MuiMenuItem-root": {
                 "&:hover": {
                   background: "var(--secondary-color)",
