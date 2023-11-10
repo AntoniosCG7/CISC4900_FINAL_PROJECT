@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   Map,
   AdvancedMarker,
@@ -12,10 +13,10 @@ const GoogleMap = () => {
   const [mapCenter, setMapCenter] = useState();
   const { setLoading } = useLoading();
 
-  // Dummy user location data (I will actually get this from the database later)
-  const userLocationFromDb = {
-    coordinates: [-74.0059728, 40.7127753], // New York, NY, USA
-  };
+  // Get current user's location from Redux store to set map center if user denies location access
+  const userLocationFromDb = useSelector(
+    (state) => state.auth.user.location.coordinates
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -31,8 +32,8 @@ const GoogleMap = () => {
       (error) => {
         console.error(error);
         setMapCenter({
-          lat: userLocationFromDb.coordinates[1],
-          lng: userLocationFromDb.coordinates[0],
+          lat: userLocationFromDb[1],
+          lng: userLocationFromDb[0],
         });
         setLoading(false);
       },
