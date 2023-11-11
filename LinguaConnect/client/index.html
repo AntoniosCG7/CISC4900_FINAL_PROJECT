@@ -19,9 +19,16 @@
       console.log('initMap')
     }
   </script>
-  <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBwBFBm5A0_IpKlewmHcDszg-bZYJddXY&libraries=places&callback=initMap">
-    </script>
+  <script type="module">
+    function loadMapsAPI() {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
+    loadMapsAPI();
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
