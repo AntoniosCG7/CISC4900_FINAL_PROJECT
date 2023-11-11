@@ -52,11 +52,7 @@ function App() {
             {/* Protected Routes */}
             <Route
               path="/create-profile"
-              element={
-                <SocketProvider>
-                  <ProtectedRoute component={ProfileCreation} />
-                </SocketProvider>
-              }
+              element={<ProtectedRoute component={ProfileCreation} />}
             />
             <Route
               path="/profile"

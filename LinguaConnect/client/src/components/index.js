@@ -9,4 +9,4 @@ export { default as Spinner } from "./UIElements/Spinner/Spinner";
 export { default as MiniNavBar } from "./Navigation/MiniNavBar/MiniNavBar";
 export { default as MinimalSelect } from "./FormElements/MinimalSelect/MinimalSelect";
 export { default as EventList } from "./UIElements/EventList/EventList";
-export { default as GoogleMap } from "./UIElements/GoogleMap/GoogleMap";
+export { default as MyMap } from "./UIElements/MyMap/MyMap";
