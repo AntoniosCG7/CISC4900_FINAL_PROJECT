@@ -122,10 +122,9 @@ const chatSlice = createSlice({
       const { chatId, message, currentUserId } = action.payload;
       const chatToUpdate = state.chats.find((chat) => chat._id === chatId);
 
-      // If chat is found, update the recent message
       if (chatToUpdate) {
         // Check if the message is sent by the current user
-        if (message.sender.$oid === currentUserId) {
+        if (message.sender._id === currentUserId) {
           // If the message has an imageUrl, it's an image message
           if (message.imageUrl) {
             chatToUpdate.recentMessage = {
