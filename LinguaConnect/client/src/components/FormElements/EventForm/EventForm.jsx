@@ -18,7 +18,8 @@ const EventForm = ({ onClose, eventLocation }) => {
       try {
         const response = await fetch("http://localhost:3000/api/v1/languages");
         const data = await response.json();
-        const languageOptions = data.map((language) => ({
+        const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
+        const languageOptions = sortedData.map((language) => ({
           value: language.name,
           label: language.name,
         }));
