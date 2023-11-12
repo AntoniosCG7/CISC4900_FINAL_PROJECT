@@ -6,9 +6,10 @@ import React, {
   useCallback,
 } from "react";
 import { useSelector } from "react-redux";
-import { GoogleMap } from "@react-google-maps/api";
+import { GoogleMap, InfoWindowF } from "@react-google-maps/api";
 import EventForm from "../../FormElements/EventForm/EventForm";
 import { useLoading } from "../../../contexts/LoadingContext";
+// import mapStyles from "./mapStyles";
 
 const containerStyle = {
   width: "100%",
@@ -28,6 +29,7 @@ const MyMap = () => {
       disableDefaultUI: true,
       clickableIcons: false,
       zoomControl: true,
+      // styles: mapStyles,
     }),
     []
   );
@@ -81,13 +83,19 @@ const MyMap = () => {
         mapContainerStyle={containerStyle}
         options={options}
         onLoad={onLoad}
-      ></GoogleMap>
-      {showEventForm && (
-        <EventForm
-          location={eventLocation}
-          onClose={() => setShowEventForm(false)}
-        />
-      )}
+      >
+        {showEventForm && (
+          <InfoWindowF
+            position={eventLocation}
+            onCloseClick={() => setShowEventForm(false)}
+          >
+            <EventForm
+              location={eventLocation}
+              onClose={() => setShowEventForm(false)}
+            />
+          </InfoWindowF>
+        )}
+      </GoogleMap>
     </>
   );
 };
