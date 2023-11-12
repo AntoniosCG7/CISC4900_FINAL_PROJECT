@@ -3,8 +3,7 @@
   padding: 5px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: auto;
+  width: 330px;
   height: max-content;
   overflow-y: hidden;
   animation: scale-in-center 0.2s ease-in-out;
@@ -16,7 +15,8 @@
   gap: 5px;
 }
 
-.event-form-container input,
+.event-form-container .event-form-title,
+.event-form-container .event-form-time,
 .event-form-container textarea,
 .event-form-container select {
   font-family: var(--secondary-font-family);
@@ -27,7 +27,8 @@
   font-size: 1rem;
 }
 
-.event-form-container input:focus,
+.event-form-container .event-form-title:focus,
+.event-form-container .event-form-time:focus,
 .event-form-container textarea:focus,
 .event-form-container select:focus {
   outline: none;

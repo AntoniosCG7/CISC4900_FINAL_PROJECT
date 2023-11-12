@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Select from "react-select";
+import DateSelect from "../DateSelect/DateSelect";
 import "./EventForm.css";
 
 const EventForm = ({ onClose, eventLocation }) => {
   const currentUser = useSelector((state) => state.auth.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [languages, setLanguages] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
@@ -36,7 +36,6 @@ const EventForm = ({ onClose, eventLocation }) => {
     formData.append("createdBy", currentUser.username);
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("date", date);
     formData.append("time", time);
     formData.append(
       "languages",
@@ -74,14 +73,6 @@ const EventForm = ({ onClose, eventLocation }) => {
     onClose();
   };
 
-  // Calculate today's date in YYYY-MM-DD format
-  const today = new Date().toISOString().split("T")[0];
-
-  // Calculate tomorrow's date
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
-
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -101,6 +92,8 @@ const EventForm = ({ onClose, eventLocation }) => {
         : state.isFocused
         ? "var(--primary-color)"
         : null,
+      fontSize: "0.8rem",
+      fontWeight: "400",
       cursor: "pointer",
     }),
     multiValue: (base) => ({
@@ -109,7 +102,7 @@ const EventForm = ({ onClose, eventLocation }) => {
     }),
     multiValueLabel: (base) => ({
       ...base,
-      fontSize: "0.8rem",
+      fontSize: "0.7rem",
     }),
     multiValueRemove: (base) => ({
       ...base,
@@ -119,9 +112,13 @@ const EventForm = ({ onClose, eventLocation }) => {
         cursor: "pointer",
       },
     }),
+    menu: (base) => ({
+      ...base,
+      marginTop: "0",
+    }),
     menuList: (base) => ({
       ...base,
-      height: "170px",
+      height: "200px",
     }),
     dropdownIndicator: (base) => ({
       ...base,
@@ -146,6 +143,7 @@ const EventForm = ({ onClose, eventLocation }) => {
       <div className="event-form-container">
         <form onSubmit={handleSubmit}>
           <input
+            className="event-form-title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -170,14 +168,9 @@ const EventForm = ({ onClose, eventLocation }) => {
             placeholder="Select languages"
             required
           />
+          <DateSelect />
           <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            min={minDate}
-            required
-          />
-          <input
+            className="event-form-time"
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
