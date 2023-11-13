@@ -90,7 +90,7 @@ const MyMap = () => {
             onCloseClick={() => setShowEventForm(false)}
           >
             <EventForm
-              location={eventLocation}
+              eventLocation={eventLocation}
               onClose={() => setShowEventForm(false)}
             />
           </InfoWindowF>

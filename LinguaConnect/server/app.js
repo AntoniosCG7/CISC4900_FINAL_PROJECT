@@ -12,6 +12,7 @@ const AppError = require("./utils/appError");
 const userRouter = require("./routes/userRoutes");
 const chatRouter = require("./routes/chatRoutes");
 const messageRouter = require("./routes/messageRoutes");
+const eventRouter = require("./routes/eventRoutes");
 const languageRouter = require("./routes/languageRoutes");
 
 // Create a new Express application
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/languages", languageRouter);
 
 // Handle errors when API route is not found

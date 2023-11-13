@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import Select from "react-select";
 import DateSelect from "../DateSelect/DateSelect";
+import TimeSelect from "../TimeSelect/TimeSelect";
+import dayjs from "dayjs";
+import { addAlert } from "../../../slices/alertSlice";
 import "./EventForm.css";
 
 const EventForm = ({ onClose, eventLocation }) => {
   const currentUser = useSelector((state) => state.auth.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(dayjs());
+  const [time, setTime] = useState(dayjs());
   const [languages, setLanguages] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     async function fetchLanguages() {
@@ -36,19 +42,25 @@ const EventForm = ({ onClose, eventLocation }) => {
     const formData = new FormData();
     formData.append("createdBy", currentUser.username);
     formData.append("title", title);
+    formData.append("date", date.format("YYYY-MM-DD"));
+    formData.append("time", time.format("HH:mm"));
     formData.append("description", description);
-    formData.append("time", time);
-    formData.append(
-      "languages",
-      JSON.stringify(languages.map((lang) => lang.value))
-    );
-    formData.append(
-      "location",
-      JSON.stringify({
-        type: "Point",
-        coordinates: [eventLocation.lng, eventLocation.lat],
-      })
-    );
+    languages.forEach((lang, index) => {
+      formData.append(`languages[${index}]`, lang.value);
+    });
+
+    // formData.append(
+    //   "location",
+    //   JSON.stringify({
+    //     type: "Point",
+    //     coordinates: [eventLocation.lng, eventLocation.lat],
+    //   })
+    // );
+
+    // Log the form data for debugging purposes
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
 
     try {
       const response = await axios.post(
@@ -56,11 +68,23 @@ const EventForm = ({ onClose, eventLocation }) => {
         formData,
         { withCredentials: true }
       );
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("Event created successfully");
+        dispatch(
+          addAlert({
+            message: "Event created successfully",
+            type: "success",
+          })
+        );
         resetForm();
       }
     } catch (error) {
+      dispatch(
+        addAlert({
+          message: "Error creating event",
+          type: "error",
+        })
+      );
       console.error("Error creating event:", error);
     }
   };
@@ -79,6 +103,7 @@ const EventForm = ({ onClose, eventLocation }) => {
       ...base,
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
+      padding: "0.2rem",
       backgroundColor: "#e0e0e0",
       fontSize: "1rem",
       fontWeight: "400",
@@ -169,14 +194,8 @@ const EventForm = ({ onClose, eventLocation }) => {
             placeholder="Select languages"
             required
           />
-          <DateSelect />
-          <input
-            className="event-form-time"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            required
-          />
+          <DateSelect date={date} setDate={setDate} />
+          <TimeSelect time={time} setTime={setTime} />
           <button type="submit" className="create-event-btn">
             Create Event
           </button>

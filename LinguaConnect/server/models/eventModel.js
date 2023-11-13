@@ -50,18 +50,18 @@ const eventSchema = new mongoose.Schema({
     },
   ],
 
-  location: {
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      required: true,
-      index: "2dsphere", // to support geospatial queries
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    address: String,
-  },
+  // location: {
+  //   coordinates: {
+  //     type: [Number], // [longitude, latitude]
+  //     required: true,
+  //     index: "2dsphere", // to support geospatial queries
+  //   },
+  //   city: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   address: String,
+  // },
 });
 
 const Event = mongoose.model("Event", eventSchema);

@@ -53,7 +53,7 @@ export const EventList = ({ selectedCategory }) => {
         }}
       >
         {filteredEvents.map((event, index) => (
-          <ListItem key={event.id} disablePadding>
+          <ListItem key={index} disablePadding>
             <CardActionArea
               onClick={() => {
                 setSelectedEvent(event);

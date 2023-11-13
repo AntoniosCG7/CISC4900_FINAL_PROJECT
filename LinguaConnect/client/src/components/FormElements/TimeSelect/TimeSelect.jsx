@@ -1,38 +1,16 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createTheme, ThemeProvider } from "@mui/material";
 
-const DateSelect = () => {
-  const [date, setDate] = useState(dayjs());
-  const tomorrow = dayjs().add(1, "day");
+const TimeSelect = () => {
+  const [time, setTime] = useState(dayjs());
 
   const theme = createTheme({
     palette: {
       primary: {
         main: "#ffb500",
-      },
-    },
-    components: {
-      MuiPickersDay: {
-        styleOverrides: {
-          root: {
-            fontSize: "0.8rem",
-            fontWeight: "400",
-            "&:hover": {
-              backgroundColor: "var(--primary-color)",
-            },
-            "&.Mui-selected": {
-              backgroundColor: "var(--primary-color)",
-              fontWeight: "bold",
-
-              "&:hover": {
-                backgroundColor: "var(--primary-color)",
-              },
-            },
-          },
-        },
       },
     },
   });
@@ -41,7 +19,7 @@ const DateSelect = () => {
     <>
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
+          <TimePicker
             sx={{
               "& .MuiInputBase-root": {
                 border: "3px solid var(--primary-color)",
@@ -62,9 +40,8 @@ const DateSelect = () => {
                 border: "none",
               },
             }}
-            value={date}
-            onChange={setDate}
-            minDate={tomorrow}
+            value={time}
+            onChange={setTime}
             required
           />
         </LocalizationProvider>
@@ -73,4 +50,4 @@ const DateSelect = () => {
   );
 };
 
-export default DateSelect;
+export default TimeSelect;
