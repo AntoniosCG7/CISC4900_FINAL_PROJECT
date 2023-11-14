@@ -8,7 +8,8 @@ import dayjs from "dayjs";
 import { addAlert } from "../../../slices/alertSlice";
 import "./EventForm.css";
 
-const EventForm = ({ onClose, eventLocation }) => {
+const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const currentUser = useSelector((state) => state.auth.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -16,9 +17,11 @@ const EventForm = ({ onClose, eventLocation }) => {
   const [time, setTime] = useState(dayjs());
   const [languages, setLanguages] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
+  const [address, setAddress] = useState("");
 
   const dispatch = useDispatch();
 
+  // Fetch available languages from API
   useEffect(() => {
     async function fetchLanguages() {
       try {
@@ -37,6 +40,69 @@ const EventForm = ({ onClose, eventLocation }) => {
     fetchLanguages();
   }, []);
 
+  // Update address field when eventLocation changes
+  useEffect(() => {
+    if (eventLocation && eventLocation.address) {
+      setAddress(eventLocation.address);
+    }
+  }, [eventLocation]);
+
+  // This function uses the Google Maps Geocoding API to convert an address into coordinates
+  const forwardGeocode = async (address) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          address
+        )}&key=${API_KEY}`
+      );
+      const results = response.data.results;
+
+      if (results && results.length > 0) {
+        const { lat, lng } = results[0].geometry.location;
+        const returnedAddress = results[0].formatted_address;
+
+        dispatch(
+          addAlert({
+            message: `Location updated to ${returnedAddress}. Please check if this is correct.`,
+            type: "info",
+          })
+        );
+        return { lat, lng };
+      } else {
+        dispatch(
+          addAlert({
+            message: "No accurate results found for the given address",
+            type: "error",
+          })
+        );
+        console.error("No accurate results found for the given address.");
+        return null;
+      }
+    } catch (error) {
+      dispatch(
+        addAlert({
+          message: "Error in forward geocoding",
+          type: "error",
+        })
+      );
+      console.error("Error in forward geocoding:", error);
+      return null;
+    }
+  };
+
+  // This function handles the "Update Location" button click
+  const handleUpdateLocation = async () => {
+    const newCoordinates = await forwardGeocode(address);
+    if (newCoordinates) {
+      updateEventLocation({
+        ...eventLocation,
+        ...newCoordinates,
+        address: address,
+      });
+    }
+  };
+
+  // This function handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -49,13 +115,13 @@ const EventForm = ({ onClose, eventLocation }) => {
       formData.append(`languages[${index}]`, lang.value);
     });
 
-    // formData.append(
-    //   "location",
-    //   JSON.stringify({
-    //     type: "Point",
-    //     coordinates: [eventLocation.lng, eventLocation.lat],
-    //   })
-    // );
+    if (eventLocation) {
+      formData.append("location[coordinates]", [
+        eventLocation.lng,
+        eventLocation.lat,
+      ]);
+      formData.append("location[address]", address);
+    }
 
     // Log the form data for debugging purposes
     for (let pair of formData.entries()) {
@@ -69,7 +135,6 @@ const EventForm = ({ onClose, eventLocation }) => {
         { withCredentials: true }
       );
       if (response.status === 201) {
-        console.log("Event created successfully");
         dispatch(
           addAlert({
             message: "Event created successfully",
@@ -89,6 +154,7 @@ const EventForm = ({ onClose, eventLocation }) => {
     }
   };
 
+  // This function resets the form fields and closes the form
   const resetForm = () => {
     setTitle("");
     setDescription("");
@@ -98,6 +164,7 @@ const EventForm = ({ onClose, eventLocation }) => {
     onClose();
   };
 
+  // Custom styles for react-select
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -196,6 +263,22 @@ const EventForm = ({ onClose, eventLocation }) => {
           />
           <DateSelect date={date} setDate={setDate} />
           <TimeSelect time={time} setTime={setTime} />
+          <div className="address-input-container">
+            <input
+              className="event-form-address"
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Address"
+            />
+            <button
+              type="button"
+              className="update-location-btn"
+              onClick={handleUpdateLocation}
+            >
+              Update Location
+            </button>
+          </div>
           <button type="submit" className="create-event-btn">
             Create Event
           </button>

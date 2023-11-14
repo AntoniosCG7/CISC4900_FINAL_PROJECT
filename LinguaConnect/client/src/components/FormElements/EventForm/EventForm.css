@@ -17,6 +17,7 @@
 
 .event-form-container .event-form-title,
 .event-form-container .event-form-time,
+.event-form-container .event-form-address,
 .event-form-container textarea,
 .event-form-container select {
   font-family: var(--secondary-font-family);
@@ -29,6 +30,7 @@
 
 .event-form-container .event-form-title:focus,
 .event-form-container .event-form-time:focus,
+.event-form-container .event-form-address:focus,
 .event-form-container textarea:focus,
 .event-form-container select:focus {
   outline: none;
@@ -37,6 +39,34 @@
 
 .event-form-container textarea {
   resize: none;
+}
+
+.address-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.event-form-container .event-form-address {
+  padding: 14px;
+  font-size: 0.8rem;
+}
+
+.event-form-container .update-location-btn {
+  font-family: var(--secondary-font-family);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  padding: 10px 6px;
+  margin-left: 5px;
+  font-size: 0.6rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.update-location-btn:hover {
+  border-radius: 12px;
 }
 
 .event-form-container .create-event-btn {

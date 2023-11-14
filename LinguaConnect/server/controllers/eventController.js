@@ -18,6 +18,17 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   const languageDocs = await Language.find({ name: { $in: languageNames } });
   const languageIds = languageDocs.map((doc) => doc._id);
 
+  // Prepare location object
+  let locationObj = {};
+  if (location) {
+    const { coordinates, address } = location;
+    locationObj = {
+      type: "Point",
+      coordinates: coordinates ? coordinates.split(",").map(Number) : [], // Convert string to array of numbers
+      address: address || "",
+    };
+  }
+
   const newEvent = await Event.create({
     createdBy,
     title,
@@ -25,12 +36,13 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     date,
     time,
     languages: languageIds,
+    location: locationObj,
   });
 
   // Add the event to the user's events array
-  // await User.findByIdAndUpdate(createdBy, {
-  //   $push: { events: { event: newEvent._id, relationship: "created" } },
-  // });
+  await User.findByIdAndUpdate(createdBy, {
+    $push: { events: { event: newEvent._id, relationship: "created" } },
+  });
 
   res.status(201).json({
     status: "success",

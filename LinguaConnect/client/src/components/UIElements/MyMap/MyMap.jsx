@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { GoogleMap, InfoWindowF } from "@react-google-maps/api";
 import EventForm from "../../FormElements/EventForm/EventForm";
 import { useLoading } from "../../../contexts/LoadingContext";
+import axios from "axios";
 // import mapStyles from "./mapStyles";
 
 const containerStyle = {
@@ -17,6 +18,7 @@ const containerStyle = {
 };
 
 const MyMap = () => {
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
   const mapRef = useRef(null);
   const { setLoading } = useLoading();
@@ -42,11 +44,36 @@ const MyMap = () => {
     (state) => state.auth.user.location.coordinates
   );
 
-  const handleMapClick = (event) => {
-    setEventLocation({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+  // Update eventLocation state
+  const updateEventLocation = (newLocation) => {
+    setEventLocation(newLocation);
+  };
+
+  // This function uses the Google Maps Geocoding API to convert coordinates into an address
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`
+      );
+      const address = response.data.results[0]?.formatted_address;
+      return address;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "";
+    }
+  };
+
+  // This function is called when the user clicks on the map
+  const handleMapClick = async (event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    const address = await reverseGeocode(lat, lng);
+
+    setEventLocation({ lat, lng, address });
     setShowEventForm(true);
   };
 
+  // Get current user's location and set map center
   useEffect(() => {
     setLoading(true);
 
@@ -91,6 +118,7 @@ const MyMap = () => {
           >
             <EventForm
               eventLocation={eventLocation}
+              updateEventLocation={updateEventLocation}
               onClose={() => setShowEventForm(false)}
             />
           </InfoWindowF>

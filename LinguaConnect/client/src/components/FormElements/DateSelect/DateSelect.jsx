@@ -62,7 +62,7 @@ const DateSelect = () => {
                 border: "none",
               },
             }}
-            value={date}
+            value={tomorrow}
             onChange={setDate}
             minDate={tomorrow}
             required
