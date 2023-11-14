@@ -8,6 +8,7 @@ import React, {
 import { useSelector } from "react-redux";
 import { GoogleMap, InfoWindowF } from "@react-google-maps/api";
 import EventForm from "../../FormElements/EventForm/EventForm";
+import MapAutocompleteSearchBox from "../../FormElements/MapAutocompleteSearchBox/MapAutocompleteSearchBox";
 import { useLoading } from "../../../contexts/LoadingContext";
 import axios from "axios";
 // import mapStyles from "./mapStyles";
@@ -73,6 +74,12 @@ const MyMap = () => {
     setShowEventForm(true);
   };
 
+  // This function is called when the user selects a place from the search box
+  const handlePlaceSelection = (location) => {
+    setEventLocation(location);
+    setShowEventForm(true);
+  };
+
   // Get current user's location and set map center
   useEffect(() => {
     setLoading(true);
@@ -111,6 +118,7 @@ const MyMap = () => {
         options={options}
         onLoad={onLoad}
       >
+        <MapAutocompleteSearchBox onPlaceSelected={handlePlaceSelection} />
         {showEventForm && (
           <InfoWindowF
             position={eventLocation}
