@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@date-io/dayjs": "^2.17.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.11.1",
@@ -20,7 +21,8 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@mui/material": "^5.14.17",
+    "@mui/icons-material": "^5.14.18",
+    "@mui/material": "^5.14.18",
     "@mui/styled-engine-sc": "^6.0.0-alpha.5",
     "@mui/x-date-pickers": "^6.18.1",
     "@react-google-maps/api": "^2.19.2",

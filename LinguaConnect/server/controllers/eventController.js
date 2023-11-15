@@ -8,8 +8,6 @@ const AppError = require("../utils/appError");
 exports.createEvent = catchAsync(async (req, res, next) => {
   const { title, description, date, time, location, languages } = req.body;
 
-  console.log("req.body in createEvent(): ", req.body);
-
   // Add the user who created the event
   const createdBy = req.user._id;
 
@@ -24,7 +22,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     const { coordinates, address } = location;
     locationObj = {
       type: "Point",
-      coordinates: coordinates ? coordinates.split(",").map(Number) : [], // Convert string to array of numbers
+      coordinates: coordinates ? coordinates.split(",").map(Number) : [],
       address: address || "",
     };
   }
@@ -39,6 +37,9 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     location: locationObj,
   });
 
+  // Populate the languages and createdBy fields in the new event
+  await newEvent.populate("languages createdBy");
+
   // Add the event to the user's events array
   await User.findByIdAndUpdate(createdBy, {
     $push: { events: { event: newEvent._id, relationship: "created" } },
@@ -48,6 +49,39 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       event: newEvent,
+    },
+  });
+});
+
+// Get all events related to a specific user
+exports.getUserEvents = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+
+  // Fetch the user along with the populated events
+  const userWithEvents = await User.findById(userId).populate({
+    path: "events.event",
+    populate: [
+      { path: "languages", model: "Language" },
+      { path: "createdBy", model: "User" },
+    ],
+  });
+
+  if (!userWithEvents) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  // Extract and format the events
+  const allUserEvents = userWithEvents.events.map((eventObj) => {
+    return {
+      ...eventObj.event._doc, // Event details
+      relationship: eventObj.relationship, // Relationship with the event
+    };
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      events: allUserEvents,
     },
   });
 });

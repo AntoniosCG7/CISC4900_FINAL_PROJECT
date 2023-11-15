@@ -1,13 +1,11 @@
-import React, { useState } from "react";
-import dayjs from "dayjs";
+import React from "react";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createTheme, ThemeProvider } from "@mui/material";
+import dayjs from "dayjs";
 
-const DateSelect = () => {
-  const [date, setDate] = useState(dayjs());
+const DateSelect = ({ date, setDate }) => {
   const tomorrow = dayjs().add(1, "day");
-
   const theme = createTheme({
     palette: {
       primary: {
@@ -62,7 +60,7 @@ const DateSelect = () => {
                 border: "none",
               },
             }}
-            value={tomorrow}
+            value={date}
             onChange={setDate}
             minDate={tomorrow}
             required

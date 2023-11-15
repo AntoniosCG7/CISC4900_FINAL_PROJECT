@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import Drawer from "@mui/material/Drawer";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
@@ -6,7 +7,8 @@ import Box from "@mui/material/Box";
 import { MiniNavBar, MinimalSelect, EventList, MyMap } from "../../components";
 
 const Map = () => {
-  const [selectedCategory, setSelectedCategory] = useState("createdByMe");
+  const currentUser = useSelector((state) => state.auth.user);
+  const [selectedCategory, setSelectedCategory] = useState("created");
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
@@ -41,7 +43,10 @@ const Map = () => {
           setSelectedCategory={setSelectedCategory}
         />
         <Divider />
-        <EventList selectedCategory={selectedCategory} />
+        <EventList
+          selectedCategory={selectedCategory}
+          userId={currentUser._id}
+        />
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
         <MyMap />

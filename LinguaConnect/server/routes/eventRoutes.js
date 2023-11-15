@@ -8,6 +8,7 @@ const upload = multer();
 router.use(authController.protect); // Protect all routes after this middleware
 
 router.post("/", upload.none(), eventController.createEvent); // Create a new event
+router.get("/user/:userId", eventController.getUserEvents); // Get all events related to a specific user
 router.get("/", eventController.getAllEvents); // Get all events
 router.get("/:id", eventController.getEvent); // Get a specific event
 router.put("/:id", eventController.updateEvent); // Update an event

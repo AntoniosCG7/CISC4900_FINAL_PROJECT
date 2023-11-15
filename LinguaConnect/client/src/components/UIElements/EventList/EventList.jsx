@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setEvents, selectEvents } from "../../../slices/eventSlice";
+import axios from "axios";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Card from "@mui/material/Card";
@@ -7,41 +10,88 @@ import CardActionArea from "@mui/material/CardActionArea";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
-export const EventList = ({ selectedCategory }) => {
-  const events = [
-    {
-      title: "Event Title (createdByMe)",
-      summary: "Event Summary",
-      category: "createdByMe",
-    },
-    {
-      title: "Event Title (createdByMe)",
-      summary: "Event Summary",
-      category: "createdByMe",
-    },
-    {
-      title: "Event Title (Going)",
-      summary: "Event Summary",
-      category: "Going",
-    },
-    {
-      title: "Event Title (Going)",
-      summary: "Event Summary",
-      category: "Going",
-    },
-    {
-      title: "Event Title (Interested)",
-      summary: "Event Summary",
-      category: "Interested",
-    },
-  ];
+export const EventList = ({ selectedCategory, userId }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const dispatch = useDispatch();
+  const events = useSelector(selectEvents);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/events/user/${userId}`,
+          { withCredentials: true }
+        );
+        let fetchedEvents = response.data.data.events;
+        // Sort events by date
+        if (fetchedEvents) {
+          fetchedEvents.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          dispatch(setEvents(fetchedEvents));
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    if (userId) {
+      fetchEvents();
+    }
+  }, [userId, dispatch]);
 
   const filteredEvents = events.filter(
-    (event) => event.category.toLowerCase() === selectedCategory.toLowerCase()
+    (event) =>
+      event.relationship.toLowerCase() === selectedCategory.toLowerCase()
   );
+
+  // Function to handle menu open
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Function to handle menu close
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  // Functions to handle edit option
+  const handleEdit = () => {
+    handleCloseMenu();
+  };
+
+  // Functions to handle delete option
+  const handleDelete = () => {
+    handleCloseMenu();
+  };
+
+  // Function to truncate strings
+  const truncateString = (str, num) => {
+    if (str.length <= num) return str;
+    return str.slice(0, num) + "...";
+  };
+
+  // Function to format date for display
+  function formatDateForDisplay(dateString) {
+    const [year, month, day] = dateString.split("T")[0].split("-");
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    };
+
+    return date.toLocaleDateString("en-US", options);
+  }
 
   return (
     <>
@@ -63,10 +113,10 @@ export const EventList = ({ selectedCategory }) => {
               <Card sx={{ margin: 2 }}>
                 <CardContent>
                   <Typography variant="h6" component="div">
-                    {event.title}
+                    {truncateString(event.title, 50)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {event.summary}
+                    {truncateString(event.description, 100)}
                   </Typography>
                 </CardContent>
               </Card>
@@ -74,35 +124,75 @@ export const EventList = ({ selectedCategory }) => {
           </ListItem>
         ))}
       </List>
-      <Modal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            maxHeight: 800,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            borderRadius: 1,
-            boxShadow: 24,
-            p: 4,
-          }}
+
+      {selectedEvent && (
+        <Modal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            {selectedEvent?.title}
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {selectedEvent?.summary}
-          </Typography>
-        </Box>
-      </Modal>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              maxWidth: 1300,
+              maxHeight: 1200,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              borderRadius: 1,
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                {selectedEvent.title}
+              </Typography>
+              <IconButton
+                aria-controls="event-menu"
+                aria-haspopup="true"
+                onClick={handleMenuOpen}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            </Box>
+            <Menu
+              id="event-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+            >
+              <MenuItem onClick={handleEdit}>Edit</MenuItem>
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+            </Menu>
+            <Typography sx={{ mt: 2 }}>{selectedEvent.description}</Typography>
+            <Typography sx={{ mt: 2 }}>
+              Date: {formatDateForDisplay(selectedEvent.date)}
+            </Typography>
+            <Typography sx={{ mt: 2 }}>Time: {selectedEvent.time}</Typography>
+            <Typography sx={{ mt: 2 }}>
+              Languages:{" "}
+              {selectedEvent.languages.map((lang) => lang.name).join(", ")}
+            </Typography>
+            <Typography sx={{ mt: 2 }}>
+              Location: {selectedEvent.location.address}
+            </Typography>
+            <Typography sx={{ mt: 2 }}>
+              Created by: {selectedEvent.createdBy.username}
+            </Typography>
+          </Box>
+        </Modal>
+      )}
     </>
   );
 };

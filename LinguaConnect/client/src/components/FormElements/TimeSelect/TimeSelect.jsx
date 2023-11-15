@@ -1,12 +1,9 @@
-import React, { useState } from "react";
-import dayjs from "dayjs";
+import React from "react";
 import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createTheme, ThemeProvider } from "@mui/material";
 
-const TimeSelect = () => {
-  const [time, setTime] = useState(dayjs());
-
+const TimeSelect = ({ time, setTime }) => {
   const theme = createTheme({
     palette: {
       primary: {

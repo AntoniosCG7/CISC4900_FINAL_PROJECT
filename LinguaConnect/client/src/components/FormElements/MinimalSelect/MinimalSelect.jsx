@@ -59,7 +59,7 @@ const MinimalSelect = ({ selectedCategory, setSelectedCategory }) => {
             },
           }}
         >
-          <MenuItem value="createdByMe">Created by Me</MenuItem>
+          <MenuItem value="created">Created by Me</MenuItem>
           <MenuItem value="going">Going</MenuItem>
           <MenuItem value="interested">Interested</MenuItem>
         </Select>

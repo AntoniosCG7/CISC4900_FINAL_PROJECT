@@ -5,6 +5,7 @@ import Select from "react-select";
 import DateSelect from "../DateSelect/DateSelect";
 import TimeSelect from "../TimeSelect/TimeSelect";
 import dayjs from "dayjs";
+import { addEvent } from "../../../slices/eventSlice";
 import { addAlert } from "../../../slices/alertSlice";
 import "./EventForm.css";
 
@@ -13,7 +14,7 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
   const currentUser = useSelector((state) => state.auth.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(dayjs());
+  const [date, setDate] = useState(dayjs().add(1, "day"));
   const [time, setTime] = useState(dayjs());
   const [languages, setLanguages] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
@@ -135,6 +136,11 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
         { withCredentials: true }
       );
       if (response.status === 201) {
+        const newEvent = {
+          ...response.data.data.event,
+          relationship: "created",
+        };
+        dispatch(addEvent(newEvent));
         dispatch(
           addAlert({
             message: "Event created successfully",
@@ -256,7 +262,7 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
             value={languages}
             onChange={setLanguages}
             isOptionDisabled={() => {
-              return languages.length >= 5;
+              return languages.length >= 8;
             }}
             placeholder="Select languages"
             required
