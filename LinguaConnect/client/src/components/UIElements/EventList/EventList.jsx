@@ -10,6 +10,7 @@ import CardActionArea from "@mui/material/CardActionArea";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
@@ -19,6 +20,7 @@ export const EventList = ({ selectedCategory, userId }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const dispatch = useDispatch();
   const events = useSelector(selectEvents);
@@ -68,9 +70,29 @@ export const EventList = ({ selectedCategory, userId }) => {
     handleCloseMenu();
   };
 
-  // Functions to handle delete option
+  // Function to handle delete option
   const handleDelete = () => {
+    setShowDeleteConfirm(true);
     handleCloseMenu();
+  };
+
+  // Function to confirm deletion of event
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:3000/api/v1/events/${selectedEvent._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(
+        setEvents(events.filter((event) => event._id !== selectedEvent._id))
+      );
+      setShowDeleteConfirm(false);
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   // Function to truncate strings
@@ -171,6 +193,7 @@ export const EventList = ({ selectedCategory, userId }) => {
               keepMounted
               open={Boolean(anchorEl)}
               onClose={handleCloseMenu}
+              sx={{ transform: "translateX( -70px)" }}
             >
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
               <MenuItem onClick={handleDelete}>Delete</MenuItem>
@@ -193,6 +216,51 @@ export const EventList = ({ selectedCategory, userId }) => {
           </Box>
         </Modal>
       )}
+      {/* Delete Confirmation Modal */}
+      <Modal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: 800,
+            maxHeight: 800,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            borderRadius: 1,
+            boxShadow: 24,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography>Are you sure you want to delete this event?</Typography>
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              onClick={handleConfirmDelete}
+              style={{
+                marginRight: "10px",
+                color: "#ffb500",
+                fontWeight: 600,
+              }}
+            >
+              Yes
+            </Button>
+            <Button
+              onClick={() => setShowDeleteConfirm(false)}
+              style={{ color: "#ffb500", fontWeight: 600 }}
+            >
+              No
+            </Button>
+          </div>
+        </Box>
+      </Modal>
     </>
   );
 };

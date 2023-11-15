@@ -138,6 +138,11 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
 exports.deleteEvent = catchAsync(async (req, res, next) => {
   const event = await Event.findByIdAndDelete(req.params.id);
 
+  // Delete the event from the user's events array
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { events: { event: event._id } },
+  });
+
   if (!event) {
     return next(new AppError("No event found with that ID", 404));
   }
