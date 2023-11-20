@@ -50,8 +50,7 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
   useEffect(() => {
     if (!autocomplete.current && window.google) {
       autocomplete.current = new window.google.maps.places.Autocomplete(
-        autocompleteInputRef.current,
-        { types: ["geocode"] }
+        autocompleteInputRef.current
       );
 
       autocomplete.current.addListener("place_changed", () => {
