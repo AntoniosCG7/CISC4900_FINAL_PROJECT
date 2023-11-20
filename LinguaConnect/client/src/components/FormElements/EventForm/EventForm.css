@@ -9,7 +9,9 @@
   animation: scale-in-center 0.2s ease-in-out;
 }
 
-.event-form-container form {
+.event-form-container form,
+.event-form-date-time,
+.event-form-address-container {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -18,8 +20,9 @@
 .event-form-container .event-form-title,
 .event-form-container .event-form-time,
 .event-form-container .event-form-address,
-.event-form-container textarea,
-.event-form-container select {
+.event-form-container .event-form-description,
+.event-form-container select,
+.event-form-container .pac-target-input {
   font-family: var(--secondary-font-family);
   background-color: #e0e0e0;
   padding: 14px;
@@ -31,42 +34,21 @@
 .event-form-container .event-form-title:focus,
 .event-form-container .event-form-time:focus,
 .event-form-container .event-form-address:focus,
-.event-form-container textarea:focus,
-.event-form-container select:focus {
+.event-form-container .event-form-description:focus,
+.event-form-container select:focus,
+.event-form-container .pac-target-input:focus {
   outline: none;
   border: 3px solid var(--primary-color);
 }
 
-.event-form-container textarea {
+.event-form-container .event-form-description {
   resize: none;
-}
-
-.address-input-container {
-  display: flex;
-  align-items: center;
+  height: 150px;
 }
 
 .event-form-container .event-form-address {
   padding: 14px;
   font-size: 0.8rem;
-}
-
-.event-form-container .update-location-btn {
-  font-family: var(--secondary-font-family);
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  padding: 10px 6px;
-  margin-left: 5px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.update-location-btn:hover {
-  border-radius: 12px;
 }
 
 .event-form-container .create-event-btn {
@@ -79,11 +61,6 @@
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-}
-
-.event-form-container .create-event-btn:hover {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
 }
 
 @-webkit-keyframes scale-in-center {

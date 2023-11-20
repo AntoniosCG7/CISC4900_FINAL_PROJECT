@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import axios from "axios";
-import Select from "react-select";
-import { Button } from "@mui/material";
 import DateSelect from "../DateSelect/DateSelect";
 import TimeSelect from "../TimeSelect/TimeSelect";
 import dayjs from "dayjs";
-import { addEvent } from "../../../slices/eventSlice";
+import dayjsPluginUTC from "dayjs-plugin-utc";
+import Select from "react-select";
+import { Button } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { addAlert } from "../../../slices/alertSlice";
-import "./EventForm.css";
+import { useLoading } from "../../../contexts/LoadingContext";
+import "./EventEditForm.css";
 
-const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
-  const currentUser = useSelector((state) => state.auth.user);
+dayjs.extend(dayjsPluginUTC);
+
+const EventEditForm = ({ eventId, onClose, onUpdate }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(dayjs().add(1, "day"));
+  const [date, setDate] = useState(dayjs());
   const [time, setTime] = useState(dayjs());
   const [languages, setLanguages] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
@@ -24,7 +27,9 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
     address: "",
   });
   const autocompleteInputRef = useRef(null);
-  const autocomplete = useRef(null);
+  const autocomplete = useRef(null); // useRef for the autocomplete instance
+  const { setLoading } = useLoading();
+
   const dispatch = useDispatch();
 
   // Fetch available languages from API
@@ -45,6 +50,44 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
     }
     fetchLanguages();
   }, []);
+
+  // Fetch event details from API and populate form fields
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/events/${eventId}`,
+          {
+            withCredentials: true,
+          }
+        );
+        const eventData = response.data.data.event;
+        const fetchedDateString = eventData.date.split("T")[0]; // Remove time from date string to avoid timezone issues with dayjs.
+        setTitle(eventData.title);
+        setDescription(eventData.description);
+        setDate(dayjs(fetchedDateString));
+        setTime(dayjs(eventData.time, "HH:mm"));
+        setLanguages(
+          eventData.languages.map((language) => ({
+            value: language.name,
+            label: language.name,
+          }))
+        );
+        setLocation({
+          lat: eventData.location.coordinates[1],
+          lng: eventData.location.coordinates[0],
+          address: eventData.location.address,
+        });
+      } catch (error) {
+        console.error("Error fetching event details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventDetails();
+  }, [eventId, setLoading]);
 
   // Initialize Google Maps Autocomplete
   useEffect(() => {
@@ -72,34 +115,10 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
     }
   }, []);
 
-  // Update address field when eventLocation changes
-  useEffect(() => {
-    if (eventLocation && eventLocation.address) {
-      setLocation({ ...eventLocation });
-    }
-  }, [eventLocation]);
-
-  // This function handles the "Update Location" button click
-  const handleUpdateLocation = () => {
-    if (location.lat && location.lng) {
-      updateEventLocation({
-        ...eventLocation,
-        lat: location.lat,
-        lng: location.lng,
-        address: location.address,
-      });
-    } else {
-      console.error(
-        "Invalid location. Please select a location from the dropdown."
-      );
-    }
-  };
-
   // This function handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("createdBy", currentUser.username);
     formData.append("title", title);
     formData.append("description", description);
     formData.append("date", date.format("YYYY-MM-DD"));
@@ -116,62 +135,44 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
       formData.append("location[address]", location.address);
     }
 
-    // Log the form data for debugging purposes
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/events",
+      const response = await axios.put(
+        `http://localhost:3000/api/v1/events/${eventId}`,
         formData,
         { withCredentials: true }
       );
-      if (response.status === 201) {
-        const newEvent = {
-          ...response.data.data.event,
-          relationship: "created",
-        };
-        dispatch(addEvent({ event: newEvent, currentUserId: currentUser._id }));
+      if (response.status === 200) {
+        const updatedEvent = response.data.data.event;
+        onUpdate(updatedEvent);
         dispatch(
           addAlert({
-            message: "Event created successfully",
+            message: "Event updated successfully",
             type: "success",
           })
         );
-        resetForm();
       }
     } catch (error) {
       dispatch(
         addAlert({
-          message: "Error creating event",
+          message: "Error updating event",
           type: "error",
         })
       );
-      console.error("Error creating event:", error);
+      console.error("Error updating event:", error);
     }
-  };
-
-  // This function resets the form fields and closes the form
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setDate("");
-    setTime("");
-    setLanguages([]);
-    onClose();
   };
 
   // Custom styles for react-select
   const customStyles = {
     control: (base) => ({
       ...base,
+      fontFamily: "var(--secondary-font-family)",
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
       padding: "0.2rem",
       backgroundColor: "#e0e0e0",
       fontSize: "1rem",
-      fontWeight: "400",
+      fontWeight: "bold",
       "&:hover": {
         cursor: "pointer",
       },
@@ -184,7 +185,7 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
         ? "var(--primary-color)"
         : null,
       fontSize: "0.8rem",
-      fontWeight: "400",
+      fontWeight: "bold",
       cursor: "pointer",
     }),
     multiValue: (base) => ({
@@ -205,11 +206,12 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
     }),
     menu: (base) => ({
       ...base,
+      fontFamily: "var(--secondary-font-family)",
       marginTop: "0",
     }),
     menuList: (base) => ({
       ...base,
-      height: "275px",
+      height: "283px",
     }),
     dropdownIndicator: (base) => ({
       ...base,
@@ -231,68 +233,60 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
 
   return (
     <>
-      <div className="event-form-container">
-        <form onSubmit={handleSubmit}>
+      <div className="event-edit-form-close-btn" onClick={onClose}>
+        <CloseIcon />
+      </div>
+      <div className="event-edit-form-header">
+        <h2>Edit Event</h2>
+      </div>
+      <div className="event-edit-form-container">
+        <form className="event-edit-form" onSubmit={handleSubmit}>
           <input
-            className="event-form-title"
+            className="event-edit-form-title"
             type="text"
+            name="title"
+            placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
             required
           />
           <textarea
-            className="event-form-description"
+            className="event-edit-form-description"
+            name="description"
+            placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Description"
-            required
-          ></textarea>
-          <Select
-            options={availableLanguages}
-            styles={customStyles}
-            isMulti
-            value={languages}
-            onChange={setLanguages}
-            isOptionDisabled={() => {
-              return languages.length >= 8;
-            }}
-            placeholder="Select languages"
             required
           />
-          <div className="event-form-date-time">
+          <div className="event-edit-form-languages">
+            <Select
+              className="event-edit-form-languages-select"
+              styles={customStyles}
+              isMulti
+              name="languages"
+              placeholder="Languages"
+              value={languages}
+              options={availableLanguages}
+              onChange={(selectedLanguages) => setLanguages(selectedLanguages)}
+              required
+            />
+          </div>
+          <div className="event-edit-form-date-time">
             <DateSelect date={date} setDate={setDate} />
             <TimeSelect time={time} setTime={setTime} />
           </div>
-          <div className="event-form-address-container">
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <input
-                ref={autocompleteInputRef}
-                className="event-form-address"
-                type="text"
-                name="address"
-                value={location.address}
-                onChange={(e) =>
-                  setLocation({ ...location, address: e.target.value })
-                }
-                placeholder="Address"
-              />
-              <Button
-                onClick={handleUpdateLocation}
-                variant="contained"
-                style={{
-                  fontSize: "10px",
-                  fontWeight: "bold",
-                  height: "57px",
-                  backgroundColor: "var(--primary-color)",
-                  color: "var(--secondary-color)",
-                  boxShadow: "none",
-                  marginLeft: "5px",
-                }}
-              >
-                Update Address
-              </Button>
-            </div>
+          <div className="event-edit-form-address">
+            <input
+              ref={autocompleteInputRef}
+              className="event-form-address"
+              type="text"
+              name="address"
+              value={location.address}
+              onChange={(e) =>
+                setLocation({ ...location, address: e.target.value })
+              }
+              placeholder="Address"
+            />
           </div>
           <Button
             variant="contained"
@@ -300,12 +294,11 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
             style={{
               backgroundColor: "var(--primary-color)",
               color: "var(--secondary-color)",
-              boxShadow: "none",
               gap: "5px",
               width: "100%",
             }}
           >
-            Create Event
+            Update Event
           </Button>
         </form>
       </div>
@@ -313,4 +306,4 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
   );
 };
 
-export default EventForm;
+export default EventEditForm;

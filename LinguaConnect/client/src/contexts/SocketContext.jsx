@@ -11,6 +11,7 @@ import {
 } from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
 import { addMessageToChat, markMessagesAsRead } from "../slices/messageSlice";
+import { addEvent, updateEvent, deleteEvent } from "../slices/eventSlice";
 
 const SocketContext = createContext();
 
@@ -97,6 +98,21 @@ export const SocketProvider = ({ children }) => {
       setTimeout(() => {
         newSocket.connect();
       }, 5000);
+    });
+
+    // listen for new events
+    newSocket.on("new-event-created", (event) => {
+      dispatch(addEvent({ event: event, currentUserId: currentUserId }));
+    });
+
+    // Listen for updated events
+    newSocket.on("event-updated", (updatedEvent) => {
+      dispatch(updateEvent(updatedEvent));
+    });
+
+    // Listen for deleted events
+    newSocket.on("event-deleted", (eventId) => {
+      dispatch(deleteEvent(eventId));
     });
 
     return () => {

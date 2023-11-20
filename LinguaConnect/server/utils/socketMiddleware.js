@@ -78,10 +78,72 @@ const handleNewMessage = async (res) => {
   });
 };
 
+// Emit new event to all connected users
+const handleEventCreation = async (res) => {
+  const event = res.locals.event;
+
+  // Emit the new event to all connected users
+  ioData.io.emit("new-event-created", event);
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      event: event,
+    },
+  });
+};
+
+// Emit updated event to all connected users
+const handleEventUpdate = async (res) => {
+  const event = res.locals.event;
+
+  // Check if event update was successful
+  if (res.locals.success && event) {
+    ioData.io.emit("event-updated", event);
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      event: event,
+    },
+  });
+};
+
+// Emit event deletion to all connected users
+const handleEventDeletion = async (res) => {
+  const eventId = res.locals.eventId;
+
+  // Check if event deletion was successful
+  if (res.locals.success && eventId) {
+    ioData.io.emit("event-deleted", eventId);
+  }
+
+  res.status(204).send();
+};
+
 // ========= Main Event Emitter Function =========
 
-const emitChatEvents = catchAsync(async (req, res, next) => {
+const emitEvents = catchAsync(async (req, res, next) => {
   if (
+    res.locals.success &&
+    res.locals.event &&
+    res.locals.action === "created"
+  ) {
+    await handleEventCreation(res);
+  } else if (
+    res.locals.success &&
+    res.locals.event &&
+    res.locals.action === "updated"
+  ) {
+    await handleEventUpdate(res);
+  } else if (
+    res.locals.success &&
+    res.locals.eventId &&
+    res.locals.action === "deleted"
+  ) {
+    await handleEventDeletion(res);
+  } else if (
     res.locals.success &&
     res.locals.chat &&
     res.locals.action === "created"
@@ -98,4 +160,4 @@ const emitChatEvents = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = emitChatEvents;
+module.exports = emitEvents;

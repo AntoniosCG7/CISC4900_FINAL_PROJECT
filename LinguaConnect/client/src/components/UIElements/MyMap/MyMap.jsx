@@ -5,8 +5,8 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { useSelector } from "react-redux";
-import { GoogleMap, InfoWindowF } from "@react-google-maps/api";
+import { useSelector, useDispatch } from "react-redux";
+import { GoogleMap, Marker, InfoWindowF } from "@react-google-maps/api";
 import EventForm from "../../FormElements/EventForm/EventForm";
 import MapAutocompleteSearchBox from "../../FormElements/MapAutocompleteSearchBox/MapAutocompleteSearchBox";
 import { useLoading } from "../../../contexts/LoadingContext";
@@ -18,14 +18,14 @@ const containerStyle = {
   height: "100vh",
 };
 
-const MyMap = () => {
+const MyMap = ({ events }) => {
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
   const mapRef = useRef(null);
-  const { setLoading } = useLoading();
   const [mapCenter, setMapCenter] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventLocation, setEventLocation] = useState(null);
+  const [markers, setMarkers] = useState([]);
   const options = useMemo(
     () => ({
       mapId: MAP_ID,
@@ -39,6 +39,9 @@ const MyMap = () => {
   const onLoad = useCallback((map) => {
     mapRef.current = map;
   }, []);
+
+  const { setLoading } = useLoading();
+  const dispatch = useDispatch();
 
   // Get current user's location from Redux store to set map center if user denies location access
   const userLocationFromDb = useSelector(
@@ -72,6 +75,13 @@ const MyMap = () => {
 
     setEventLocation({ lat, lng, address });
     setShowEventForm(true);
+  };
+
+  // This function is called when the user clicks on a marker
+  const handleMarkerClick = (event) => {
+    // Here I will implement what happens when a marker is clicked
+
+    console.log("Event clicked:", event);
   };
 
   // This function is called when the user selects a place from the search box
@@ -108,6 +118,29 @@ const MyMap = () => {
     );
   }, [setLoading, userLocationFromDb]);
 
+  // Update markers when event location changes
+  useEffect(() => {
+    const newMarkers = {}; // Object to track markers by their event IDs
+
+    // Loop through each event
+    events.forEach((event) => {
+      // Update or add a marker for each event
+      // If a marker with the same ID exists, it will be overwritten
+      // This ensures that each event ID has only one corresponding marker
+      newMarkers[event._id] = {
+        id: event._id, // Unique identifier for the marker
+        position: {
+          lat: event.location.coordinates[1],
+          lng: event.location.coordinates[0],
+        },
+      };
+    });
+
+    // Convert the markers object to an array and update the state
+    // This array will have the latest marker for each event
+    setMarkers(Object.values(newMarkers));
+  }, [events]);
+
   return (
     <>
       <GoogleMap
@@ -131,6 +164,14 @@ const MyMap = () => {
             />
           </InfoWindowF>
         )}
+
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            position={marker.position}
+            onClick={() => handleMarkerClick(marker)}
+          />
+        ))}
       </GoogleMap>
     </>
   );

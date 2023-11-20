@@ -1,0 +1,87 @@
+.event-edit-form-container {
+  background-color: var(--tertiary-color);
+  padding: 5px;
+  max-width: 800px;
+  width: 500px;
+  height: max-content;
+  overflow-y: hidden;
+  animation: scale-in-center 0.2s ease-in-out;
+}
+
+.event-edit-form-container form,
+.event-edit-form-date-time,
+.event-edit-form-address {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.event-edit-form-header {
+  font-family: var(--secondary-font-family);
+  font-size: 1.2rem;
+  font-weight: bold;
+  align-self: center;
+  margin-bottom: 0.6rem;
+}
+
+.event-edit-form-container .event-edit-form-title,
+.event-edit-form-container .event-edit-form-description,
+.event-edit-form-container select,
+.event-edit-form-container .pac-target-input {
+  font-family: var(--secondary-font-family);
+  background-color: #e0e0e0;
+  padding: 14px;
+  border: 3px solid var(--primary-color);
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.event-edit-form-container .event-edit-form-title:focus,
+.event-edit-form-container .event-edit-form-description:focus,
+.event-edit-form-container select:focus,
+.event-edit-form-container .pac-target-input:focus {
+  outline: none;
+  border: 3px solid var(--primary-color);
+}
+
+.event-edit-form-container .event-edit-form-description {
+  resize: none;
+  height: 200px;
+}
+
+.event-edit-form-close-btn {
+  position: absolute;
+  font-size: small;
+  top: 0px;
+  right: 0px;
+  cursor: pointer;
+}
+
+.event-edit-form-close-btn:hover {
+  background-color: red;
+}
+
+@-webkit-keyframes scale-in-center {
+  0% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes scale-in-center {
+  0% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+}

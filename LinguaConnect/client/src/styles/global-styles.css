@@ -48,7 +48,7 @@ h1 {
 }
 
 h2 {
-  font-family: var(--font-family);
+  font-family: var(--secondary-family);
   font-size: 1.5rem;
   color: var(--secondary-color);
 }
@@ -60,7 +60,7 @@ h3 {
 }
 
 h4 {
-  font-family: var(--font-family);
+  font-family: var(--secondary-family);
   font-size: 1rem;
   color: var(--secondary-color);
 }
@@ -72,7 +72,7 @@ h5 {
 }
 
 h6 {
-  font-family: var(--font-family);
+  font-family: var(--secondary-family);
   font-size: 0.75rem;
   color: var(--secondary-color);
 }
@@ -113,6 +113,81 @@ a button {
   font-family: var(--font-family);
 }
 
+/* Google places dropdown menu */
+.pac-container {
+  z-index: 2000 !important;
+  border-radius: 5px !important;
+  box-sizing: content-box !important;
+  padding: 0 3px !important;
+  animation: rotateMenu 400ms ease-in-out forwards;
+  transform-origin: top center;
+}
+
+.pac-item {
+  cursor: pointer;
+}
+
+.pac-item:hover {
+  background-color: var(--primary-color);
+}
+
+.pac-matched {
+  font-weight: bold;
+}
+
+.pac-logo {
+  padding: 10px 0;
+  &::after {
+    display: none;
+  }
+}
+
+@-moz-keyframes rotateMenu {
+  0% {
+    transform: rotateX(-90deg);
+  }
+  70% {
+    transform: rotateX(20deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+@-webkit-keyframes rotateMenu {
+  0% {
+    transform: rotateX(-90deg);
+  }
+  70% {
+    transform: rotateX(20deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+@-o-keyframes rotateMenu {
+  0% {
+    transform: rotateX(-90deg);
+  }
+  70% {
+    transform: rotateX(20deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+@keyframes rotateMenu {
+  0% {
+    transform: rotateX(-90deg);
+  }
+  70% {
+    transform: rotateX(20deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* Other Animations  */
 .bounce-top {
   -webkit-animation: bounce-top 0.9s both;
   animation: bounce-top 0.9s both;

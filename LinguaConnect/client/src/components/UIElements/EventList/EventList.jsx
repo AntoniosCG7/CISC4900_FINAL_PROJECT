@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setEvents, selectEvents } from "../../../slices/eventSlice";
+import { useNavigate } from "react-router-dom";
+import {
+  selectUserEvents,
+  setUserEvents,
+  updateEvent,
+  deleteEvent,
+} from "../../../slices/eventSlice";
+import { addAlert } from "../../../slices/alertSlice";
 import axios from "axios";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -15,16 +22,21 @@ import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Avatar from "@mui/material/Avatar";
+import EventEditForm from "../../FormElements/EventEditForm/EventEditForm";
 
 export const EventList = ({ selectedCategory, userId }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const dispatch = useDispatch();
-  const events = useSelector(selectEvents);
+  const navigate = useNavigate();
+  const events = useSelector(selectUserEvents);
 
+  // Fetch events related to the current user from API
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -38,7 +50,7 @@ export const EventList = ({ selectedCategory, userId }) => {
           fetchedEvents.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
-          dispatch(setEvents(fetchedEvents));
+          dispatch(setUserEvents(fetchedEvents));
         }
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -50,8 +62,10 @@ export const EventList = ({ selectedCategory, userId }) => {
     }
   }, [userId, dispatch]);
 
+  // Filter events by category
   const filteredEvents = events.filter(
     (event) =>
+      event.relationship &&
       event.relationship.toLowerCase() === selectedCategory.toLowerCase()
   );
 
@@ -65,8 +79,9 @@ export const EventList = ({ selectedCategory, userId }) => {
     setAnchorEl(null);
   };
 
-  // Functions to handle edit option
+  // Function to handle edit option
   const handleEdit = () => {
+    setIsEditMode(true);
     handleCloseMenu();
   };
 
@@ -85,8 +100,15 @@ export const EventList = ({ selectedCategory, userId }) => {
           withCredentials: true,
         }
       );
+      // dispatch(
+      //   setUserEvents(events.filter((event) => event._id !== selectedEvent._id))
+      // );
+      dispatch(deleteEvent(selectedEvent._id));
       dispatch(
-        setEvents(events.filter((event) => event._id !== selectedEvent._id))
+        addAlert({
+          message: "Event deleted successfully",
+          type: "success",
+        })
       );
       setShowDeleteConfirm(false);
       setOpenModal(false);
@@ -210,9 +232,64 @@ export const EventList = ({ selectedCategory, userId }) => {
             <Typography sx={{ mt: 2 }}>
               Location: {selectedEvent.location.address}
             </Typography>
-            <Typography sx={{ mt: 2 }}>
-              Created by: {selectedEvent.createdBy.username}
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mt: 2,
+              }}
+            >
+              <Typography sx={{ mr: 1 }}>Created by:</Typography>
+              <Avatar
+                alt="Creator's Profile Picture"
+                src={selectedEvent.createdBy.profilePicture.url}
+                onClick={() =>
+                  navigate(`/profile/${selectedEvent.createdBy._id}`)
+                }
+                sx={{
+                  width: 36,
+                  height: 36,
+                  cursor: "pointer",
+                }}
+              />
+            </Box>
+          </Box>
+        </Modal>
+      )}
+
+      {/* Edit Event Modal */}
+      {isEditMode && (
+        <Modal
+          open={isEditMode}
+          onClose={() => setIsEditMode(false)}
+          aria-labelledby="edit-event-modal-title"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 600,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              borderRadius: 1,
+              boxShadow: 24,
+              p: 4,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <EventEditForm
+              eventId={selectedEvent._id}
+              onClose={() => setIsEditMode(false)}
+              onUpdate={(updatedEvent) => {
+                dispatch(updateEvent(updatedEvent));
+                setIsEditMode(false);
+                setOpenModal(false);
+              }}
+            />
           </Box>
         </Modal>
       )}
