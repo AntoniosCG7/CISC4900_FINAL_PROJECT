@@ -136,7 +136,7 @@ const userSchema = new mongoose.Schema(
         },
         relationship: {
           type: String,
-          enum: ["created", "attending", "interested"],
+          enum: ["created", "going", "interested"],
         },
       },
     ],

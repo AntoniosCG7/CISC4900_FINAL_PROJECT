@@ -13,3 +13,4 @@ export { default as TimeSelect } from "./FormElements/TimeSelect/TimeSelect";
 export { default as EventList } from "./UIElements/EventList/EventList";
 export { default as MyMap } from "./UIElements/MyMap/MyMap";
 export { default as MapAutocompleteSearchBox } from "./FormElements/MapAutocompleteSearchBox/MapAutocompleteSearchBox";
+export { default as EventDetails } from "./UIElements/EventDetails/EventDetails";

@@ -11,6 +11,7 @@ import EventForm from "../../FormElements/EventForm/EventForm";
 import MapAutocompleteSearchBox from "../../FormElements/MapAutocompleteSearchBox/MapAutocompleteSearchBox";
 import { useLoading } from "../../../contexts/LoadingContext";
 import axios from "axios";
+import EventDetails from "../EventDetails/EventDetails";
 // import mapStyles from "./mapStyles";
 
 const containerStyle = {
@@ -26,6 +27,8 @@ const MyMap = ({ events }) => {
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventLocation, setEventLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const options = useMemo(
     () => ({
       mapId: MAP_ID,
@@ -79,9 +82,8 @@ const MyMap = ({ events }) => {
 
   // This function is called when the user clicks on a marker
   const handleMarkerClick = (event) => {
-    // Here I will implement what happens when a marker is clicked
-
-    console.log("Event clicked:", event);
+    setSelectedEvent(event);
+    setSelectedMarkerId(event._id);
   };
 
   // This function is called when the user selects a place from the search box
@@ -133,6 +135,13 @@ const MyMap = ({ events }) => {
           lat: event.location.coordinates[1],
           lng: event.location.coordinates[0],
         },
+        title: event.title,
+        description: event.description,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        languages: event.languages,
+        createdBy: event.createdBy,
       };
     });
 
@@ -165,11 +174,21 @@ const MyMap = ({ events }) => {
           </InfoWindowF>
         )}
 
+        {selectedEvent && (
+          <InfoWindowF
+            position={selectedEvent.position}
+            onCloseClick={() => setSelectedEvent(null)}
+          >
+            <EventDetails event={selectedEvent} />
+          </InfoWindowF>
+        )}
+
         {markers.map((marker) => (
           <Marker
             key={marker.id}
             position={marker.position}
             onClick={() => handleMarkerClick(marker)}
+            animation={google.maps.Animation.DROP}
           />
         ))}
       </GoogleMap>

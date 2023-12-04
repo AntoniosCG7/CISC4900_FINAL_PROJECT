@@ -279,14 +279,17 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
               <Button
                 onClick={handleUpdateLocation}
                 variant="contained"
-                style={{
+                sx={{
                   fontSize: "10px",
                   fontWeight: "bold",
-                  height: "57px",
-                  backgroundColor: "var(--primary-color)",
                   color: "var(--secondary-color)",
+                  ml: 1,
+                  height: "57px",
                   boxShadow: "none",
-                  marginLeft: "5px",
+                  backgroundColor: "var(--primary-color)",
+                  "&:hover": {
+                    backgroundColor: "#d9a300",
+                  },
                 }}
               >
                 Update Address
@@ -296,12 +299,14 @@ const EventForm = ({ onClose, eventLocation, updateEventLocation }) => {
           <Button
             variant="contained"
             type="submit"
-            style={{
-              backgroundColor: "var(--primary-color)",
+            sx={{
+              width: "100%",
               color: "var(--secondary-color)",
               boxShadow: "none",
-              gap: "5px",
-              width: "100%",
+              backgroundColor: "var(--primary-color)",
+              "&:hover": {
+                backgroundColor: "#d9a300",
+              },
             }}
           >
             Create Event

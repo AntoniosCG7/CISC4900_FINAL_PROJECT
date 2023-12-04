@@ -1,5 +1,6 @@
 const { ioData, currentlyActiveUsers } = require("./socketSetup");
 const Chat = require("../models/chatModel");
+const Event = require("../models/eventModel");
 const catchAsync = require("./catchAsync");
 
 // ========= Utility Functions =========
@@ -110,6 +111,78 @@ const handleEventUpdate = async (res) => {
   });
 };
 
+// Emit updated user event status to all connected users
+const handleUserEventStatusUpdate = async (res) => {
+  if (
+    res.locals.success &&
+    (res.locals.action === "statusUpdated" ||
+      res.locals.action === "statusAdded")
+  ) {
+    const event = res.locals.event;
+    const user = res.locals.user;
+
+    // Fetch the updated event with full population
+    const updatedEvent = await Event.findById(event._id)
+      .populate({
+        path: "going",
+        model: "User",
+        select: "_id",
+      })
+      .populate({
+        path: "interested",
+        model: "User",
+        select: "_id",
+      })
+      .populate({
+        path: "createdBy",
+        model: "User",
+        select: "profilePicture",
+      })
+      .populate("languages");
+
+    const emitData = {
+      event: {
+        ...updatedEvent.toObject(),
+        goingCount: updatedEvent.going.length,
+        interestedCount: updatedEvent.interested.length,
+      },
+      user,
+      status: user.events.find(
+        (e) => e.event.toString() === event._id.toString()
+      ).relationship,
+    };
+
+    // Emit the updated data to all connected users
+    ioData.io.emit("user-event-status-changed", emitData);
+
+    res.status(200).json({
+      status: "success",
+      message: "Event status updated successfully",
+      data: {
+        event: updatedEvent,
+      },
+    });
+  }
+};
+
+// Emit event removal to all connected users
+const handleEventRemoval = async (res) => {
+  const { eventId } = res.locals;
+
+  // Fetch the updated event to get the latest 'going' and 'interested' counts
+  const updatedEvent = await Event.findById(eventId);
+
+  if (res.locals.success && updatedEvent) {
+    ioData.io.emit("event-removed", {
+      eventId: eventId,
+      goingCount: updatedEvent.going.length,
+      interestedCount: updatedEvent.interested.length,
+    });
+  }
+
+  res.status(200).send();
+};
+
 // Emit event deletion to all connected users
 const handleEventDeletion = async (res) => {
   const eventId = res.locals.eventId;
@@ -137,6 +210,19 @@ const emitEvents = catchAsync(async (req, res, next) => {
     res.locals.action === "updated"
   ) {
     await handleEventUpdate(res);
+  } else if (
+    res.locals.success &&
+    res.locals.user &&
+    (res.locals.action === "statusUpdated" ||
+      res.locals.action === "statusAdded")
+  ) {
+    await handleUserEventStatusUpdate(res);
+  } else if (
+    res.locals.success &&
+    res.locals.eventId &&
+    res.locals.action === "removed"
+  ) {
+    await handleEventRemoval(res);
   } else if (
     res.locals.success &&
     res.locals.eventId &&

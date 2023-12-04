@@ -100,6 +100,64 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
   next(); // Pass control to the next middleware
 });
 
+// Update the status of a user's event
+exports.updateUserEventStatus = catchAsync(async (req, res, next) => {
+  const { eventId, userId, status } = req.body;
+
+  // Check if the event exists
+  const event = await Event.findById(eventId);
+  if (!event) {
+    return next(new AppError("No event found with that ID", 404));
+  }
+
+  // Prevent the creator of the event from changing their status
+  if (event.createdBy.toString() === userId) {
+    return res.status(403).json({
+      status: "info",
+      message: "You cannot change your status for an event you have created.",
+    });
+  }
+
+  // Fetch the user and check their current status for the event
+  const user = await User.findById(userId);
+  const existingEvent = user.events.find((e) => e.event.toString() === eventId);
+
+  let actionTaken = "";
+  if (existingEvent) {
+    if (existingEvent.relationship === status) {
+      return res.status(200).json({
+        status: "info",
+        message: `You have already marked yourself as ${status} for this event.`,
+      });
+    }
+    existingEvent.relationship = status;
+    actionTaken = "statusUpdated";
+  } else {
+    user.events.push({ event: eventId, relationship: status });
+    actionTaken = "statusAdded";
+  }
+
+  // Update the event's 'going' and 'interested' arrays
+  if (status === "going") {
+    event.interested.pull(userId);
+    event.going.addToSet(userId);
+  } else if (status === "interested") {
+    event.going.pull(userId);
+    event.interested.addToSet(userId);
+  }
+
+  await user.save({ validateBeforeSave: false });
+  await event.save();
+
+  // Store the necessary information in res.locals for the middleware
+  res.locals.event = event;
+  res.locals.user = user;
+  res.locals.action = actionTaken; // 'statusUpdated' or 'statusAdded'
+  res.locals.success = true;
+
+  next(); // Pass control to the next middleware
+});
+
 // Delete an event
 exports.deleteEvent = catchAsync(async (req, res, next) => {
   const event = await Event.findByIdAndDelete(req.params.id);
@@ -121,16 +179,48 @@ exports.deleteEvent = catchAsync(async (req, res, next) => {
   next(); // Pass control to the next middleware
 });
 
+// Remove an event from the user's list
+exports.removeEventFromUserList = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  const eventId = req.params.id;
+
+  // Update the user document by pulling the event from their events array
+  await User.findByIdAndUpdate(userId, {
+    $pull: { events: { event: eventId } },
+  });
+
+  // Update the event document by pulling the user from the 'going' and 'interested' arrays
+  const event = await Event.findById(eventId);
+  const wasGoing = event.going.includes(userId);
+  const wasInterested = event.interested.includes(userId);
+
+  event.going.pull(userId);
+  event.interested.pull(userId);
+  await event.save();
+
+  // Store the necessary info in res.locals
+  res.locals.event = event;
+  res.locals.eventId = eventId;
+  res.locals.userId = userId;
+  res.locals.action = "removed";
+  res.locals.success = true;
+  res.locals.wasGoing = wasGoing;
+  res.locals.wasInterested = wasInterested;
+
+  next(); // Pass control to the next middleware
+});
+
 // Get all events related to a specific user
 exports.getUserEvents = catchAsync(async (req, res, next) => {
   const userId = req.params.userId;
 
-  // Fetch the user along with the populated events
   const userWithEvents = await User.findById(userId).populate({
     path: "events.event",
     populate: [
       { path: "languages", model: "Language" },
       { path: "createdBy", model: "User" },
+      { path: "going", model: "User" },
+      { path: "interested", model: "User" },
     ],
   });
 
@@ -138,13 +228,12 @@ exports.getUserEvents = catchAsync(async (req, res, next) => {
     return next(new AppError("No user found with that ID", 404));
   }
 
-  // Extract and format the events
-  const allUserEvents = userWithEvents.events.map((eventObj) => {
-    return {
-      ...eventObj.event._doc, // Event details
-      relationship: eventObj.relationship, // Relationship with the event
-    };
-  });
+  const allUserEvents = userWithEvents.events.map((eventObj) => ({
+    ...eventObj.event._doc,
+    relationship: eventObj.relationship,
+    goingCount: eventObj.event.going.length,
+    interestedCount: eventObj.event.interested.length,
+  }));
 
   res.status(200).json({
     status: "success",
@@ -156,11 +245,20 @@ exports.getUserEvents = catchAsync(async (req, res, next) => {
 
 // Get all events
 exports.getAllEvents = catchAsync(async (req, res, next) => {
-  const events = await Event.find().populate("languages createdBy");
+  const events = await Event.find().populate(
+    "languages createdBy going interested"
+  );
+
+  const eventsWithCounts = events.map((event) => ({
+    ...event.toObject(),
+    goingCount: event.going.length,
+    interestedCount: event.interested.length,
+  }));
+
   res.status(200).json({
     status: "success",
     data: {
-      events,
+      events: eventsWithCounts,
     },
   });
 });
@@ -168,17 +266,23 @@ exports.getAllEvents = catchAsync(async (req, res, next) => {
 // Get a single event
 exports.getEvent = catchAsync(async (req, res, next) => {
   const event = await Event.findById(req.params.id).populate(
-    "languages createdBy date time"
+    "languages createdBy going interested"
   );
 
   if (!event) {
     return next(new AppError("No event found with that ID", 404));
   }
 
+  const eventWithCounts = {
+    ...event.toObject(),
+    goingCount: event.going.length,
+    interestedCount: event.interested.length,
+  };
+
   res.status(200).json({
     status: "success",
     data: {
-      event,
+      event: eventWithCounts,
     },
   });
 });

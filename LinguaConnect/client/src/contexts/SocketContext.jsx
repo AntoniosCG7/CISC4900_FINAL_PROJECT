@@ -11,7 +11,14 @@ import {
 } from "../slices/chatSlice";
 import { addAlert } from "../slices/alertSlice";
 import { addMessageToChat, markMessagesAsRead } from "../slices/messageSlice";
-import { addEvent, updateEvent, deleteEvent } from "../slices/eventSlice";
+import {
+  addEvent,
+  updateEvent,
+  deleteEvent,
+  updateEventStatus,
+  updateEventCounts,
+  removeEventFromUserList,
+} from "../slices/eventSlice";
 
 const SocketContext = createContext();
 
@@ -113,6 +120,31 @@ export const SocketProvider = ({ children }) => {
     // Listen for deleted events
     newSocket.on("event-deleted", (eventId) => {
       dispatch(deleteEvent(eventId));
+    });
+
+    // Listen for user event status changes
+    newSocket.on("user-event-status-changed", (data) => {
+      dispatch(
+        updateEventStatus({
+          event: data.event,
+          status: data.status,
+          currentUserId: currentUserId,
+        })
+      );
+    });
+
+    // Listen for event removed
+    newSocket.on("event-removed", (data) => {
+      if (data.eventId) {
+        dispatch(removeEventFromUserList({ eventId: data.eventId }));
+        dispatch(
+          updateEventCounts({
+            eventId: data.eventId,
+            goingCount: data.goingCount,
+            interestedCount: data.interestedCount,
+          })
+        );
+      }
     });
 
     return () => {

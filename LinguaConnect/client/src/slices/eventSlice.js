@@ -8,13 +8,21 @@ export const eventSlice = createSlice({
   },
   reducers: {
     // Sets all events related to the current user
-    setUserEvents: (state, action) => {
-      state.userEvents = action.payload;
+    setAllEvents: (state, action) => {
+      state.allEvents = action.payload.map((event) => ({
+        ...event,
+        goingCount: event.going?.length || 0,
+        interestedCount: event.interested?.length || 0,
+      }));
     },
 
     // Sets all events fetched from the API
-    setAllEvents: (state, action) => {
-      state.allEvents = action.payload;
+    setUserEvents: (state, action) => {
+      state.userEvents = action.payload.map((event) => ({
+        ...event,
+        goingCount: event.going?.length || 0,
+        interestedCount: event.interested?.length || 0,
+      }));
     },
 
     // Adds an event and updates userEvents and allEvents as needed
@@ -53,6 +61,50 @@ export const eventSlice = createSlice({
       }
     },
 
+    // Adds an event with 'going' or 'interested' status to userEvents or updates its status
+    updateEventStatus: (state, action) => {
+      const { event, status, currentUserId } = action.payload;
+
+      // Find if the event already exists in userEvents
+      const eventIndex = state.userEvents.findIndex(
+        (userEvent) => userEvent._id === event._id
+      );
+
+      if (eventIndex !== -1) {
+        // Update the status of the existing event, only if it's not created by the current user
+        if (state.userEvents[eventIndex].createdBy._id !== currentUserId) {
+          state.userEvents[eventIndex].relationship = status;
+        }
+      } else {
+        // Add the event with the specified status
+        state.userEvents.push({ ...event, relationship: status });
+      }
+
+      // Update the counts for "going" and "interested" in allEvents
+      const allEventsIndex = state.allEvents.findIndex(
+        (e) => e._id === event._id
+      );
+      if (allEventsIndex !== -1) {
+        state.allEvents[allEventsIndex] = {
+          ...state.allEvents[allEventsIndex],
+          goingCount: event.goingCount,
+          interestedCount: event.interestedCount,
+        };
+      }
+    },
+
+    // Updates the "going" and "interested" counts for an event
+    updateEventCounts: (state, action) => {
+      const { eventId, goingCount, interestedCount } = action.payload;
+      const eventIndex = state.allEvents.findIndex(
+        (event) => event._id === eventId
+      );
+      if (eventIndex !== -1) {
+        state.allEvents[eventIndex].goingCount = goingCount;
+        state.allEvents[eventIndex].interestedCount = interestedCount;
+      }
+    },
+
     // Deletes an event from both userEvents and allEvents arrays
     deleteEvent: (state, action) => {
       const eventId = action.payload;
@@ -67,6 +119,14 @@ export const eventSlice = createSlice({
         (event) => event._id !== eventId
       );
     },
+
+    // Removes an event from the userEvents array
+    removeEventFromUserList: (state, action) => {
+      const eventId = action.payload;
+      state.userEvents = state.userEvents.filter(
+        (event) => event._id !== eventId
+      );
+    },
   },
 });
 
@@ -76,6 +136,9 @@ export const {
   addEvent,
   updateEvent,
   deleteEvent,
+  updateEventStatus,
+  updateEventCounts,
+  removeEventFromUserList,
 } = eventSlice.actions;
 
 // Selector to get events related to the current user

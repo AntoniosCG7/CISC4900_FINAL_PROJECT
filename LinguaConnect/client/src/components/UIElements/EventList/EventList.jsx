@@ -6,6 +6,7 @@ import {
   setUserEvents,
   updateEvent,
   deleteEvent,
+  removeEventFromUserList,
 } from "../../../slices/eventSlice";
 import { addAlert } from "../../../slices/alertSlice";
 import axios from "axios";
@@ -30,6 +31,7 @@ export const EventList = ({ selectedCategory, userId }) => {
   const [openModal, setOpenModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const dispatch = useDispatch();
@@ -91,6 +93,12 @@ export const EventList = ({ selectedCategory, userId }) => {
     handleCloseMenu();
   };
 
+  // Function to handle remove option
+  const handleRemove = () => {
+    setShowRemoveConfirm(true);
+    handleCloseMenu();
+  };
+
   // Function to confirm deletion of event
   const handleConfirmDelete = async () => {
     try {
@@ -100,9 +108,6 @@ export const EventList = ({ selectedCategory, userId }) => {
           withCredentials: true,
         }
       );
-      // dispatch(
-      //   setUserEvents(events.filter((event) => event._id !== selectedEvent._id))
-      // );
       dispatch(deleteEvent(selectedEvent._id));
       dispatch(
         addAlert({
@@ -114,6 +119,30 @@ export const EventList = ({ selectedCategory, userId }) => {
       setOpenModal(false);
     } catch (error) {
       console.error("Error deleting event:", error);
+    }
+  };
+
+  // Function to confirm removal of event from user's list
+  const handleConfirmRemove = async () => {
+    const eventId = selectedEvent._id;
+    try {
+      await axios.delete(
+        `http://localhost:3000/api/v1/events/removeEvent/${eventId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(removeEventFromUserList(eventId));
+
+      dispatch(
+        addAlert({
+          message: "Event removed from your list successfully",
+          type: "success",
+        })
+      );
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Error removing event:", error);
     }
   };
 
@@ -136,6 +165,14 @@ export const EventList = ({ selectedCategory, userId }) => {
 
     return date.toLocaleDateString("en-US", options);
   }
+
+  // Format Time to 12-hour format with AM/PM
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    const hoursIn12HourFormat = ((parseInt(hours) + 11) % 12) + 1;
+    const amPm = hours >= 12 ? "PM" : "AM";
+    return `${hoursIn12HourFormat}:${minutes} ${amPm}`;
+  };
 
   return (
     <>
@@ -198,7 +235,12 @@ export const EventList = ({ selectedCategory, userId }) => {
                 alignItems: "center",
               }}
             >
-              <Typography id="modal-modal-title" variant="h6" component="h2">
+              <Typography
+                id="modal-modal-title"
+                variant="h6"
+                component="h2"
+                sx={{ fontWeight: "bold" }}
+              >
                 {selectedEvent.title}
               </Typography>
               <IconButton
@@ -215,21 +257,30 @@ export const EventList = ({ selectedCategory, userId }) => {
               keepMounted
               open={Boolean(anchorEl)}
               onClose={handleCloseMenu}
-              sx={{ transform: "translateX( -70px)" }}
+              sx={{ transform: "translateX(-70px)" }}
             >
-              <MenuItem onClick={handleEdit}>Edit</MenuItem>
-              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+              {selectedEvent.relationship === "created" && (
+                <MenuItem onClick={handleEdit}>Edit</MenuItem>
+              )}
+              {selectedEvent.relationship === "created" && (
+                <MenuItem onClick={handleDelete}>Delete</MenuItem>
+              )}
+              {selectedEvent.relationship !== "created" && (
+                <MenuItem onClick={handleRemove}>Remove</MenuItem>
+              )}
             </Menu>
             <Typography sx={{ mt: 2 }}>{selectedEvent.description}</Typography>
-            <Typography sx={{ mt: 2 }}>
+            <Typography sx={{ mt: 2, fontWeight: "bold" }}>
               Date: {formatDateForDisplay(selectedEvent.date)}
             </Typography>
-            <Typography sx={{ mt: 2 }}>Time: {selectedEvent.time}</Typography>
-            <Typography sx={{ mt: 2 }}>
+            <Typography sx={{ mt: 2, fontWeight: "bold" }}>
+              Time: {formatTime(selectedEvent.time)}
+            </Typography>
+            <Typography sx={{ mt: 2, fontWeight: "bold" }}>
               Languages:{" "}
               {selectedEvent.languages.map((lang) => lang.name).join(", ")}
             </Typography>
-            <Typography sx={{ mt: 2 }}>
+            <Typography sx={{ mt: 2, fontWeight: "bold" }}>
               Location: {selectedEvent.location.address}
             </Typography>
             <Box
@@ -239,7 +290,9 @@ export const EventList = ({ selectedCategory, userId }) => {
                 mt: 2,
               }}
             >
-              <Typography sx={{ mr: 1 }}>Created by:</Typography>
+              <Typography sx={{ mr: 1, fontWeight: "bold" }}>
+                Hosted by:
+              </Typography>
               <Avatar
                 alt="Creator's Profile Picture"
                 src={selectedEvent.createdBy.profilePicture.url}
@@ -247,8 +300,8 @@ export const EventList = ({ selectedCategory, userId }) => {
                   navigate(`/profile/${selectedEvent.createdBy._id}`)
                 }
                 sx={{
-                  width: 36,
-                  height: 36,
+                  width: 56,
+                  height: 56,
                   cursor: "pointer",
                 }}
               />
@@ -331,6 +384,57 @@ export const EventList = ({ selectedCategory, userId }) => {
             </Button>
             <Button
               onClick={() => setShowDeleteConfirm(false)}
+              style={{ color: "#ffb500", fontWeight: 600 }}
+            >
+              No
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+
+      {/* Remove Confirmation Modal */}
+      <Modal
+        open={showRemoveConfirm}
+        onClose={() => setShowRemoveConfirm(false)}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: 800,
+            maxHeight: 800,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            borderRadius: 1,
+            boxShadow: 24,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography>
+            Are you sure you want to remove this event from your list?
+          </Typography>
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              onClick={() => {
+                handleConfirmRemove();
+                setShowRemoveConfirm(false);
+              }}
+              style={{
+                marginRight: "10px",
+                color: "#ffb500",
+                fontWeight: 600,
+              }}
+            >
+              Yes
+            </Button>
+            <Button
+              onClick={() => setShowRemoveConfirm(false)}
               style={{ color: "#ffb500", fontWeight: 600 }}
             >
               No

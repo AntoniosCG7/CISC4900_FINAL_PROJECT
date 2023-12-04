@@ -1,8 +1,5 @@
 .event-form-container {
-  background-color: var(--tertiary-color);
   padding: 5px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 330px;
   height: max-content;
   overflow-y: hidden;
