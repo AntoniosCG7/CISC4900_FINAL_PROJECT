@@ -92,10 +92,9 @@ const MyMap = ({ events }) => {
     setShowEventForm(true);
   };
 
-  // Get current user's location and set map center
-  useEffect(() => {
+  // Set map center to user's location
+  const fetchUserLocation = () => {
     setLoading(true);
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setMapCenter({
@@ -118,19 +117,20 @@ const MyMap = ({ events }) => {
         maximumAge: 0,
       }
     );
+  };
+
+  // Set map center to user's location on page load
+  useEffect(() => {
+    fetchUserLocation();
   }, [setLoading, userLocationFromDb]);
 
   // Update markers when event location changes
   useEffect(() => {
-    const newMarkers = {}; // Object to track markers by their event IDs
+    const newMarkers = {};
 
-    // Loop through each event
     events.forEach((event) => {
-      // Update or add a marker for each event
-      // If a marker with the same ID exists, it will be overwritten
-      // This ensures that each event ID has only one corresponding marker
       newMarkers[event._id] = {
-        id: event._id, // Unique identifier for the marker
+        id: event._id,
         position: {
           lat: event.location.coordinates[1],
           lng: event.location.coordinates[0],
@@ -145,8 +145,6 @@ const MyMap = ({ events }) => {
       };
     });
 
-    // Convert the markers object to an array and update the state
-    // This array will have the latest marker for each event
     setMarkers(Object.values(newMarkers));
   }, [events]);
 

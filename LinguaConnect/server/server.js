@@ -13,9 +13,15 @@ const port = process.env.PORT || 3000;
 // Import the Express application from the app.js file
 const app = require("./app");
 
+// Import the scheduled task for deleting past events
+const deletePastEvents = require("./utils/scheduledTasks");
+
 // Start the server and listen for incoming requests
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
+
+  // Start the scheduled task to delete past events
+  deletePastEvents();
 });
 
 // Import the Socket.io setup function and currentlyActiveUsers object

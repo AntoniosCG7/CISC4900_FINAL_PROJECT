@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const Language = require("../models/languageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const moment = require("moment");
 
 // Create a new event
 exports.createEvent = catchAsync(async (req, res, next) => {
@@ -59,7 +60,7 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
   const { title, description, date, time, location, languages } = req.body;
 
   // Convert language names to ObjectIds
-  const languageNames = languages; // Assuming languages is an array of strings
+  const languageNames = languages;
   const languageDocs = await Language.find({ name: { $in: languageNames } });
   const languageIds = languageDocs.map((doc) => doc._id);
 
@@ -213,9 +214,11 @@ exports.removeEventFromUserList = catchAsync(async (req, res, next) => {
 // Get all events related to a specific user
 exports.getUserEvents = catchAsync(async (req, res, next) => {
   const userId = req.params.userId;
+  const currentDate = moment().startOf("day").toDate();
 
   const userWithEvents = await User.findById(userId).populate({
     path: "events.event",
+    match: { date: { $gte: currentDate } }, // Filter out past events
     populate: [
       { path: "languages", model: "Language" },
       { path: "createdBy", model: "User" },
@@ -228,7 +231,12 @@ exports.getUserEvents = catchAsync(async (req, res, next) => {
     return next(new AppError("No user found with that ID", 404));
   }
 
-  const allUserEvents = userWithEvents.events.map((eventObj) => ({
+  // Filter out null events (in case an event was deleted but still referenced in the user's events)
+  const validUserEvents = userWithEvents.events.filter(
+    (eventObj) => eventObj.event
+  );
+
+  const allUserEvents = validUserEvents.map((eventObj) => ({
     ...eventObj.event._doc,
     relationship: eventObj.relationship,
     goingCount: eventObj.event.going.length,
@@ -243,11 +251,13 @@ exports.getUserEvents = catchAsync(async (req, res, next) => {
   });
 });
 
-// Get all events
+// Get all events happening today or later
 exports.getAllEvents = catchAsync(async (req, res, next) => {
-  const events = await Event.find().populate(
-    "languages createdBy going interested"
-  );
+  const currentDate = moment().startOf("day").toDate();
+
+  const events = await Event.find({
+    date: { $gte: currentDate },
+  }).populate("languages createdBy going interested");
 
   const eventsWithCounts = events.map((event) => ({
     ...event.toObject(),
