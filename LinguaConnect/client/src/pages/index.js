@@ -9,5 +9,6 @@ export { default as EditProfile } from "./EditProfile/EditProfile";
 export { default as PublicProfile } from "./PublicProfile/PublicProfile";
 export { default as Discover } from "./Discover/Discover";
 export { default as User } from "./User/User";
+export { default as UserSettings } from "./UserSettings/UserSettings";
 export { default as Chat } from "./Chat/Chat";
 export { default as Map } from "./Map/Map";

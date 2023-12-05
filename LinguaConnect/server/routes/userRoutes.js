@@ -34,6 +34,7 @@ router.patch(
   upload.fields([{ name: "profilePicture", maxCount: 1 }]),
   userController.updateMe
 ); // Update current user
+router.patch("/updateSettings", userController.updateUserSettings);
 router.post(
   "/uploadPhotos",
   upload.fields([{ name: "photos", maxCount: 10 }]),

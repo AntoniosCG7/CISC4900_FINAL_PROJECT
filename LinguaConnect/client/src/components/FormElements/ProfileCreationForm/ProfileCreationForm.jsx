@@ -167,6 +167,7 @@ function ProfileCreationForm() {
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
       backgroundColor: "#e0e0e0",
+      fontFamily: "var(--secondary-font-family)",
       fontSize: "20px",
       fontWeight: "bold",
       padding: "5px",

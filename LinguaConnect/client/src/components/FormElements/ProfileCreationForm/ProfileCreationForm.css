@@ -48,7 +48,7 @@
 .profile-creation-form .photos-section input,
 .profile-creation-form textarea,
 .profile-creation-form select {
-  font-family: var(--font-family);
+  font-family: var(--secondary-font-family);
   font-weight: bold;
   background-color: #e0e0e0;
   width: 100%;

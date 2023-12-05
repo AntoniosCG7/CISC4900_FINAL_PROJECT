@@ -239,6 +239,7 @@ const ProfileEditForm = () => {
       border: "3px solid var(--primary-color)",
       boxShadow: "none",
       backgroundColor: "#e0e0e0",
+      fontFamily: "var(--secondary-font-family)",
       fontSize: "1.2rem",
       fontWeight: "bold",
       padding: "5px",

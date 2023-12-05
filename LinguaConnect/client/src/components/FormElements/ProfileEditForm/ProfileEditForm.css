@@ -32,7 +32,6 @@
   margin-bottom: 10px;
 }
 
-.form-container .username-email-section input,
 .form-container .name-section input,
 .form-container .date-of-birth-section input,
 .form-container .location-section input,
@@ -41,7 +40,7 @@
 .form-container .profile-picture-section input,
 .form-container textarea,
 .form-container select {
-  font-family: var(--font-family);
+  font-family: var(--secondary-font-family);
   font-size: 1.2rem;
   background-color: #e0e0e0;
   width: 100%;
@@ -53,7 +52,6 @@
   transition: all 0.3s ease-in-out;
 }
 
-.form-container .username-email-section input:focus,
 .form-container .name-section input:focus,
 .form-container .date-of-birth-section input:focus,
 .form-container .location-section input:focus,

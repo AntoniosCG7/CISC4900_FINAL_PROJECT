@@ -298,6 +298,35 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+// Update user settings
+exports.updateUserSettings = catchAsync(async (req, res, next) => {
+  const { username, email } = req.body;
+
+  if (!req.user.id) {
+    return next(new AppError("User not found.", 404));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { username, email },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
 // Upload user photos
 exports.uploadUserPhotos = catchAsync(async (req, res, next) => {
   if (!req.files.photos) {

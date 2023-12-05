@@ -17,6 +17,7 @@ import {
   EditProfile,
   PublicProfile,
   User,
+  UserSettings,
   Chat,
   Map,
   Discover,
@@ -71,6 +72,17 @@ function App() {
                 <SocketProvider>
                   <ProtectedRoute
                     component={EditProfile}
+                    profileRequired={true}
+                  />
+                </SocketProvider>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <SocketProvider>
+                  <ProtectedRoute
+                    component={UserSettings}
                     profileRequired={true}
                   />
                 </SocketProvider>
