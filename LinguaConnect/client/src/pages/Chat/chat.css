@@ -37,7 +37,7 @@
   font-weight: bold;
   display: flex;
   align-items: center;
-  padding: 15px 40px 15px 10px;
+  padding: 15px 40px 15px 20px;
   width: 95%;
   margin: 20px auto;
   background-color: var(--tertiary-color);
@@ -58,24 +58,6 @@
 .chat-search:focus {
   outline: none;
   box-shadow: 0 1px 10px 3px rgba(0, 0, 0, 0.5);
-}
-
-.chat-search-icon {
-  color: grey;
-  position: absolute;
-  right: 25px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  fill: var(--quinary-color);
-  z-index: 10;
-  transition: transform 0.3s ease;
-}
-
-.chat-search-icon.clicked {
-  transform: translateY(-50%) rotate(-20deg);
 }
 
 .active-users {

@@ -27,7 +27,6 @@ import {
   faFaceLaughBeam,
   faPaperPlane,
   faEllipsis,
-  faMagnifyingGlass,
   faSquareCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
@@ -372,15 +371,6 @@ const Chat = () => {
     setSidebarVisible(!isSidebarVisible);
   };
 
-  // Toggle the search icon's clicked state
-  const handleIconClick = () => {
-    setIconClicked(!iconClicked);
-
-    setTimeout(() => {
-      setIconClicked(false);
-    }, 300);
-  };
-
   // Handle emoji selection
   const handleEmojiSelect = (emoji) => {
     setMessage((prevMessage) => prevMessage + emoji.native);
@@ -464,11 +454,6 @@ const Chat = () => {
               placeholder="Search for a chat..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className={`chat-search-icon ${iconClicked ? "clicked" : ""}`}
-              onClick={handleIconClick}
             />
           </div>
 

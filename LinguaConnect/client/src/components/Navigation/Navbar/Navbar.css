@@ -118,10 +118,10 @@ a.logo:hover {
     position: absolute;
     top: 100%;
     right: -100%;
-    width: 200px;
-    height: 200px;
-    background-color: var(--secondary-color);
-    color: #ffffff;
+    width: 180px;
+    height: 180px;
+    border: 2px solid var(--secondary-color);
+    background-color: var(--tertiary-color);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -131,9 +131,10 @@ a.logo:hover {
 
   .navbar li a {
     display: block;
-    margin: 18px 0;
+    margin: 15px 0;
     padding: 0px 30px;
     transition: all 0.5s ease;
+    color: var(--secondary-color);
   }
 
   .navbar li a::after {

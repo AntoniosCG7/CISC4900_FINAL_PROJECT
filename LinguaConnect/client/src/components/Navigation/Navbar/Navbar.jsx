@@ -67,9 +67,9 @@ const Navbar = () => {
   return (
     <>
       <header className="header">
-        <Link to="/home" className="logo">
+        <a className="logo" onClick={(e) => e.preventDefault()}>
           <img src={logo} alt="logo" className="rotate-vert-center" />
-        </Link>
+        </a>
 
         <ul className={`navbar ${isMenuOpen ? "open" : ""}`}>
           {isAuthenticated ? (

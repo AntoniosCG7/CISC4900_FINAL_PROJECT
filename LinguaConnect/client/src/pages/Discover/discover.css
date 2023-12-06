@@ -4,3 +4,30 @@
   gap: 50px;
   max-width: 100%;
 }
+
+.discover-search-bar {
+  font-family: var(--secondary-font-family);
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 20px 40px 20px 40px;
+  width: 80%;
+  margin-bottom: 2rem;
+  background-color: var(--tertiary-color);
+  color: var(--secondary-color);
+  border: 1px solid var(--quinary-color);
+  border-radius: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.discover-search-bar::placeholder {
+  color: var(--quinary-color);
+  font-style: italic;
+}
+
+.discover-search-bar:focus {
+  outline: none;
+  box-shadow: 0 1px 10px 3px rgba(0, 0, 0, 0.5);
+}

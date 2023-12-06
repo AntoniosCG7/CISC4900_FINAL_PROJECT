@@ -187,6 +187,10 @@ const MyMap = ({ events }) => {
             position={marker.position}
             onClick={() => handleMarkerClick(marker)}
             animation={google.maps.Animation.DROP}
+            icon={{
+              url: "public/assets/images/marker.png",
+              scaledSize: new google.maps.Size(60, 60),
+            }}
           />
         ))}
       </GoogleMap>
