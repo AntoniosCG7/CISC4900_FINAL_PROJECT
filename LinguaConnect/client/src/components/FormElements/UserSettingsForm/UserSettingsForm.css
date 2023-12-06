@@ -1,3 +1,10 @@
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.1rem 14%;
+}
+
 .settings-form-container {
   font-size: 1.4rem;
   display: flex;

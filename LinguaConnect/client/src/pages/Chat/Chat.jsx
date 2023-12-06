@@ -446,7 +446,9 @@ const Chat = () => {
     <>
       <div className="chat-page">
         <div className="chat-sidebar">
-          <MiniNavBar />
+          <div className="mini-navbar-container">
+            <MiniNavBar />
+          </div>
           <div className="chat-search-wrapper">
             <input
               className="chat-search"

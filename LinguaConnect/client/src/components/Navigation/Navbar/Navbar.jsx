@@ -9,8 +9,10 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { faUserPen } from "@fortawesome/free-solid-svg-icons";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
-import "./Navbar.css";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
 import logo from "/assets/images/logo-white.png";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -103,17 +105,17 @@ const Navbar = () => {
 
         {isAuthenticated ? (
           <div className="navbar_buttons">
-            <img
-              src={
-                user.profilePicture
-                  ? user.profilePicture.url
-                  : "client/public/assets/images/Default.png"
-              }
-              alt="User Profile"
-              className="user-avatar"
-              ref={userAvatarRef}
-              onClick={toggleUserDropdown}
-            />
+            <IconButton onClick={toggleUserDropdown} sx={{ p: 0 }}>
+              <Avatar
+                alt={user.firstName}
+                src={
+                  user.profilePicture
+                    ? user.profilePicture.url
+                    : "client/public/assets/images/Default.png"
+                }
+                sx={{ width: 80, height: 80, border: "3px solid #fff" }}
+              />
+            </IconButton>
             <div
               ref={userMenuRef}
               className={`user-menu ${isUserDropdownOpen ? "open" : ""}`}

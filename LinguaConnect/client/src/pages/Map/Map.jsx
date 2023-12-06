@@ -42,6 +42,7 @@ const Map = () => {
           "& .MuiDrawer-paper": {
             width: "20%",
             backgroundColor: "var(--primary-color)",
+            overflow: "hidden",
           },
         }}
         variant="permanent"

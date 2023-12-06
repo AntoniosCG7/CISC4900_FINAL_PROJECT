@@ -16,6 +16,10 @@
   color: var(--secondary-color);
 }
 
+.mini-navbar-container {
+  position: relative;
+}
+
 .profile-photo {
   width: 60px;
   height: 60px;

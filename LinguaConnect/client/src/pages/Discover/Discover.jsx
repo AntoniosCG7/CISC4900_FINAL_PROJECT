@@ -27,7 +27,6 @@ const Discover = () => {
           (user) =>
             user._id !== currentUser._id && user.profileCompleted === true
         );
-        console.log("Users to display:", usersToDisplay);
         setUsers(usersToDisplay);
       } catch (error) {
         console.error("Error fetching users:", error);

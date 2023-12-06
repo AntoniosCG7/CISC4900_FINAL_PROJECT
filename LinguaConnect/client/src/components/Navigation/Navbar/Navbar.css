@@ -118,32 +118,37 @@ a.logo:hover {
     position: absolute;
     top: 100%;
     right: -100%;
-    width: 180px;
+    width: 165px;
     height: 180px;
     border: 2px solid var(--secondary-color);
     background-color: var(--tertiary-color);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-around;
     border-radius: 0.4rem;
     transition: all 0.5s;
   }
 
   .navbar li a {
+    margin: 0;
     display: block;
-    margin: 15px 0;
-    padding: 0px 30px;
+    width: 100%;
+    border-bottom: 1px solid var(--secondary-color);
+    padding: 16px 20px;
     transition: all 0.5s ease;
     color: var(--secondary-color);
   }
 
+  .navbar li:last-child a {
+    border-bottom: none;
+  }
+
   .navbar li a::after {
-    height: 0px;
+    display: none;
   }
 
   .navbar li a:hover {
     color: var(--primary-color);
-    transform: translateY(-3px);
   }
 
   .navbar li a:active {
@@ -161,15 +166,6 @@ a.logo:hover {
   #register-btn {
     margin-right: 0.6rem;
   }
-}
-
-.user-avatar {
-  border: 3px solid var(--tertiary-color);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.5s ease all;
 }
 
 .user-menu {
