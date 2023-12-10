@@ -1,9 +1,12 @@
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
+const Event = require("../models/eventModel");
 const Language = require("../models/languageModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { cloudinary } = require("../cloudinary");
+const mongoose = require("mongoose");
 
 // Get all users
 exports.getAllUsers = catchAsync(async (req, res, next) => {
@@ -132,20 +135,6 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser,
     },
-  });
-});
-
-// Delete a user
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndDelete(req.params.id);
-
-  if (!user) {
-    return next(new AppError("No user found with that ID", 404));
-  }
-
-  res.status(204).json({
-    status: "success",
-    data: null,
   });
 });
 
@@ -412,15 +401,45 @@ exports.deleteUserPhoto = catchAsync(async (req, res, next) => {
     .json({ status: "success", message: "Photo deleted successfully." });
 });
 
-// Perform a "soft delete" on the current user
+// Delete the current user
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, { active: false });
+  const userId = req.params.id;
 
-  // 204 status code means "No Content"
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
+  // Delete all related data when a user account is deleted.
+  // Start a session to perform transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Use the session to delete the user and associated events
+    const user = await User.findByIdAndDelete(userId).session(session);
+
+    if (!user) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new AppError("No user found with that ID", 404));
+    }
+
+    // Delete all data associated with the user
+    await Event.deleteMany({ createdBy: userId }).session(session);
+    await Chat.deleteMany({ user1: userId }).session(session);
+    await Chat.deleteMany({ user2: userId }).session(session);
+    await Message.deleteMany({ sender: userId }).session(session);
+    await Message.deleteMany({ recipient: userId }).session(session);
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    return next(new AppError("Error occurred during deletion process", 500));
+  }
 });
 
 // Create a user profile
@@ -520,16 +539,18 @@ exports.createProfile = catchAsync(async (req, res, next) => {
 // Get all active users
 exports.getActiveChatUsers = catchAsync(
   async (req, res, next) => {
-    // Get the user ID from the request object (set by the protect middleware which is called before this handler)
     const userId = req.user.id;
 
     if (!userId) {
       return next(new AppError("User not authenticated", 401));
     }
 
-    // Get chats where the user is either user1 or user2
+    // Get chats where the user is either user1 or user2, and the chat is not deleted by this user
     const chats = await Chat.find({
-      $or: [{ user1: userId }, { user2: userId }],
+      $or: [
+        { user1: userId, deletedByUser1: { $ne: true } },
+        { user2: userId, deletedByUser2: { $ne: true } },
+      ],
     });
 
     // Extract the user IDs
@@ -537,7 +558,7 @@ exports.getActiveChatUsers = catchAsync(
       chat.user1.toString() === userId.toString() ? chat.user2 : chat.user1
     );
 
-    // Now fetch these users who are active
+    // Fetch active users from these user IDs
     const activeChatUsers = await User.find({
       _id: { $in: chatUserIds },
       currentlyActive: true,

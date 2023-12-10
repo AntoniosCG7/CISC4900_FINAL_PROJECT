@@ -42,16 +42,12 @@ router.post(
 ); // Upload photos to current user
 router.post("/deletePhoto", userController.deleteUserPhoto); // Delete photo from current user
 router.patch("/updatePassword", authController.updatePassword); // Update user password
-router.delete("/deleteMe", userController.deleteMe); // Delete current user
-// router.get("/me/events", userController.myEvents); // Get events user has joined or created
+router.delete("/deleteMe/:id", userController.deleteMe); // Delete current user
 
 // From here on, all routes require admin authorization
 router.use(authController.restrictTo("admin"));
 
 // ADMIN ROUTES (Only admins can access these routes)
-router
-  .route("/:id")
-  .patch(userController.updateUser) // Update a user by ID
-  .delete(userController.deleteUser); // Delete a user by ID
+router.route("/:id").patch(userController.updateUser); // Update a user by ID
 
 module.exports = router;

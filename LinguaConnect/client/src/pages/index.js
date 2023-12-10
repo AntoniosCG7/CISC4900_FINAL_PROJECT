@@ -3,6 +3,8 @@ export { default as About } from "./About/About";
 export { default as Contact } from "./Contact/Contact";
 export { default as Login } from "./Login/Login";
 export { default as Register } from "./Register/Register";
+export { default as ForgotPassword } from "./ForgotPassword/ForgotPassword";
+export { default as ResetPassword } from "./ResetPassword/ResetPassword";
 export { default as ProfileCreation } from "./ProfileCreation/ProfileCreation";
 export { default as PersonalProfile } from "./PersonalProfile/PersonalProfile";
 export { default as EditProfile } from "./EditProfile/EditProfile";

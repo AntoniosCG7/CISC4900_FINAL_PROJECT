@@ -228,6 +228,16 @@ a.logo:hover {
   margin-right: 10px;
 }
 
+@media (max-width: 1080px) {
+  .user-menu.open {
+    right: -60px;
+  }
+
+  .user-menu::before {
+    left: 89px;
+  }
+}
+
 @media (max-width: 700px) {
   #login-btn,
   #register-btn {

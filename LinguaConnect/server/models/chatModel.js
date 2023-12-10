@@ -17,13 +17,23 @@ const chatSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    deletedByUser1: {
+      type: Boolean,
+      default: false,
+    },
+    deletedByUser2: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
 // Middleware to update 'lastMessageTimestamp' on save
 chatSchema.pre("save", function (next) {
-  this.lastMessageTimestamp = Date.now();
+  if (!this.isModified("lastMessageTimestamp")) {
+    this.lastMessageTimestamp = Date.now();
+  }
   next();
 });
 

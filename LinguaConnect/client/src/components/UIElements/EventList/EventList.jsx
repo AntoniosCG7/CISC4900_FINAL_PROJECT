@@ -371,24 +371,26 @@ export const EventList = ({ selectedCategory, userId }) => {
           }}
         >
           <Typography>Are you sure you want to delete this event?</Typography>
-          <div style={{ marginTop: "20px" }}>
+          <Box
+            sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+          >
             <Button
-              onClick={handleConfirmDelete}
-              style={{
-                marginRight: "10px",
-                color: "#ffb500",
-                fontWeight: 600,
-              }}
-            >
-              Yes
-            </Button>
-            <Button
+              variant="contained"
+              color="error"
               onClick={() => setShowDeleteConfirm(false)}
-              style={{ color: "#ffb500", fontWeight: 600 }}
+              sx={{ width: "130px" }}
             >
-              No
+              NO
             </Button>
-          </div>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleConfirmDelete}
+              sx={{ width: "130px" }}
+            >
+              YES
+            </Button>
+          </Box>
         </Box>
       </Modal>
 
@@ -419,27 +421,29 @@ export const EventList = ({ selectedCategory, userId }) => {
           <Typography>
             Are you sure you want to remove this event from your list?
           </Typography>
-          <div style={{ marginTop: "20px" }}>
+          <Box
+            sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+          >
             <Button
+              variant="contained"
+              color="error"
+              onClick={() => setShowRemoveConfirm(false)}
+              sx={{ width: "130px" }}
+            >
+              NO
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
               onClick={() => {
                 handleConfirmRemove();
                 setShowRemoveConfirm(false);
               }}
-              style={{
-                marginRight: "10px",
-                color: "#ffb500",
-                fontWeight: 600,
-              }}
+              sx={{ width: "130px" }}
             >
-              Yes
+              YES
             </Button>
-            <Button
-              onClick={() => setShowRemoveConfirm(false)}
-              style={{ color: "#ffb500", fontWeight: 600 }}
-            >
-              No
-            </Button>
-          </div>
+          </Box>
         </Box>
       </Modal>
     </>

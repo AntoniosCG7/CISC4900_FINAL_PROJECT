@@ -59,12 +59,15 @@ exports.createChat = catchAsync(async (req, res, next) => {
   next(); // Pass control to the next middleware
 });
 
-// Get all chats for a user
+// Get all chats for a user excluding deleted chats
 exports.listChatsForUser = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
 
   const chats = await Chat.find({
-    $or: [{ user1: userId }, { user2: userId }],
+    $or: [
+      { user1: userId, deletedByUser1: { $ne: true } },
+      { user2: userId, deletedByUser2: { $ne: true } },
+    ],
   })
     .sort({ lastMessageTimestamp: -1 }) // Sorting by lastMessageTimestamp in descending order
     .populate({
@@ -156,9 +159,10 @@ exports.getChat = catchAsync(async (req, res, next) => {
   res.status(200).json(chat);
 });
 
-// Delete a chat
+// Delete a chat for a user (soft delete)
 exports.deleteChat = catchAsync(async (req, res, next) => {
   const { chatId } = req.params;
+  const requestingUserId = req.user._id; // Assuming you have the user's ID here
 
   const chat = await Chat.findById(chatId);
 
@@ -166,6 +170,19 @@ exports.deleteChat = catchAsync(async (req, res, next) => {
     return next(new AppError("Chat not found.", 404));
   }
 
-  await chat.remove();
-  res.status(204).send();
+  // Soft delete the chat for the requesting user
+  if (chat.user1.toString() === requestingUserId.toString()) {
+    chat.deletedByUser1 = true;
+  } else if (chat.user2.toString() === requestingUserId.toString()) {
+    chat.deletedByUser2 = true;
+  } else {
+    return next(new AppError("User not part of the chat.", 403));
+  }
+
+  await chat.save();
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });

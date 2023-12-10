@@ -12,6 +12,8 @@ import {
   Contact,
   Login,
   Register,
+  ForgotPassword,
+  ResetPassword,
   ProfileCreation,
   PersonalProfile,
   EditProfile,
@@ -49,6 +51,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* Protected Routes */}
             <Route

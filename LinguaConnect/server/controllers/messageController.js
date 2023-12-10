@@ -1,4 +1,5 @@
 const Message = require("../models/messageModel");
+const Chat = require("../models/chatModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -22,6 +23,12 @@ exports.createTextMessage = catchAsync(async (req, res, next) => {
     delivered: Date.now(),
   });
 
+  // Reset deleted status for both users in the chat
+  await Chat.findByIdAndUpdate(chat, {
+    deletedByUser1: false,
+    deletedByUser2: false,
+  });
+
   // Populate the sender and chat using a query
   const populatedMessage = await Message.findById(newMessage._id)
     .populate("sender", "firstName lastName _id")
@@ -29,6 +36,7 @@ exports.createTextMessage = catchAsync(async (req, res, next) => {
 
   // Set the populated message and the action type in res.locals
   res.locals.message = populatedMessage;
+  res.locals.chat = populatedMessage.chat;
   res.locals.action = "messageSent";
   res.locals.success = true;
 
@@ -55,6 +63,12 @@ exports.createImageMessage = catchAsync(async (req, res, next) => {
     sender,
     imageUrl,
     delivered: Date.now(),
+  });
+
+  // Reset deleted status for both users in the chat
+  await Chat.findByIdAndUpdate(chat, {
+    deletedByUser1: false,
+    deletedByUser2: false,
   });
 
   // Populate the sender and chat using a query

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProfileImageUpload from "../ProfileImageUpload/ProfileImageUpload";
 import LocationsAutocomplete from "../LocationsAutocomplete/LocationsAutocomplete";
-import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
 import { authError, setUserOnAuthentication } from "../../../slices/authSlice";
 import { useLoading } from "../../../contexts/LoadingContext";
+import { Button } from "@mui/material";
 import "./ProfileCreationForm.css";
 
 function ProfileCreationForm() {
@@ -182,6 +183,8 @@ function ProfileCreationForm() {
         : state.isFocused
         ? "var(--primary-color)"
         : null,
+      fontFamily: "var(--secondary-font-family)",
+      fontWeight: "bold",
       cursor: "pointer",
     }),
     multiValue: (base) => ({
@@ -376,10 +379,24 @@ function ProfileCreationForm() {
               name="profilePicture"
             />
           </fieldset>
-
-          <button type="submit" className="profile-creation-button">
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "var(--secondary-color)",
+              width: "100%",
+              padding: "10px 0",
+              "&:hover": {
+                color: "var(--secondary-color)",
+                backgroundColor: "var(--primary-color)",
+                boxShadow: "0 0 30px var(--primary-color)",
+              },
+            }}
+          >
             Create Profile
-          </button>
+          </Button>
         </form>
       </div>
     </>

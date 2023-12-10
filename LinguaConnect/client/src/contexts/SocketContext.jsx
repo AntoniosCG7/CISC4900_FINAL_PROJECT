@@ -107,9 +107,16 @@ export const SocketProvider = ({ children }) => {
       }, 5000);
     });
 
-    // listen for new events
+    // Listen for new events
     newSocket.on("new-event-created", (event) => {
       dispatch(addEvent({ event: event, currentUserId: currentUserId }));
+      if (event.createdBy._id === currentUserId) return;
+      dispatch(
+        addAlert({
+          type: "info",
+          message: `A new event has been created by ${event.createdBy.firstName} ${event.createdBy.lastName}! 😃🥳🎉`,
+        })
+      );
     });
 
     // Listen for updated events
@@ -118,8 +125,17 @@ export const SocketProvider = ({ children }) => {
     });
 
     // Listen for deleted events
-    newSocket.on("event-deleted", (eventId) => {
+    newSocket.on("event-deleted", (event) => {
+      const { eventId, eventTitle, eventCreatorId } = event;
       dispatch(deleteEvent(eventId));
+
+      if (eventCreatorId === currentUserId) return;
+      dispatch(
+        addAlert({
+          type: "info",
+          message: `The event "${eventTitle}" has been deleted 😢.`,
+        })
+      );
     });
 
     // Listen for user event status changes
@@ -131,6 +147,15 @@ export const SocketProvider = ({ children }) => {
           currentUserId: currentUserId,
         })
       );
+
+      if (data.event.createdBy._id === currentUserId) {
+        dispatch(
+          addAlert({
+            type: "info",
+            message: `${data.user.firstName} ${data.user.lastName} has marked their status as ${data.status} for the event "${data.event.title}".`,
+          })
+        );
+      }
     });
 
     // Listen for event removed
@@ -144,6 +169,15 @@ export const SocketProvider = ({ children }) => {
             interestedCount: data.interestedCount,
           })
         );
+
+        if (data.event.createdBy === currentUserId) {
+          dispatch(
+            addAlert({
+              type: "info",
+              message: `Someone has removed your event "${data.event.title}" from their list.`,
+            })
+          );
+        }
       }
     });
 
@@ -189,6 +223,12 @@ export const SocketProvider = ({ children }) => {
       } else {
         // Increment the unread message count for the chat if the chat is not currently open
         dispatch(incrementUnreadCount(message.chat._id));
+        dispatch(
+          addAlert({
+            type: "info",
+            message: `${message.sender.firstName} ${message.sender.lastName} has sent you a message!`,
+          })
+        );
       }
     };
 

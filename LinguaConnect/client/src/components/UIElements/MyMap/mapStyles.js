@@ -23,7 +23,7 @@ const mapStyles = [
     featureType: "administrative",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -39,7 +39,7 @@ const mapStyles = [
     featureType: "poi.attraction",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -59,7 +59,7 @@ const mapStyles = [
     featureType: "poi.business",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -75,7 +75,7 @@ const mapStyles = [
     featureType: "poi.place_of_worship",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -83,7 +83,7 @@ const mapStyles = [
     featureType: "poi.school",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -91,7 +91,7 @@ const mapStyles = [
     featureType: "poi.sports_complex",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -126,7 +126,7 @@ const mapStyles = [
         color: "#ffffff",
       },
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -135,7 +135,7 @@ const mapStyles = [
     elementType: "labels.icon",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
@@ -160,12 +160,21 @@ const mapStyles = [
     elementType: "labels.icon",
     stylers: [
       {
-        visibility: "off",
+        visibility: "on",
       },
     ],
   },
   {
     featureType: "poi",
+    elementType: "labels.icon",
+    stylers: [
+      {
+        visibility: "on",
+      },
+    ],
+  },
+  {
+    featureType: "poi.medical",
     elementType: "labels.icon",
     stylers: [
       {
@@ -298,6 +307,23 @@ const mapStyles = [
     stylers: [
       {
         visibility: "simplified",
+      },
+    ],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "labels.text.fill",
+    stylers: [{ visibility: "on" }, { color: "#898a8f" }],
+  },
+  {
+    featureType: "road.local",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        lightness: "-37",
+      },
+      {
+        color: "#898a8f",
       },
     ],
   },

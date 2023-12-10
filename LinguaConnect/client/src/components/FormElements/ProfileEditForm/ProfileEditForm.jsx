@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { addAlert } from "../../../slices/alertSlice";
 import { authError, updateUser } from "../../../slices/authSlice";
 import PicturesWall from "../PicturesWall/PicturesWall";
+import { Button } from "@mui/material";
 import { useLoading } from "../../../contexts/LoadingContext";
 import "./ProfileEditForm.css";
 
@@ -254,6 +255,8 @@ const ProfileEditForm = () => {
         : state.isFocused
         ? "var(--primary-color)"
         : null,
+      fontFamily: "var(--secondary-font-family)",
+      fontWeight: "bold",
       cursor: "pointer",
     }),
     multiValue: (base) => ({
@@ -416,10 +419,24 @@ const ProfileEditForm = () => {
               required
             />
           </fieldset>
-
-          <button type="submit" className="update-profile-button">
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "var(--secondary-color)",
+              width: "100%",
+              padding: "10px 0",
+              "&:hover": {
+                color: "var(--secondary-color)",
+                backgroundColor: "var(--primary-color)",
+                boxShadow: "0 0 30px var(--primary-color)",
+              },
+            }}
+          >
             Update Profile
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -436,9 +453,24 @@ const ProfileEditForm = () => {
               />
             </div>
           </fieldset>
-          <button type="submit" className="upload-delete-photos-button">
-            Save
-          </button>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            sx={{
+              fontWeight: "bold",
+              backgroundColor: "var(--secondary-color)",
+              width: "100%",
+              padding: "10px 0",
+              "&:hover": {
+                color: "var(--secondary-color)",
+                backgroundColor: "var(--primary-color)",
+                boxShadow: "0 0 30px var(--primary-color)",
+              },
+            }}
+          >
+            Update Photos
+          </Button>
         </form>
       </div>
     </div>

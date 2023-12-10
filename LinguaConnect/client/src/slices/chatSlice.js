@@ -56,6 +56,17 @@ const chatSlice = createSlice({
       state.chats.unshift(chat); // Adds chat at the start of the array
     },
 
+    // Action to delete a chat
+    deleteChat: (state, action) => {
+      const chatId = action.payload;
+      const chatIndex = state.chats.findIndex((chat) => chat._id === chatId);
+
+      // If chat is found, remove it from the array
+      if (chatIndex > -1) {
+        state.chats.splice(chatIndex, 1);
+      }
+    },
+
     // Action to set all chats
     setChats: (state, action) => {
       state.chats = action.payload;
@@ -180,6 +191,7 @@ const chatSlice = createSlice({
 
 export const {
   addChat,
+  deleteChat,
   setChats,
   incrementUnreadCount,
   setCurrentChat,

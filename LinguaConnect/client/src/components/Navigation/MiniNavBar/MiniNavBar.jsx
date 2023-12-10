@@ -11,7 +11,6 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { logoutUser } from "../../../slices/authSlice";
 import { resetChatState } from "../../../slices/chatSlice";
 import { addAlert } from "../../../slices/alertSlice";
-import logo from "/assets/images/logo-white.png";
 import "./MiniNavBar.css";
 
 const MiniNavBar = () => {
@@ -69,20 +68,6 @@ const MiniNavBar = () => {
   return (
     <>
       <div className="mini-navbar">
-        <a className="mini-navbar-logo" onClick={(e) => e.preventDefault()}>
-          <img src={logo} alt="logo" className="rotate-vert-center" />
-        </a>
-        <ul className="mini-nav-options">
-          <li>
-            <Link to="/discover">Discover</Link>
-          </li>
-          <li>
-            <Link to="/chat">Chat</Link>
-          </li>
-          <li>
-            <Link to="/map">Map</Link>
-          </li>
-        </ul>
         <IconButton onClick={toggleUserDropdown} sx={{ p: 0 }}>
           <Avatar
             alt={user.firstName}
@@ -94,6 +79,19 @@ const MiniNavBar = () => {
             sx={{ width: 60, height: 60, border: "3px solid #fff" }}
           />
         </IconButton>
+        <div className="mini-nav-options-container">
+          <ul className="mini-nav-options">
+            <li>
+              <Link to="/discover">Discover</Link>
+            </li>
+            <li>
+              <Link to="/chat">Chat</Link>
+            </li>
+            <li>
+              <Link to="/map">Map</Link>
+            </li>
+          </ul>
+        </div>
         <div
           ref={userMenuRef}
           className={`mini-navbar-user-menu ${

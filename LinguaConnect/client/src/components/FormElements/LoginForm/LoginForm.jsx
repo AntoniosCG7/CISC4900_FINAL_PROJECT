@@ -53,19 +53,29 @@ const LoginForm = () => {
 
       if (response.data.status === "success") {
         const user = response.data.data.user;
+        const firstName = user.firstName;
+        const username = user.username;
+        const isProfileCompleted = user.profileCompleted;
+
         dispatch(setUserOnAuthentication(user));
         dispatch(resetLoggedOut());
-        const firstName = user.firstName;
-        dispatch(
-          addAlert({
-            message: `Welcome, ${firstName}!`,
-            type: "success",
-          })
-        );
-        if (!user.profileCompleted) {
-          navigate("/create-profile");
-        } else {
+
+        if (isProfileCompleted) {
           navigate("/discover");
+          dispatch(
+            addAlert({
+              message: `Welcome back, ${firstName}!`,
+              type: "success",
+            })
+          );
+        } else {
+          navigate("/create-profile");
+          dispatch(
+            addAlert({
+              message: `Welcome back, ${username}! Please complete your profile.`,
+              type: "success",
+            })
+          );
         }
       } else {
         dispatch(
@@ -128,6 +138,14 @@ const LoginForm = () => {
                   Don't have an account?{" "}
                   <Link to="/register" className="register-link">
                     Sign Up
+                  </Link>
+                </p>
+              </div>
+              <div className="forgot-password">
+                <p>
+                  Forgot your password?{" "}
+                  <Link to="/forgot-password" className="forgot-password-link">
+                    Reset it
                   </Link>
                 </p>
               </div>

@@ -11,6 +11,7 @@ import {
   clearCurrentChat,
   moveChatToTop,
   updateRecentMessage,
+  deleteChat,
 } from "./../../slices/chatSlice";
 import {
   addMessageToChat,
@@ -22,6 +23,7 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, Carousel } from "antd";
+import { Modal as MuiModal, Button, Box, Typography } from "@mui/material";
 import {
   faFileImage,
   faFaceLaughBeam,
@@ -46,7 +48,6 @@ const Chat = () => {
     selectMessagesByChatId(state, currentChat?._id)
   );
   const messagesContainerRef = useRef(null);
-  const [iconClicked, setIconClicked] = useState(false);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiButtonRef = useRef(null);
@@ -54,6 +55,9 @@ const Chat = () => {
   const [modalImageUrl, setModalImageUrl] = useState(null);
   const [isSharedMediaVisible, setSharedMediaVisible] = useState(false);
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
+  const [isChatDeleteModalOpen, setIsChatDeleteModalOpen] = useState(false);
+  const handleOpenChatDeleteModal = () => setIsChatDeleteModalOpen(true);
+  const handleCloseChatDeleteModal = () => setIsChatDeleteModalOpen(false);
   const carouselRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -320,6 +324,33 @@ const Chat = () => {
     }
   };
 
+  // Delete a chat
+  const handleDeleteChat = async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3000/api/v1/chats/${currentChat._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 204) {
+        // Clear the current chat
+        dispatch(clearCurrentChat());
+
+        // Remove the chat from the Redux store
+        dispatch(deleteChat(currentChat._id));
+
+        // Close the modal
+        setIsChatDeleteModalOpen(false);
+      } else {
+        console.error("Failed to delete the chat.");
+      }
+    } catch (error) {
+      console.error("Error deleting the chat:", error);
+    }
+  };
+
   // Scroll to the bottom of the messages list when the image is loaded
   const handleImageLoad = () => {
     if (messagesContainerRef.current) {
@@ -440,6 +471,21 @@ const Chat = () => {
     leave: { opacity: 0, transform: "translateY(10%)" },
   });
 
+  const modalStyle = {
+    position: "absolute",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 500,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 1,
+  };
+
   if (!currentUser) return <div>Loading...</div>;
 
   return (
@@ -518,8 +564,8 @@ const Chat = () => {
                             : ""}
                           {chat.recentMessage.imageUrl
                             ? "Sent a Photo."
-                            : chat.recentMessage.content.length > 35
-                            ? chat.recentMessage.content.substring(0, 32) +
+                            : chat.recentMessage.content.length > 27
+                            ? chat.recentMessage.content.substring(0, 24) +
                               "..."
                             : chat.recentMessage.content}
                         </span>
@@ -835,7 +881,70 @@ const Chat = () => {
                       </animated.div>
                     )
                 )}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "auto",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleOpenChatDeleteModal}
+                    style={{
+                      fontWeight: 600,
+                    }}
+                  >
+                    Delete Chat
+                  </Button>
+                </Box>
               </div>
+              <MuiModal
+                open={isChatDeleteModalOpen}
+                onClose={handleCloseChatDeleteModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={modalStyle}>
+                  <Typography
+                    id="modal-modal-title"
+                    variant="h6"
+                    component="h2"
+                  >
+                    Confirm Chat Deletion
+                  </Typography>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    Are you sure you want to delete this chat? This action
+                    cannot be undone.
+                  </Typography>
+                  <Box
+                    sx={{
+                      mt: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={handleCloseChatDeleteModal}
+                      sx={{ width: "130px" }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={handleDeleteChat}
+                      sx={{ width: "130px" }}
+                    >
+                      Confirm
+                    </Button>
+                  </Box>
+                </Box>
+              </MuiModal>
             </>
           ) : (
             <>

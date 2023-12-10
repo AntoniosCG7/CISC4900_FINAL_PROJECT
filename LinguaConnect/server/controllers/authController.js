@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const sendEmail = require("../utils/email");
+const Email = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const crypto = require("crypto");
@@ -62,6 +62,9 @@ exports.register = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  // Send a welcome email to the new user
+  await new Email(newUser).sendWelcome(newUser.username);
 
   // Log the user in by sending them a JWT token
   createSendToken(newUser, 201, req, res);
@@ -139,24 +142,21 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 5. Construct the full URL for the password reset endpoint that includes the generated token as a parameter.
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/resetPassword/${resetToken}`;
-
-  const message = `You recently requested a password reset. Please submit a PATCH request with your new password to: ${resetURL}.\nIf you didn't request a password reset, please ignore this email.`;
+  const frontEndHost =
+    process.env.NODE_ENV === "production"
+      ? "linguaconnect.co"
+      : "localhost:5173";
+  const resetURL = `${req.protocol}://${frontEndHost}/reset-password/${resetToken}`;
 
   // 6. Attempt to send the password reset email to the user.
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 minutes)",
-      message,
-    });
+    // Create a new instance of the Email class and send the password reset email
+    await new Email(user, resetURL).sendPasswordReset(user.username, resetURL);
 
     // 7. If email is successfully sent, respond to client indicating success.
     res.status(200).json({
       status: "success",
-      message: "Password reset token sent to email.",
+      message: "Password reset email sent successfully.",
     });
   } catch (err) {
     // Nullify the reset token and expiration in the user's document to ensure security.
@@ -187,6 +187,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }, // Ensure the reset token's expiration time is still in the future.
   });
+
+  if (!user) {
+    return next(new AppError("Token is invalid or has expired.", 400));
+  }
 
   // 3. Update the user's password with the new password from the request body, and clear out the reset token and its expiration.
   user.password = req.body.password;

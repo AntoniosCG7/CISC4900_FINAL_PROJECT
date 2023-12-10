@@ -1,28 +1,45 @@
-const nodemailer = require("nodemailer");
-const catchAsync = require("./catchAsync");
+const postmark = require("postmark");
 
-// Define a function for sending emails
-const sendEmail = catchAsync(async (options) => {
-  // Create a new nodemailer transporter with the provided email settings
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
+module.exports = class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstName = user.firstName;
+    this.url = url;
+    this.from = `LinguaConnect <${process.env.EMAIL_FROM}>`;
+    this.client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
+  }
 
-  // Define the email options
-  const mailOptions = {
-    from: "LinguaConnect <linguaconnect@gmail.com>",
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-  };
+  async send(subject, textBody) {
+    await this.client.sendEmail({
+      From: this.from,
+      To: this.to,
+      Subject: subject,
+      TextBody: textBody,
+    });
+  }
 
-  // Send the email using the transporter and the mail options
-  await transporter.sendMail(mailOptions);
-});
+  async sendWelcome(username) {
+    await this.client.sendEmailWithTemplate({
+      From: this.from,
+      To: this.to,
+      TemplateAlias: "welcome",
+      TemplateModel: {
+        username: username,
+        product_name: "LinguaConnect",
+      },
+    });
+  }
 
-module.exports = sendEmail;
+  async sendPasswordReset(username, actionUrl) {
+    await this.client.sendEmailWithTemplate({
+      From: this.from,
+      To: this.to,
+      TemplateAlias: "password-reset",
+      TemplateModel: {
+        username: username,
+        product_name: "LinguaConnect",
+        action_url: actionUrl,
+      },
+    });
+  }
+};

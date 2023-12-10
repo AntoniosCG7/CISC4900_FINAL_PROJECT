@@ -12,7 +12,7 @@ import MapAutocompleteSearchBox from "../../FormElements/MapAutocompleteSearchBo
 import { useLoading } from "../../../contexts/LoadingContext";
 import axios from "axios";
 import EventDetails from "../EventDetails/EventDetails";
-// import mapStyles from "./mapStyles";
+import mapStyles from "./mapStyles";
 
 const containerStyle = {
   width: "100%",
@@ -21,7 +21,6 @@ const containerStyle = {
 
 const MyMap = ({ events }) => {
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
   const mapRef = useRef(null);
   const [mapCenter, setMapCenter] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -31,11 +30,10 @@ const MyMap = ({ events }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const options = useMemo(
     () => ({
-      mapId: MAP_ID,
       disableDefaultUI: true,
       clickableIcons: false,
       zoomControl: true,
-      // styles: mapStyles,
+      styles: mapStyles,
     }),
     []
   );
@@ -189,7 +187,7 @@ const MyMap = ({ events }) => {
             animation={google.maps.Animation.DROP}
             icon={{
               url: "public/assets/images/marker.png",
-              scaledSize: new google.maps.Size(60, 60),
+              scaledSize: new google.maps.Size(80, 80),
             }}
           />
         ))}

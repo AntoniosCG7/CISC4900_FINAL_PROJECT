@@ -167,13 +167,14 @@ const handleUserEventStatusUpdate = async (res) => {
 
 // Emit event removal to all connected users
 const handleEventRemoval = async (res) => {
-  const { eventId } = res.locals;
+  const { eventId, event } = res.locals;
 
   // Fetch the updated event to get the latest 'going' and 'interested' counts
   const updatedEvent = await Event.findById(eventId);
 
   if (res.locals.success && updatedEvent) {
     ioData.io.emit("event-removed", {
+      event: event,
       eventId: eventId,
       goingCount: updatedEvent.going.length,
       interestedCount: updatedEvent.interested.length,
@@ -186,10 +187,12 @@ const handleEventRemoval = async (res) => {
 // Emit event deletion to all connected users
 const handleEventDeletion = async (res) => {
   const eventId = res.locals.eventId;
+  const eventTitle = res.locals.eventTitle;
+  const eventCreatorId = res.locals.eventCreatorId;
 
   // Check if event deletion was successful
   if (res.locals.success && eventId) {
-    ioData.io.emit("event-deleted", eventId);
+    ioData.io.emit("event-deleted", { eventId, eventCreatorId, eventTitle });
   }
 
   res.status(204).send();

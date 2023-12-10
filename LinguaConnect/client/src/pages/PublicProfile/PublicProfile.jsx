@@ -9,8 +9,8 @@ import { addAlert } from "./../../slices/alertSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Carousel } from "antd";
+import { Button } from "@mui/material";
 import { useLoading } from "../../contexts/LoadingContext";
-import "./PublicProfile.css";
 
 const PublicProfile = () => {
   const [otherUser, setOtherUser] = useState(null);
@@ -137,12 +137,23 @@ const PublicProfile = () => {
         </h2>
         {currentUser._id !== otherUser._id && (
           <div>
-            <button
-              id="chat-initiation-btn"
+            <Button
+              variant="contained"
+              color="success"
               onClick={() => initiateChat(otherUser._id)}
+              sx={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                color: "var(--tertiary-color)",
+                backgroundColor: "var(--secondary-color)",
+                border: "3px solid var(--tertiary-color)",
+                width: "100%",
+                marginBottom: "2rem",
+                animation: "wobble-hor-bottom 8s infinite both",
+              }}
             >
               Chat with {otherUser.firstName}
-            </button>
+            </Button>
           </div>
         )}
         <div className="profile-details">

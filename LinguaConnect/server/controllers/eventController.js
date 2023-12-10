@@ -161,19 +161,23 @@ exports.updateUserEventStatus = catchAsync(async (req, res, next) => {
 
 // Delete an event
 exports.deleteEvent = catchAsync(async (req, res, next) => {
-  const event = await Event.findByIdAndDelete(req.params.id);
-
-  // Delete the event from the user's events array
-  await User.findByIdAndUpdate(req.user._id, {
-    $pull: { events: { event: event._id } },
-  });
+  const eventId = req.params.id;
+  const event = await Event.findByIdAndDelete(eventId);
 
   if (!event) {
     return next(new AppError("No event found with that ID", 404));
   }
 
+  // Remove the event from the events array of all users who have it
+  await User.updateMany(
+    { events: { $elemMatch: { event: eventId } } },
+    { $pull: { events: { event: eventId } } }
+  );
+
   // Store the deleted event ID and action type in res.locals
-  res.locals.eventId = req.params.id;
+  res.locals.eventId = eventId;
+  res.locals.eventCreatorId = event.createdBy._id;
+  res.locals.eventTitle = event.title;
   res.locals.action = "deleted";
   res.locals.success = true;
 
