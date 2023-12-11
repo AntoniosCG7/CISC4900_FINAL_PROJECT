@@ -1,17 +1,37 @@
 import React from "react";
-import { Navbar } from "../../components";
+import {
+  Navbar,
+  HeroSection,
+  AboutFeatures,
+  FeaturePreviews,
+  AboutSection,
+  ContactForm,
+  Footer,
+} from "../../components";
 import "./Home.css";
 
 const Home = () => {
   return (
     <>
       <Navbar />
-      <div className="main-container">
-        {/* <img src={heroImage} alt="hero-image" className="hero-image" /> */}
+      <div id="home-section">
+        <HeroSection />
       </div>
-      <footer>
-        <p>&copy; {new Date().getFullYear()} Your Company Name</p>
-      </footer>
+      <div className="theme">
+        <div className="about-features-container">
+          <AboutFeatures />
+        </div>
+        <div className="feature-previews-container">
+          <FeaturePreviews />
+        </div>
+        <div className="about-section-container" id="about-section">
+          <AboutSection />
+        </div>
+        <div className="contact-container" id="contact-section">
+          <ContactForm />
+        </div>
+        <Footer />
+      </div>
     </>
   );
 };

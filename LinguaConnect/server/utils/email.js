@@ -42,4 +42,18 @@ module.exports = class Email {
       },
     });
   }
+
+  async sendContactForm(name, userEmail, message) {
+    await this.client.sendEmailWithTemplate({
+      From: this.from,
+      To: this.to,
+      TemplateAlias: "contact-form-submission",
+      TemplateModel: {
+        name: name,
+        email: userEmail,
+        message: message,
+        product_name: "LinguaConnect",
+      },
+    });
+  }
 };

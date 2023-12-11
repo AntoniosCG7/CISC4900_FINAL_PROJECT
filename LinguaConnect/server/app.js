@@ -14,6 +14,7 @@ const chatRouter = require("./routes/chatRoutes");
 const messageRouter = require("./routes/messageRoutes");
 const eventRouter = require("./routes/eventRoutes");
 const languageRouter = require("./routes/languageRoutes");
+const emailRouter = require("./routes/emailRoutes");
 
 // Create a new Express application
 const app = express();
@@ -73,6 +74,7 @@ app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/languages", languageRouter);
+app.use("/api/v1/emails", emailRouter);
 
 // Handle errors when API route is not found
 app.all("*", (req, res, next) => {

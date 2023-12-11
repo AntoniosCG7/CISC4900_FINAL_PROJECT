@@ -8,8 +8,6 @@ import Alert from "./components/UIElements/Alert/Alert";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import {
   Home,
-  About,
-  Contact,
   Login,
   Register,
   ForgotPassword,
@@ -42,13 +40,12 @@ function App() {
             draggable
             pauseOnHover
             theme="colored"
+            style={{ width: "350px", fontSize: "1rem" }}
           />
           <Routes>
             {/* Public routes */}
             <Route index element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

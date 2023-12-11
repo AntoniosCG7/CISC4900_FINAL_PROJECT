@@ -1,0 +1,23 @@
+.hero-section {
+  position: relative;
+  text-align: center;
+  padding: 300px 0;
+  width: 100%;
+  height: 100%;
+  margin-top: 5rem;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("public/assets/images/hero-image.webp");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9) blur(0.1px);
+  z-index: -1;
+}

@@ -10,6 +10,8 @@ import {
   authError,
   startLoading,
 } from "../../../slices/authSlice";
+import IconButton from "@mui/material/IconButton";
+import HomeIcon from "@mui/icons-material/Home";
 import "./LoginForm.css";
 
 const LoginForm = () => {
@@ -103,6 +105,17 @@ const LoginForm = () => {
   return (
     <>
       <div className="body">
+        <div className="home-icon">
+          <IconButton
+            sx={{
+              color: "var(--secondary-color)",
+            }}
+            component={Link}
+            to="/"
+          >
+            <HomeIcon />
+          </IconButton>
+        </div>
         <div className="login-form">
           <div className="login-form-container">
             <h1 className="login-form-title">Login</h1>

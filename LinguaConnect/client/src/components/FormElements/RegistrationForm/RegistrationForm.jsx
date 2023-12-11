@@ -9,7 +9,8 @@ import {
   startLoading,
   setUserOnAuthentication,
 } from "../../../slices/authSlice";
-
+import IconButton from "@mui/material/IconButton";
+import HomeIcon from "@mui/icons-material/Home";
 import "./RegistrationForm.css";
 
 const RegistrationForm = () => {
@@ -127,6 +128,17 @@ const RegistrationForm = () => {
   return (
     <>
       <div className="body">
+        <div className="home-icon">
+          <IconButton
+            sx={{
+              color: "var(--secondary-color)",
+            }}
+            component={Link}
+            to="/"
+          >
+            <HomeIcon />
+          </IconButton>
+        </div>
         <div className="register-form">
           <div className="register-form-container">
             <h1 className="register-form-title">Register</h1>

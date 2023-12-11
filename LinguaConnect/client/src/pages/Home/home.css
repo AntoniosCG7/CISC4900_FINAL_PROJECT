@@ -1,0 +1,23 @@
+.theme {
+  background-color: var(--tertiary-color);
+}
+
+.about-features-container,
+.about-section-container {
+  padding: 0.1rem 14%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.feature-previews-container {
+  padding: 0.1rem 14%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  background-color: var(--primary-color);
+}
+
+.contact-container {
+  padding: 0.1rem 14%;
+  background-color: var(--primary-color);
+  margin-top: 2rem;
+}

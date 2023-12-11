@@ -89,15 +89,15 @@ const Navbar = () => {
           ) : (
             <>
               <li>
-                <Link to="/home" className="active">
+                <a href="#home-section" className="active">
                   Home
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/about">About Us</Link>
+                <a href="#about-section">About Me</a>
               </li>
               <li>
-                <Link to="/contact">Contact</Link>
+                <a href="#contact-section">Contact</a>
               </li>
             </>
           )}
